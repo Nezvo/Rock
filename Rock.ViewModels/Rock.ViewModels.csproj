@@ -53,6 +53,14 @@
     <Compile Include="Blocks\Cms\AdaptiveMessageDetail\AdaptiveMessageBag.cs" />
     <Compile Include="Blocks\Cms\AdaptiveMessageDetail\AdaptiveMessageDetailOptionsBag.cs" />
     <Compile Include="Blocks\Cms\AdaptiveMessageList\AdaptiveMessageListOptionsBag.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\OnSiteCoordinatorAttributeModel.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\OnSiteCoordinatorProjectModel.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\ProjectAttributesModel.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\ProjectTimeOfDay.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\InitializationBox.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\MatchingScoreModel.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\OnSiteCoordinatorResponseBag.cs" />
+    <Compile Include="Blocks\OscMatching\MatchingTool\ProjectResponseBag.cs" />
     <Compile Include="Blocks\Cms\PageRouteList\PageRouteListOptionsBag.cs" />
     <Compile Include="Blocks\Core\RestActionList\RestActionListOptionsBag.cs" />
     <Compile Include="Blocks\Crm\PersonMergeRequestList\PersonMergeRequestListOptionsBag.cs" />
@@ -663,6 +671,5 @@
       <Name>Rock.Enums</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
