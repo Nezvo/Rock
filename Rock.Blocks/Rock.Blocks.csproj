@@ -104,6 +104,7 @@
     <Compile Include="Core\ScheduledJobHistoryList.cs" />
     <Compile Include="Finance\FinancialPersonBankAccountList.cs" />
     <Compile Include="Finance\FinancialScheduledTransactionList.cs" />
+    <Compile Include="OscMatching\MatchingTool.cs" />
     <Compile Include="Tv\AppleTvPageList.cs" />
     <Compile Include="Cms\PageShortLinkClickList.cs" />
     <Compile Include="Cms\PageShortLinkList.cs" />
