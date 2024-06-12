@@ -169,6 +169,7 @@
     <Content Include="src\Group\Scheduling\GroupScheduleToolbox\signUpOccurrence.partial.obs" />
     <Content Include="src\Group\Scheduling\GroupScheduleToolbox\signUpOccurrenceDate.partial.obs" />
     <Content Include="src\Group\Scheduling\GroupScheduleToolbox\updatePreferences.partial.obs" />
+    <Content Include="src\OscMatching\matchingTool.obs" />
     <Content Include="src\Prayer\prayerRequestDetail.obs" />
     <Content Include="src\Prayer\PrayerRequestDetail\editPanel.partial.obs" />
     <Content Include="src\Prayer\PrayerRequestDetail\viewPanel.partial.obs" />
@@ -359,6 +360,7 @@
     <Folder Include="src\Group\Scheduling\" />
     <Folder Include="src\Group\Scheduling\GroupScheduler\" />
     <Folder Include="src\Group\Scheduling\GroupScheduleToolbox\" />
+    <Folder Include="src\OscMatching\" />
     <Folder Include="src\Prayer\" />
     <Folder Include="src\Prayer\PrayerRequestDetail\" />
     <Folder Include="src\Finance\FinancialPledgeDetail\" />

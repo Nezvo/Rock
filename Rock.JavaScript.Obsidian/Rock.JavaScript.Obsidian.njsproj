@@ -398,6 +398,8 @@
     <Folder Include="Framework\ViewModels\Blocks\Group\Scheduling\" />
     <Folder Include="Framework\ViewModels\Blocks\Group\Scheduling\GroupScheduler\" />
     <Folder Include="Framework\ViewModels\Blocks\Group\Scheduling\GroupScheduleToolbox\" />
+    <Folder Include="Framework\ViewModels\Blocks\OscMatching\" />
+    <Folder Include="Framework\ViewModels\Blocks\OscMatching\MatchingTool\" />
     <Folder Include="Framework\ViewModels\Blocks\Prayer\" />
     <Folder Include="Framework\ViewModels\Blocks\Prayer\PrayerRequestDetail\" />
     <Folder Include="Framework\ViewModels\Blocks\Prayer\PrayerRequestEntry\" />
@@ -1031,6 +1033,9 @@
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Group\Scheduling\GroupScheduleToolbox\signUpOccurrenceBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Group\Scheduling\GroupScheduleToolbox\signUpOccurrenceLocationBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Group\Scheduling\GroupScheduleToolbox\signUpsBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\OscMatching\MatchingTool\initializationBox.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\OscMatching\MatchingTool\onSiteCoordinatorResponseBag.d.ts" />
+    <TypeScriptCompile Include="Framework\ViewModels\Blocks\OscMatching\MatchingTool\projectResponseBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Prayer\PrayerRequestDetail\prayerRequestBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Prayer\PrayerRequestDetail\prayerRequestDetailAddPersonResponseBag.d.ts" />
     <TypeScriptCompile Include="Framework\ViewModels\Blocks\Prayer\PrayerRequestDetail\prayerRequestDetailOptionsBag.d.ts" />
