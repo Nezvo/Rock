@@ -154,7 +154,7 @@ namespace Rock.Blocks.OscMatching
 
     #endregion
 
-    public class MatchingTool : RockBlockType
+    public class MatchingTool : ObsidianBlockPlugin
     {
         #region Constants
 
