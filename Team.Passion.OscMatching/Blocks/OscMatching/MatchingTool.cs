@@ -19,7 +19,7 @@ namespace Rock.Blocks.OscMatching
     /// <summary>
     /// OSC Matching Tool.
     /// </summary>
-    /// <seealso cref="RockBlockType" />
+    /// <seealso cref="RockPluginBlockType" />
 
     [DisplayName("OSC Matching Tool")]
     [Category("OSC Matching")]
@@ -154,7 +154,7 @@ namespace Rock.Blocks.OscMatching
 
     #endregion
 
-    public class MatchingTool : RockBlockType
+    public class MatchingTool : RockPluginBlockType
     {
         #region Constants
 
