@@ -23,6 +23,8 @@ using System.Reflection;
 
 using EntityFramework.Utilities;
 
+using Microsoft.EntityFrameworkCore;
+
 using Rock.Data;
 
 namespace Rock.Model
@@ -162,12 +164,12 @@ SET [SundayDateYear] = YEAR([SundayDate]);";
                 try
                 {
                     // if TRUNCATE takes more than 5 seconds, it is probably due to a lock. If so, do a DELETE FROM instead
-                    rockContext.Database.CommandTimeout = 5;
+                    rockContext.Database.SetCommandTimeout( 5 );
                     rockContext.Database.ExecuteSqlCommand( string.Format( "TRUNCATE TABLE {0}", typeof( AnalyticsSourceDate ).GetCustomAttribute<TableAttribute>().Name ) );
                 }
                 catch
                 {
-                    rockContext.Database.CommandTimeout = null;
+                    rockContext.Database.SetCommandTimeout( null );
                     rockContext.Database.ExecuteSqlCommand( string.Format( "DELETE FROM {0}", typeof( AnalyticsSourceDate ).GetCustomAttribute<TableAttribute>().Name ) );
                 }
             }

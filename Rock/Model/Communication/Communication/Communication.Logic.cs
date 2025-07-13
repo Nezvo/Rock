@@ -24,6 +24,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
+using Microsoft.EntityFrameworkCore;
+
 using Rock.Communication;
 using Rock.Data;
 using Rock.Observability;
@@ -933,7 +935,7 @@ INNER JOIN @DuplicateRecipients dr
                             Reason: Communications with a large number of recipients time out and don't send.
                             https://github.com/SparkDevNetwork/Rock/issues/5651
                         */
-                        rockContext.Database.CommandTimeout = 90;
+                        rockContext.Database.SetCommandTimeout( 90 );
 
                         if ( communication.ListGroupId.HasValue )
                         {
@@ -1003,7 +1005,7 @@ INNER JOIN @DuplicateRecipients dr
                             Reason: Communications with a large number of recipients time out and don't send.
                             https://github.com/SparkDevNetwork/Rock/issues/5651
                         */
-                        rockContext.Database.CommandTimeout = 90;
+                        rockContext.Database.SetCommandTimeout( 90 );
 
                         if ( communication.ListGroupId.HasValue )
                         {
