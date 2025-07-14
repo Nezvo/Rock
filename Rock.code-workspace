@@ -228,8 +228,11 @@
 				},
 				"isBackground": true,
 				"problemMatcher": {
-					"base": "$vite",
+                    "pattern": {
+                        "regexp": ""
+                    },
 					"background": {
+                        "activeOnStart": true,
 						"beginsPattern": "^rollup v",
 						"endsPattern": "waiting for changes\\.\\.\\.$"
 					}
@@ -250,8 +253,11 @@
 				},
 				"isBackground": true,
 				"problemMatcher": {
-					"base": "$vite",
+                    "pattern": {
+                        "regexp": ""
+                    },
 					"background": {
+                        "activeOnStart": true,
 						"beginsPattern": "^rollup v",
 						"endsPattern": "waiting for changes\\.\\.\\.$"
 					}
@@ -272,8 +278,11 @@
 				},
 				"isBackground": true,
 				"problemMatcher": {
-					"base": "$vite",
+                    "pattern": {
+                        "regexp": ""
+                    },
 					"background": {
+                        "activeOnStart": true,
 						"beginsPattern": "^rollup v",
 						"endsPattern": "waiting for changes\\.\\.\\.$"
 					}
