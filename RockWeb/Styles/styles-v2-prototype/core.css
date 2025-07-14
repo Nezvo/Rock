@@ -30170,11 +30170,13 @@ tbody .collapse.in {
   filter: none;
 }
 
-.fa-spin {
+.fa-spin,
+.ti-spin {
   animation: fa-spin 2s infinite linear;
 }
 
-.fa-pulse {
+.fa-pulse,
+.ti-pulse {
   animation: fa-spin 1s infinite steps(8);
 }
 
