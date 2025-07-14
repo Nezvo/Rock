@@ -10692,6 +10692,13 @@ ul ul, ol ul, ul ol, ol ol {
   margin-left: var(--spacing-tiny);
 }
 
+.panel.panel-body-flush > .panel-body {
+  padding: 0;
+}
+.panel.panel-body-flush > .panel-body .actions:last-of-type {
+  margin: inherit;
+}
+
 .panel-block {
   position: relative;
   display: -ms-flexbox;
