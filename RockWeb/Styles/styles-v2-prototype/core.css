@@ -8536,6 +8536,18 @@ ul ul, ol ul, ul ol, ol ol {
   background-color: inherit;
 }
 
+.panel-worksurface .panel-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.panel-worksurface .panel-scrollable-content {
+  flex-grow: 1;
+  overflow: clip auto;
+}
+
 .paneleditor-label {
   float: left;
 }
@@ -8629,6 +8641,16 @@ ul ul, ol ul, ul ol, ol ol {
 
 .panel-headerimage {
   margin: -15px -15px 15px -15px;
+}
+
+.panel-footer-content {
+  padding: var(--panel-body-padding);
+  background: var(--color-interface-softer);
+  border-top: 1px solid var(--color-interface-soft);
+}
+
+.panel-sidebar-footer-content {
+  grid-column: 1/span 4;
 }
 
 .popover {
