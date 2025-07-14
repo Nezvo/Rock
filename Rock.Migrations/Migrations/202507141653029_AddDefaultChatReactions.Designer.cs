@@ -7,13 +7,13 @@ namespace Rock.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddChatReactionDefinedType : IMigrationMetadata
+    public sealed partial class AddDefaultChatReactions : IMigrationMetadata
     {
         private readonly ResourceManager Resources = new ResourceManager(typeof(AddCommunicationFlowModels));
         
         string IMigrationMetadata.Id
         {
-            get { return "202507112259516_AddChatReactionDefinedType"; }
+            get { return "202507141653029_AddDefaultChatReactions"; }
         }
         
         string IMigrationMetadata.Source

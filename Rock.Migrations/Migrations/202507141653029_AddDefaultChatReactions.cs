@@ -1,10 +1,37 @@
-﻿namespace Rock.Migrations
+﻿// <copyright>
+// Copyright by the Spark Development Network
+//
+// Licensed under the Rock Community License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.rockrms.com/license
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// </copyright>
+//
+namespace Rock.Migrations
 {
-    public partial class AddChatReactionDefinedType : Rock.Migrations.RockMigration
+    /// <summary>
+    /// A migration that adds the default Chat Reactions defined type with the populated values.
+    /// </summary>
+    public partial class AddDefaultChatReactions : Rock.Migrations.RockMigration
     {
-        private readonly string _textReactionGuid = "C3F37466-CBC4-44FD-9ACF-1FE79DFC0B56";
+        /// <summary>
+        /// A guid for the text reaction attribute.
+        /// </summary>
+        private readonly string _textReactionGuid = "C3F37466-CBC4-44FD-9ACF-1FE79DFC0B56";  
+
+        /// <summary>
+        /// The guid for the image reaction attribute.
+        /// </summary>
         private readonly string _imageReactionGuid = "86ECA0E7-440D-463C-A2AE-2F1F5674E1F8";
 
+        /// <inheritdoc />
         public override void Up()
         {
             // 1) Create the defined type
@@ -78,6 +105,7 @@
             );
         }
 
+        /// <inheritdoc />
         public override void Down()
         {
             // Remove defined values in reverse order
