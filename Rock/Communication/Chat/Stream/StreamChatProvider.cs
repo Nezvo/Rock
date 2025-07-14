@@ -3460,6 +3460,7 @@ namespace Rock.Communication.Chat
                     PushNotifications = true,
                     Blocklist = null,
                     BlocklistBehavior = null,
+                    Quotes = true,
                     Commands = new List<string> { "giphy" }
                 };
             }
