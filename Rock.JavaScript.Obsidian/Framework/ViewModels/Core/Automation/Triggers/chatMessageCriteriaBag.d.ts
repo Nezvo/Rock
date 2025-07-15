@@ -25,15 +25,9 @@ import { ChatMessageCriteriaRuleBag } from "@Obsidian/ViewModels/Core/Automation
 
 /** The criteria used to determine if a chat message should trigger. */
 export type ChatMessageCriteriaBag = {
-    /**
-     * Determines if all rules must match or if any one matching rule is
-     * sufficient to trigger the events.
-     */
+    /** Gets or sets whether all rules must match or if any one matching rule is sufficient to trigger the events. */
     areAllRulesRequired: boolean;
 
-    /**
-     * The list of rules that will be used to determine if the chat message
-     * matches this criteria.
-     */
+    /** Gets or sets the list of rules that will be used to determine if the chat message matches this criteria. */
     rules?: ChatMessageCriteriaRuleBag[] | null;
 };

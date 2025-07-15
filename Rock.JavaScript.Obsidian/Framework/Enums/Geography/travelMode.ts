@@ -21,14 +21,26 @@
 // </copyright>
 //
 
-/**
- * The options that can be passed to the GetComponents API action of
- * the ComponentPicker control.
- */
-export type ComponentPickerGetComponentsOptionsBag = {
-    /** Type of the container the components are within */
-    containerType?: string | null;
+/** Represents the mode of travel for distance calculations. */
+export const TravelMode = {
+    /** Travel by driving a vehicle. */
+    Drive: 0,
 
-    /**  Gets or sets a value indicating whether inactive components are included. (Defaults to false.) */
-    includeInactive: boolean;
+    /** Travel by walking. */
+    Walk: 1,
+
+    /** Travel by riding a bicycle. */
+    Bicycle: 2
+} as const;
+
+/** Represents the mode of travel for distance calculations. */
+export const TravelModeDescription: Record<number, string> = {
+    0: "Drive",
+
+    1: "Walk",
+
+    2: "Bicycle"
 };
+
+/** Represents the mode of travel for distance calculations. */
+export type TravelMode = typeof TravelMode[keyof typeof TravelMode];

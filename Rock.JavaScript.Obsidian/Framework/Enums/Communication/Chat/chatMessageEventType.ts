@@ -21,14 +21,21 @@
 // </copyright>
 //
 
-/**
- * The options that can be passed to the GetComponents API action of
- * the ComponentPicker control.
- */
-export type ComponentPickerGetComponentsOptionsBag = {
-    /** Type of the container the components are within */
-    containerType?: string | null;
+/** The types of chat messages events that can be reported by the external chat system. */
+export const ChatMessageEventType = {
+    /** A new message was added. */
+    New: 0,
 
-    /**  Gets or sets a value indicating whether inactive components are included. (Defaults to false.) */
-    includeInactive: boolean;
+    /** An existing message was updated. */
+    Update: 1
+} as const;
+
+/** The types of chat messages events that can be reported by the external chat system. */
+export const ChatMessageEventTypeDescription: Record<number, string> = {
+    0: "New",
+
+    1: "Update"
 };
+
+/** The types of chat messages events that can be reported by the external chat system. */
+export type ChatMessageEventType = typeof ChatMessageEventType[keyof typeof ChatMessageEventType];

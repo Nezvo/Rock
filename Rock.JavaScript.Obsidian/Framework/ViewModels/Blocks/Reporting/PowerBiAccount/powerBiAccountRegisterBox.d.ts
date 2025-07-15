@@ -21,14 +21,10 @@
 // </copyright>
 //
 
-/**
- * The options that can be passed to the GetComponents API action of
- * the ComponentPicker control.
- */
-export type ComponentPickerGetComponentsOptionsBag = {
-    /** Type of the container the components are within */
-    containerType?: string | null;
+import { PowerBiAccountRegisterOptionsBag } from "@Obsidian/ViewModels/Blocks/Reporting/PowerBiAccount/powerBiAccountRegisterOptionsBag";
 
-    /**  Gets or sets a value indicating whether inactive components are included. (Defaults to false.) */
-    includeInactive: boolean;
+/** The initialization data for the Power BI Account Register block. */
+export type PowerBiAccountRegisterBox = {
+    /** Gets or sets the options for the block. */
+    options?: PowerBiAccountRegisterOptionsBag | null;
 };

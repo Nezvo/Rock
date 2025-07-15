@@ -438,6 +438,7 @@ You may have noticed that distance values are returned in meters. If you're more
         /// </summary>
         /// <param name="groupQuery"></param>
         /// <param name="options"></param>
+        /// <param name="childElements"></param>
         /// <returns></returns>
         private IQueryable<GroupLocation> ApplyFilters( IQueryable<GroupLocation> groupQuery, Options options, List<ChildBlockElement> childElements )
         {

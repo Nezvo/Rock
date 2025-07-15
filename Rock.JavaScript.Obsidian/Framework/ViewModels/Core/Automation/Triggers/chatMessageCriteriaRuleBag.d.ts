@@ -26,18 +26,18 @@ import { Guid } from "@Obsidian/Types";
 
 /** A single rule that is used to determine if a chat message should trigger the events. */
 export type ChatMessageCriteriaRuleBag = {
-    /** The criteria value to use when qualifying incoming chat messages for a triggered event. */
+    /** Gets or sets the criteria value to use to determine if a chat message should trigger the events. */
     criteriaValue?: string | null;
 
-    /** The friendly criteria value to display to the individual in the UI. */
+    /** Gets or sets the friendly criteria value to display to the individual when administering this rule in the UI. */
     friendlyCriteriaValue?: string | null;
 
     /**
-     * A unique identifier for this rule. This is used to identify the
-     * rule in the UI and not used for any other purpose.
+     * Gets or sets a unique identifier for this rule. This is used to identify the rule in the UI and not used for
+     * any other purpose.
      */
     guid: Guid;
 
-    /** The type of rule to use when qualifying incoming chat messages for a triggered event. */
+    /** Gets or sets the type of rule to use to determine if a chat message should trigger the events. */
     ruleType: ChatMessageCriteriaRuleType;
 };
