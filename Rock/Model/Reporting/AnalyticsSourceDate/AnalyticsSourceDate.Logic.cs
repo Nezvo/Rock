@@ -141,7 +141,7 @@ SET [SundayDateYear] = YEAR([SundayDate]);";
         /// <param name="fiscalStartMonth">The fiscal start month.</param>
         /// <param name="date">The date.</param>
         /// <returns></returns>
-        [Obsolete("Use the new GetFiscalYear method signature below.")]
+        [RockObsolete("Use the new GetFiscalYear method signature below.")]
         private static int GetFiscalYear( int fiscalStartMonth, DateTime date )
         {
             int fiscalYearStart = date.AddMonths( -( fiscalStartMonth - 1 ) ).Year;
