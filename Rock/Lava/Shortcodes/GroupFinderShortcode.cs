@@ -242,7 +242,7 @@ You can filter by time using multiple filters for ranges. Supported operators in
 </ul>
 
 <h5>Response Data</h5>
-<p>Each matching group includes the following:</p>
+<p>The Lava merge field <code>MatchedGroups</code> will contain a collection of matching results. Each result includes the following:</p>
 
 <ul>
 	<li><strong>Group</strong> – The matching group.</li>
@@ -367,40 +367,54 @@ You may have noticed that distance values are returned in meters. If you're more
                 Origin = settings[ParameterKeys.Origin].ToString(),
                 OriginPoint = GetOriginPoint( settings[ParameterKeys.Origin].ToString(), context ),
                 TravelMode = settings[ParameterKeys.TravelMode].ToString().ConvertToEnumOrNull<TravelMode>(),
-                Include = settings[ParameterKeys.Include] ?? "Group.Schedule",
+                Include = string.IsNullOrWhiteSpace( settings[ParameterKeys.Include] ) ? "Group.Schedule" : settings[ParameterKeys.Include],
                 HideOvercapacityGroups = settings[ParameterKeys.HideOvercapacityGroups].AsBooleanOrNull() ?? true
             };
 
             // Create the initial queryable based on whether there is a origin provided.
             var groupQuery = GetGroupLocationQueryable( options );
 
-            ApplyFilters( groupQuery, options, childElements );
+            groupQuery = ApplyFilters( groupQuery, options, childElements );
 
             // Convert out origin point to a DbGeography for use in EF queries
-            var sourcePoint = options.OriginPoint.ToDatabase();
+            var sourcePoint = options.OriginPoint?.ToDatabase();
 
             // Run query to get the results.
-            var results = groupQuery.Select( g => new GroupProximityResult
-            {
-                StraightLineDistanceInMeters = g.Location.GeoPoint.Distance( sourcePoint ),
-                Group = g.Group,
-                Location = g.Location
-            } ).ToList();
+            List<GroupProximityResult> results;
 
-            // Append travel mode details
-            if ( options.Origin.IsNotNullOrWhiteSpace() && options.TravelMode != null && results.Count > 0 )
+            if (sourcePoint != null )
             {
-                try
+                results = groupQuery.Select( g => new GroupProximityResult
                 {
-                    results = AppendTravelModeDetails( options.OriginPoint, options.TravelMode.Value, results );
-                }
-                catch ( Exception ex )
-                {
-                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                    StraightLineDistanceInMeters = g.Location.GeoPoint.Distance( sourcePoint ),
+                    Group = g.Group,
+                    Location = g.Location
+                } ).ToList();
 
-                    result.Write( $"Error calculating travel distances: {message}" );
-                    return;
+                // Append travel mode details
+                if ( options.TravelMode != null && results.Count > 0 )
+                {
+                    try
+                    {
+                        results = AppendTravelModeDetails( options.OriginPoint, options.TravelMode.Value, results );
+                    }
+                    catch ( Exception ex )
+                    {
+                        var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
+                        result.Write( $"Error calculating travel distances: {message}" );
+                        return;
+                    }
                 }
+            }
+            else
+            {
+                results = groupQuery.Select( g => new GroupProximityResult
+                {
+                    StraightLineDistanceInMeters = null,
+                    Group = g.Group,
+                    Location = g.Location
+                } ).ToList();
             }
 
             // Process the residual content and output results
@@ -417,7 +431,8 @@ You may have noticed that distance values are returned in meters. If you're more
         /// <returns></returns>
         private IQueryable<GroupLocation> GetGroupLocationQueryable( Options options )
         {
-            if ( options.Origin.IsNotNullOrWhiteSpace() )
+            // If we don't have an origin, or the person does not have a mapped location, then we'll just provide the filtered list of groups.
+            if ( options.Origin.IsNotNullOrWhiteSpace() && options.OriginPoint != null )
             {
                 return new GroupService( _rockContext )
                     .GetNearestGroups( options.OriginPoint, options.GroupTypeIdList, options.MaxResults, options.ReturnOnlyClosestLocationPerGroup, options.MaxDistance )
@@ -442,7 +457,7 @@ You may have noticed that distance values are returned in meters. If you're more
         /// <returns></returns>
         private IQueryable<GroupLocation> ApplyFilters( IQueryable<GroupLocation> groupQuery, Options options, List<ChildBlockElement> childElements )
         {
-            ApplyFilterGroupOvercapacity( groupQuery, options );
+            groupQuery = ApplyFilterGroupOvercapacity( groupQuery, options );
 
             // Process each of the settings they provided in the child elements.
             foreach ( var setting in childElements )
@@ -456,25 +471,25 @@ You may have noticed that distance values are returned in meters. If you're more
                         // Campus(es)
                         case "campus":
                             {
-                                ApplyFilterCampus( groupQuery, setting, options );
+                                groupQuery = ApplyFilterCampus( groupQuery, setting, options );
                                 break;
                             }
                         // Attributes
                         case "attribute":
                             {
-                                ApplyFilterAttributes( groupQuery, setting, options );
+                                groupQuery = ApplyFilterAttributes( groupQuery, setting, options );
                                 break;
                             }
                         // Day of week
                         case "dayofweek":
                             {
-                                ApplyFilterDayOfWeek( groupQuery, setting, options );
+                                groupQuery = ApplyFilterDayOfWeek( groupQuery, setting, options );
                                 break;
                             }
                         // Time of day
                         case "timeofday":
                             {
-                                ApplyFilterTimeOfDay( groupQuery, setting, options );
+                                groupQuery = ApplyFilterTimeOfDay( groupQuery, setting, options );
                                 break;
                             }
                     }
