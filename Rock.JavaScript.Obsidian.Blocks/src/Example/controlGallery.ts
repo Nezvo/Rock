@@ -1016,6 +1016,7 @@ export default defineComponent({
     components: {
         Panel,
         SectionHeader,
+        TextBox,
         ...controlGalleryComponents,
         ...templateGalleryComponents,
         ...generalInformationGalleryComponents
@@ -1028,6 +1029,7 @@ export default defineComponent({
 
         onConfigurationValuesChanged(useReloadBlock());
 
+        const componentFilter = ref<string>("");
         const currentComponent = ref<Component>(Object.values(controlGalleryComponents)[0]);
 
         function getComponentFromHash(): void {
@@ -1044,6 +1046,31 @@ export default defineComponent({
             }
         }
 
+        function filterComponents(source: Record<string, Component>): Record<string, Component> {
+            const components = { ...source };
+
+            if (componentFilter.value) {
+                Object.keys(components).forEach(key => {
+                    if (!components[key].name!.toLowerCase().includes(componentFilter.value.toLowerCase())) {
+                        delete components[key];
+                    }
+                });
+            }
+            return components;
+        }
+
+        const filteredControlGalleryComponents = computed(() => {
+            return filterComponents(controlGalleryComponents);
+        });
+
+        const filteredTemplateGalleryComponents = computed(() => {
+            return filterComponents(templateGalleryComponents);
+        });
+
+        const filteredGeneralInformationGalleryComponents = computed(() => {
+            return filterComponents(generalInformationGalleryComponents);
+        });
+
         getComponentFromHash();
 
         onMounted(() => {
@@ -1055,25 +1082,47 @@ export default defineComponent({
         });
 
         return {
+            componentFilter,
             currentComponent,
             convertComponentName,
-            controlGalleryComponents,
-            templateGalleryComponents,
-            generalInformationGalleryComponents
+            controlGalleryComponents: filteredControlGalleryComponents,
+            templateGalleryComponents: filteredTemplateGalleryComponents,
+            generalInformationGalleryComponents: filteredGeneralInformationGalleryComponents
         };
     },
 
     template: `
 <v-style>
+.galleryContainer {
+    overflow: hidden;
+}
+
 .gallerySidebar {
     border-radius: 0;
     margin: -1px 0 -1px -1px;
     overflow-y: auto;
-    flex-shrink: 0;
+    flex-grow: 1;
+    width: 300px;
+}
+
+.gallerySidebar li {
+    padding: var(--spacing-tiny);
+    margin-bottom: var(--spacing-tiny);
+}
+
+.gallerySidebar li:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: var(--spacing-tiny);
 }
 
 .gallerySidebar li.current {
     font-weight: 700;
+}
+
+.gallerySidebar li > a {
+    display: inline-block;
+    margin-left: var(--spacing-small);
+    text-indent: calc(0px - var(--spacing-small));
 }
 
 .galleryContent {
@@ -1104,30 +1153,36 @@ export default defineComponent({
     </template>
     <template #default>
         <div class="panel-flex-fill-body flex-row galleryContainer">
+            <div class="d-flex flex-column">
+                <TextBox v-model="componentFilter"
+                         class="search-input"
+                         placeholder="Search"
+                         isClearable />
 
-            <div class="gallerySidebar well">
-                <h4>Components</h4>
+                <div class="gallerySidebar well">
+                    <h4>Components</h4>
 
-                <ul class="list-unstyled mb-0">
-                    <li v-for="(component, key) in controlGalleryComponents" :key="key" :class="{current: currentComponent.name === component.name}">
-                        <a :href="'#' + key" @click="currentComponent = component">{{ convertComponentName(component.name) }}</a>
-                    </li>
-                </ul>
+                    <ul class="list-unstyled mb-0">
+                        <li v-for="(component, key) in controlGalleryComponents" :key="key" :class="{current: currentComponent.name === component.name}">
+                            <a :href="'#' + key" @click="currentComponent = component">{{ convertComponentName(component.name) }}</a>
+                        </li>
+                    </ul>
 
-                <h4 class="mt-3">Templates</h4>
+                    <h4 class="mt-3">Templates</h4>
 
-                <ul class="list-unstyled mb-0">
-                    <li v-for="(component, key) in templateGalleryComponents" :key="key" :class="{current: currentComponent.name === component.name}">
-                        <a :href="'#' + key" @click="currentComponent = component">{{ convertComponentName(component.name) }}</a>
-                    </li>
-                </ul>
+                    <ul class="list-unstyled mb-0">
+                        <li v-for="(component, key) in templateGalleryComponents" :key="key" :class="{current: currentComponent.name === component.name}">
+                            <a :href="'#' + key" @click="currentComponent = component">{{ convertComponentName(component.name) }}</a>
+                        </li>
+                    </ul>
 
-                <h4 class="mt-3">General Information</h4>
-                <ul class="list-unstyled mb-0">
-                    <li v-for="(component, key) in generalInformationGalleryComponents" :key="key" :class="{current: currentComponent.name === component.name}">
-                        <a :href="'#' + key" @click="currentComponent = component">{{ convertComponentName(component.name) }}</a>
-                    </li>
-                </ul>
+                    <h4 class="mt-3">General Information</h4>
+                    <ul class="list-unstyled mb-0">
+                        <li v-for="(component, key) in generalInformationGalleryComponents" :key="key" :class="{current: currentComponent.name === component.name}">
+                            <a :href="'#' + key" @click="currentComponent = component">{{ convertComponentName(component.name) }}</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <div class="galleryContent">

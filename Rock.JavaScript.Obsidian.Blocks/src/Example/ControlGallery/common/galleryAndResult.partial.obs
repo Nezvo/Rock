@@ -2,10 +2,10 @@
     <SectionHeader :title="componentName" :description="description" />
     <div class="galleryContent-mainRow mb-5 row">
         <div v-if="$slots.default" :class="value === void 0 ? 'col-sm-12' : 'col-lg-6'">
-            <h4 class="mt-0">Test Control</h4>
+            <h4 v-if="!demoMode" class="mt-0">Test Control</h4>
             <slot name="default" />
 
-            <div v-if="enableReflection && config.showReflection" class="mt-3">
+            <div v-if="!demoMode && enableReflection && config.showReflection" class="mt-3">
                 <div class="mb-3 galleryContent-reflectionToggle">
                     <Switch v-model="showReflection" text="Show Reflection" />
                 </div>
@@ -17,7 +17,7 @@
                 </TransitionVerticalCollapse>
             </div>
         </div>
-        <div v-if="value !== void 0" class="col-lg-6">
+        <div v-if="!demoMode && value !== void 0" class="col-lg-6">
             <div class="well">
                 <h4>Current Value<template v-if="hasMultipleValues">s</template></h4>
                 <template v-if="hasMultipleValues" v-for="value, key in formattedValue">
@@ -138,7 +138,17 @@
         displayAsRaw: {
             type: Boolean as PropType<boolean>,
             default: false
-        }
+        },
+
+        /**
+         * Enables/Disables various features to operate in a mode suitable for
+         * demoing functionality in components rather than acting as a place
+         * to test input controls.
+         */
+        demoMode: {
+            type: Boolean as PropType<boolean>,
+            default: false
+        },
     });
 
     const config = useConfigurationValues<ControlGalleryInitializationBox>();
