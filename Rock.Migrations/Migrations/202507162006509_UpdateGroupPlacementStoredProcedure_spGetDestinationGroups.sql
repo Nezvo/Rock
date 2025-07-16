@@ -68,7 +68,7 @@
 
     <remarks>
         This procedure supports dynamic group selection strategies based on how group placements 
-        are configuredâ€”whether tied directly to a group, an entity set, a template, or specific 
+        are configured—whether tied directly to a group, an entity set, a template, or specific 
 		registration instances.
     </remarks>
 
@@ -90,7 +90,7 @@
 */
 
 
-ALTER PROCEDURE [dbo].[spGetDestinationGroups]
+CREATE PROCEDURE [dbo].[spGetDestinationGroups]
     @RegistrationTemplatePlacementEntityTypeId INT = NULL,
     @RegistrationInstanceEntityTypeId INT = NULL,
     @SourceEntityTypeId INT = NULL,
