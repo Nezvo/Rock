@@ -344,6 +344,10 @@
     height: 100%;
 }
 
+.panel-title {
+    padding: var(--spacing-xsmall) 0;
+}
+
 .slide-enter-active,
 .slide-leave-active {
     transition: all 0.5s ease;
@@ -1150,9 +1154,17 @@
                     placementGroup.groupMembers = [];
                 }
 
-                await addGroupMembersToGroup(pendingGroupMembers, placementGroup);
+                const selectedPeopleClone = new Set([...selectedPersonIdKeys.value]);
 
-                selectedPersonIdKeys.value.clear();
+                const result = await addGroupMembersToGroup(pendingGroupMembers, placementGroup);
+                if (result) {
+                    selectedPersonIdKeys.value.clear();
+                }
+                else if (selectedPersonIdKeys.value.size === 0) {
+                    // If the add group members failed and the selected person IdKeys were
+                    // cleared from our handleOutsideClick function then we will reset it here.
+                    selectedPersonIdKeys.value = selectedPeopleClone;
+                }
             }
         };
     }
@@ -1249,13 +1261,9 @@
         let shouldBeDisplayed: boolean = true;
 
         if (box.placementMode === PlacementMode.TemplateMode) {
-            if (!placementConfigurationSettings.value.includedRegistrationInstanceIds || placementConfigurationSettings.value.includedRegistrationInstanceIds?.length === 0) {
-                return true;
-            }
-
             // Default to true if person or registrants were not found for some reason.
             shouldBeDisplayed = groupMember!.person?.registrants?.some(r => {
-                return placementConfigurationSettings.value.includedRegistrationInstanceIds!.includes(r.registrationInstanceIdKey ?? "");
+                return placementConfigurationSettings.value.includedRegistrationInstanceIds?.includes(r.registrationInstanceIdKey ?? "");
             }) ?? true;
         }
 
@@ -2124,7 +2132,7 @@
      * @param placementGroup The target placement group.
      * @returns A promise resolving to the added group members.
      */
-    async function addGroupMembersToGroup(pendingGroupMembers: GroupMemberBag[], placementGroup: PlacementGroupBag): Promise<GroupMemberBag[]> {
+    async function addGroupMembersToGroup(pendingGroupMembers: GroupMemberBag[], placementGroup: PlacementGroupBag): Promise<boolean> {
         const result = await invokeBlockAction<GroupMemberBag[]>("AddGroupMembersToGroup", {
             addGroupMembersBag: {
                 pendingGroupMembers,
@@ -2135,14 +2143,15 @@
         });
 
         if (result.isSuccess && result.data) {
-            return result.data;
+            return true;
         }
         else {
             if (pendingGroupMembers[0].groupRoleIdKey) {
                 setGroupRoleError(placementGroup.groupIdKey!, pendingGroupMembers[0].groupRoleIdKey, result.errorMessage ?? "An unknown error occurred while trying to add a group member.");
+                return false;
             }
         }
-        return [];
+        return false;
     }
 
     /**
