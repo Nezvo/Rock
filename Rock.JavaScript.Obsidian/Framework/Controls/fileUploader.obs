@@ -44,6 +44,7 @@
     import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
     import RockFormField from "./rockFormField.obs";
     import { newGuid, toGuidOrNull } from "@Obsidian/Utility/guid";
+    import { useSecurityGrantToken } from "@Obsidian/Utility/block";
 
     const props = defineProps({
         /**
@@ -127,6 +128,8 @@
 
     const internalValue = ref(props.modelValue);
 
+    const securityGrantToken = useSecurityGrantToken();
+
     // Variables related to the progress of uploading a new file.
     const isUploading = ref(false);
     const uploadProgressText = ref("");
@@ -189,7 +192,8 @@
                     },
                     parentEntityTypeId: props.parentEntityTypeId,
                     parentEntityId: props.parentEntityId,
-                    baseUrl: props.uploadUrl
+                    baseUrl: props.uploadUrl,
+                securityGrantToken: securityGrantToken.value
                 });
                 internalValue.value = result;
             }
