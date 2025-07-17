@@ -4,7 +4,9 @@
           :definition="internalGridDefinition!"
           :data="gridDataSource"
           keyField="personIdKey"
+          itemTerm="Recipient"
           title="Recipient Log"
+          isNestedInScrollable
           gridSettings
           :gridSettingsActive="hasSettingsFilters"
           @gridSettingsClick="isGridSettingsVisible = true"
@@ -24,7 +26,14 @@
                         field="lastActivityDateTime"
                         title="Last Activity"
                         width="200"
-                        :filter="dateValueFilter" />
+                        :filter="dateValueFilter"
+                        :tooltip="getLastActivityDateTimeTooltip">
+            <template #format="{ row }">
+                <div :class="{ 'recipient-details-grid-cell-failure': getIsRowIsDeliveryFailure(row) }">
+                    {{ getFormattedDateTime((row as RecipientGridRow).lastActivityDateTime) }}
+                </div>
+            </template>
+        </DateTimeColumn>
 
         <NumberColumn v-if="showEmailColumns"
                       name="opensCount"
@@ -51,69 +60,49 @@
             </template>
         </Column>
 
-        <Column name="deliveredDateTime"
-                field="deliveredDateTime"
-                title="Delivered"
-                width="150"
-                :filter="booleanValueFilter"
-                :filterValue="getWasDeliveredBooleanValue">
+        <BooleanColumn name="delivered"
+                       field="delivered"
+                       title="Delivered"
+                       width="150"
+                       tooltip="deliveredDateTime"
+                       :filter="booleanValueFilter">
             <template #format="{ row }">
-                <BooleanWithTooltipCell :isTrue="getWasDeliveredBooleanValue(row)"
-                                        :cellTooltip="getFormattedDateTime((row as RecipientGridRow).deliveredDateTime)" />
+                <i v-if="(row as RecipientGridRow).delivered" class="fa fa-check"></i>
+                <i v-else-if="getIsRowIsDeliveryFailure(row)" class="fa fa-times recipient-details-grid-cell-failure"></i>
             </template>
-        </Column>
+        </BooleanColumn>
 
-        <Column v-if="showOpenedColumn"
-                name="lastOpenedDateTime"
-                field="lastOpenedDateTime"
-                title="Opened"
-                width="150"
-                :filter="booleanValueFilter"
-                :filterValue="getWasOpenedBooleanValue">
-            <template #format="{ row }">
-                <BooleanWithTooltipCell :isTrue="getWasOpenedBooleanValue(row)"
-                                        :cellTooltip="getFormattedDateTime((row as RecipientGridRow).lastOpenedDateTime)" />
-            </template>
-        </Column>
+        <BooleanColumn v-if="showOpenedColumn"
+                       name="opened"
+                       field="opened"
+                       title="Opened"
+                       width="150"
+                       tooltip="lastOpenedDateTime"
+                       :filter="booleanValueFilter" />
 
-        <Column v-if="showEmailColumns"
-                name="lastClickedDateTime"
-                field="lastClickedDateTime"
-                title="Clicked"
-                width="150"
-                :filter="booleanValueFilter"
-                :filterValue="getWasClickedBooleanValue">
-            <template #format="{ row }">
-                <BooleanWithTooltipCell :isTrue="getWasClickedBooleanValue(row)"
-                                        :cellTooltip="getFormattedDateTime((row as RecipientGridRow).lastClickedDateTime)" />
-            </template>
-        </Column>
+        <BooleanColumn v-if="showEmailColumns"
+                       name="clicked"
+                       field="clicked"
+                       title="Clicked"
+                       width="150"
+                       tooltip="lastClickedDateTime"
+                       :filter="booleanValueFilter" />
 
-        <Column v-if="showEmailColumns"
-                name="unsubscribeDateTime"
-                field="unsubscribeDateTime"
-                title="Unsubscribed"
-                width="150"
-                :filter="booleanValueFilter"
-                :filterValue="getWasUnsubscribedBooleanValue">
-            <template #format="{ row }">
-                <BooleanWithTooltipCell :isTrue="getWasUnsubscribedBooleanValue(row)"
-                                        :cellTooltip="getFormattedDateTime((row as RecipientGridRow).unsubscribeDateTime)" />
-            </template>
-        </Column>
+        <BooleanColumn v-if="showEmailColumns"
+                       name="unsubscribed"
+                       field="unsubscribed"
+                       title="Unsubscribed"
+                       width="150"
+                       tooltip="unsubscribedDateTime"
+                       :filter="booleanValueFilter" />
 
-        <Column v-if="showEmailColumns"
-                name="spamComplaintDateTime"
-                field="spamComplaintDateTime"
-                title="Spam"
-                width="150"
-                :filter="booleanValueFilter"
-                :filterValue="getWasMarkedAsSpamBooleanValue">
-            <template #format="{ row }">
-                <BooleanWithTooltipCell :isTrue="getWasMarkedAsSpamBooleanValue(row)"
-                                        :cellTooltip="getFormattedDateTime((row as RecipientGridRow).spamComplaintDateTime)" />
-            </template>
-        </Column>
+        <BooleanColumn v-if="showEmailColumns"
+                       name="spam"
+                       field="spam"
+                       title="Spam"
+                       width="150"
+                       tooltip="spamComplaintDateTime"
+                       :filter="booleanValueFilter" />
 
         <NumberColumn v-if="isPropertyColumnVisible(PersonPropertyName.Age)"
                       name="age"
@@ -221,11 +210,14 @@
 .recipient-details-activity-panel-footer-actions .btn {
     color: var(--color-primary);
 }
+
+.recipient-details-grid-cell-failure {
+    color: var(--color-danger-strong);
+}
 </style>
 
 <script setup lang="ts">
     import { computed, PropType, reactive, ref, watch } from "vue";
-    import BooleanWithTooltipCell from "./booleanWithTooltipCell.partial.obs";
     import RecipientGridSettingsModal from "./recipientGridSettingsModal.partial.obs";
     import { GridSettingsOptions, PersonPropertyName } from "./types.partial";
     import MediumCell from "./mediumCell.partial.obs";
@@ -235,6 +227,7 @@
     import Panel from "@Obsidian/Controls/panel.obs";
     import CommunicationRecipientActivity from "@Obsidian/Controls/Internal/CommunicationRecipientActivity.obs";
     import RockButton from "@Obsidian/Controls/rockButton.obs";
+    import { CommunicationRecipientStatus } from "@Obsidian/Enums/Communication/communicationRecipientStatus";
     import { CommunicationType, CommunicationTypeDescription } from "@Obsidian/Enums/Communication/communicationType";
     import { BtnType } from "@Obsidian/Enums/Controls/btnType";
     import { AgeClassificationDescription } from "@Obsidian/Enums/Crm/ageClassification";
@@ -364,6 +357,16 @@
     }
 
     /**
+     * Gets whether the provided row represents a delivery failure.
+     *
+     * @param row The row to check.
+     */
+    function getIsRowIsDeliveryFailure(row: Record<string, unknown>): boolean {
+        const status = (row as RecipientGridRow).status;
+        return status == CommunicationRecipientStatus.Failed;
+    }
+
+    /**
      * Gets the text value for the "Person" column.
      *
      * @param row The row whose value to get.
@@ -371,6 +374,22 @@
     function getPersonTextValue(row: Record<string, unknown>): string {
         const person = (row as RecipientGridRow).person;
         return !person ? "" : `${person.nickName} ${person.lastName}`;
+    }
+
+    /**
+     * Gets the tooltip for the "Last Activity" column.
+     *
+     * @param row The row whose tooltip to get.
+     */
+    function getLastActivityDateTimeTooltip(row: Record<string, unknown>): string {
+        if (!getIsRowIsDeliveryFailure(row)) {
+            return "";
+        }
+
+        const recipientGridRow = (row as RecipientGridRow);
+        return recipientGridRow.statusNote
+            ? `Failed delivery: ${recipientGridRow.statusNote}`
+            : `Falied delivery on ${getFormattedDateTime(recipientGridRow.lastActivityDateTime)}`;
     }
 
     /**
@@ -383,51 +402,6 @@
         return isNullish(communicationType)
             ? ""
             : CommunicationTypeDescription[communicationType];
-    }
-
-    /**
-     * Gets the boolean value for the "Delivered" column.
-     *
-     * @param row The row whose value to get.
-     */
-    function getWasDeliveredBooleanValue(row: Record<string, unknown>): boolean {
-        return !!(row as RecipientGridRow).deliveredDateTime;
-    }
-
-    /**
-     * Gets the boolean value for the "Opened" column.
-     *
-     * @param row The row whose value to get.
-     */
-    function getWasOpenedBooleanValue(row: Record<string, unknown>): boolean {
-        return !!(row as RecipientGridRow).lastOpenedDateTime;
-    }
-
-    /**
-     * Gets the boolean value for the "Clicked" column.
-     *
-     * @param row The row whose value to get.
-     */
-    function getWasClickedBooleanValue(row: Record<string, unknown>): boolean {
-        return !!(row as RecipientGridRow).lastClickedDateTime;
-    }
-
-    /**
-     * Gets the boolean value for the "Unsubscribed" column.
-     *
-     * @param row The row whose value to get.
-     */
-    function getWasUnsubscribedBooleanValue(row: Record<string, unknown>): boolean {
-        return !!(row as RecipientGridRow).unsubscribeDateTime;
-    }
-
-    /**
-     * Gets the boolean value for the "Spam" column.
-     *
-     * @param row The row whose value to get.
-     */
-    function getWasMarkedAsSpamBooleanValue(row: Record<string, unknown>): boolean {
-        return !!(row as RecipientGridRow).spamComplaintDateTime;
     }
 
     /**

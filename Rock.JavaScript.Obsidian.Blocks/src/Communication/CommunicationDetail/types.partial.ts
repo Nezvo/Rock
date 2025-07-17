@@ -47,10 +47,6 @@ export type ChartStyles = {
     fallbackColor: string;
 };
 
-export const enum PageParameterKey {
-    Tab = "Tab"
-}
-
 export const enum PreferenceKey {
     RecipientListSettings = "RecipientListSettings"
 }
@@ -77,14 +73,23 @@ export type RecipientGridRow = {
     lastActivityDateTime?: string | null;
     status: CommunicationRecipientStatus;
     statusNote?: string | null;
-    sendDatetime?: string | null;
-    deliveredDateTime?: string | null;
     medium?: CommunicationType | null;
     opensCount?: number | null;
-    lastOpenedDateTime?: string | null;
     clicksCount?: number | null;
+
+    delivered: boolean;
+    deliveredDateTime?: string | null;
+
+    opened: boolean;
+    lastOpenedDateTime?: string | null;
+
+    clicked: boolean;
     lastClickedDateTime?: string | null;
-    unsubscribeDateTime?: string | null;
+
+    unsubscribed: boolean;
+    unsubscribedDateTime?: string | null;
+
+    spam: boolean;
     spamComplaintDateTime?: string | null;
 
     age?: number | null;

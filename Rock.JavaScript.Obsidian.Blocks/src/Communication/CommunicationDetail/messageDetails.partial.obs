@@ -135,7 +135,7 @@
 
         </Panel>
 
-        <Panel title="Preview" :hasFullscreen="true">
+        <Panel title="Preview" :hasFullscreen="true" class="panel-body-flush">
 
             <EmailPreview v-if="isEmail" :message="messagePreview?.emailMessage ?? ''" />
 

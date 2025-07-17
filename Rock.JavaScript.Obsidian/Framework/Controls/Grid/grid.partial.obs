@@ -59,7 +59,7 @@
                       @width="calculateOverflow"
                       @click="onRowClick" />
 
-            <div class="grid-body" v-else-if="!keyField || light">
+            <div class="grid-body" v-else-if="!keyField || light || isNestedInScrollable">
                 <DataRows
                           :columns="visibleColumnDefinitions"
                           :rows="visibleRows"
@@ -552,6 +552,18 @@
             default: false
         },
 
+        /**
+         * When `true`, forces page size to 50 and disables virtual scrolling.
+         *
+         * TEMPORARY: This is a temporary workaround for a virtual scrolling
+         * issue that affects grids nested within a scrollable container, and
+         * WILL be removed in the future.
+         */
+        isNestedInScrollable: {
+            type: Boolean as PropType<boolean>,
+            default: false
+        }
+
     });
 
     const emit = defineEmits<{
@@ -576,7 +588,7 @@
     const overflow = ref(false);
     const currentPage = ref(1);
     const pageSize = ref(50);
-    const pageSizes = [50, 500, 5000];
+    const pageSizes = props.isNestedInScrollable ? [50] : [50, 500, 5000];
     const quickFilterValue = ref("");
     const loadingData = ref(false);
     const gridErrorMessage = ref("");

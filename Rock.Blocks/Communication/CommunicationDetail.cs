@@ -81,7 +81,7 @@ namespace Rock.Blocks.Communication
             public const string CommunicationId = "CommunicationId";
 
             public const string Edit = "Edit";
-            public const string Tab = "Tab";
+            public const string Tab = "tab";
         }
 
         private static class PersonPreferenceKey
@@ -879,17 +879,14 @@ namespace Rock.Blocks.Communication
 
             var communicationService = new CommunicationService( RockContext );
 
-            var newCommunication = communicationService.Copy( communication.Id, GetCurrentPerson()?.PrimaryAliasId );
-            if ( newCommunication == null )
+            var newCommunicationId = communicationService.CopyWithBulkInsert( communication.Id, GetCurrentPerson()?.PrimaryAliasId );
+            if ( !newCommunicationId.HasValue )
             {
                 return ActionInternalServerError( $"Unable to duplicate the {CommunicationFriendlyName}." );
             }
 
-            communicationService.Add( newCommunication );
-            RockContext.SaveChanges();
-
             // Redirect to the new communication.
-            var pageParams = GetPageParamsForReload( newCommunication.Id );
+            var pageParams = GetPageParamsForReload( newCommunicationId.Value );
             pageParams.Remove( PageParameterKey.Tab );
 
             return ActionOk(
@@ -2237,8 +2234,8 @@ namespace Rock.Blocks.Communication
                 .AddDateTimeField( "lastActivityDateTime", r => r.LastActivityDateTime )
                 .AddField( "status", r => r.Status )
                 .AddTextField( "statusNote", r => r.StatusNote )
-                .AddDateTimeField( "sendDateTime", r => r.SendDateTime )
-                .AddDateTimeField( "deliveredDateTime", r => r.DeliveredDateTime );
+                .AddField( "delivered", r => r.DeliveredDateTime.HasValue )
+                .AddTextField( "deliveredDateTime", r => r.DeliveredDateTime?.ToString( "g" ) );
 
             if ( communicationType == CommunicationType.RecipientPreference )
             {
@@ -2256,7 +2253,9 @@ namespace Rock.Blocks.Communication
 
             if ( communicationType != CommunicationType.SMS )
             {
-                builder.AddField( "lastOpenedDateTime", r => r.LastOpenedDateTime );
+                builder
+                    .AddField( "opened", r => r.LastOpenedDateTime.HasValue )
+                    .AddTextField( "lastOpenedDateTime", r => r.LastOpenedDateTime?.ToString( "g" ) );
             }
 
             if ( communicationType == CommunicationType.RecipientPreference || communicationType == CommunicationType.Email )
@@ -2264,9 +2263,15 @@ namespace Rock.Blocks.Communication
                 builder
                     .AddField( "opensCount", r => r.OpensCount )
                     .AddField( "clicksCount", r => r.ClicksCount )
-                    .AddField( "lastClickedDateTime", r => r.LastClickedDateTime )
-                    .AddField( "unsubscribeDateTime", r => r.UnsubscribeDateTime )
-                    .AddField( "spamComplaintDateTime", r => r.SpamComplaintDateTime );
+
+                    .AddField( "clicked", r => r.LastClickedDateTime.HasValue )
+                    .AddTextField( "lastClickedDateTime", r => r.LastClickedDateTime?.ToString( "g" ) )
+
+                    .AddField( "unsubscribed", r => r.UnsubscribeDateTime.HasValue )
+                    .AddTextField( "unsubscribedDateTime", r => r.UnsubscribeDateTime?.ToString( "g" ) )
+
+                    .AddField( "spam", r => r.SpamComplaintDateTime.HasValue )
+                    .AddTextField( "spamComplaintDateTime", r => r.SpamComplaintDateTime?.ToString( "g" ) );
             }
 
             if ( RecipientGridPropertyColumns?.Any() == true )

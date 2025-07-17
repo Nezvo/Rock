@@ -977,16 +977,16 @@
 }
 // ===================== END PANEL BADGES =====================
 
-.panel-worksurface .panel-body {
+.panel-worksurface > .panel-body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .panel-worksurface .panel-scrollable-content {
     flex-grow: 1;
-    overflow: clip auto;
+    overflow: hidden auto;
 }
 
 .paneleditor-label {

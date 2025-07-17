@@ -617,22 +617,13 @@ namespace RockWeb.Blocks.Communication
 
             using ( var rockContext = new RockContext() )
             {
-                var communicationService = new CommunicationService( rockContext );
-
                 using ( var activity = ObservabilityHelper.StartActivity( "COMMUNICATION: List > Copy Communication" ) )
                 {
-                    var newCommunication = communicationService.Copy( e.RowKeyId, CurrentPersonAliasId );
-                    if ( newCommunication != null )
-                    {
-                        activity?.AddTag( "rock.communication_to_copy_id", e.RowKeyId );
+                    newCommunicationId = new CommunicationService( rockContext )
+                        .CopyWithBulkInsert( e.RowKeyId, CurrentPersonAliasId );
 
-                        communicationService.Add( newCommunication );
-                        rockContext.SaveChanges();
-
-                        newCommunicationId = newCommunication.Id;
-
-                        activity?.AddTag( "rock.new_communication_id", newCommunicationId );
-                    }
+                    activity?.AddTag( "rock.communication_to_copy_id", e.RowKeyId );
+                    activity?.AddTag( "rock.new_communication_id", newCommunicationId );
                 }
             }
 
