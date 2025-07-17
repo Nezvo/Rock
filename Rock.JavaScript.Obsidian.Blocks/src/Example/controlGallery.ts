@@ -1106,7 +1106,6 @@ export default defineComponent({
 }
 
 .gallerySidebar li {
-    padding: var(--spacing-tiny);
     margin-bottom: var(--spacing-tiny);
 }
 
@@ -1120,12 +1119,15 @@ export default defineComponent({
 }
 
 .gallerySidebar li > a {
-    display: inline-block;
+    display: block;
     margin-left: var(--spacing-small);
     text-indent: calc(0px - var(--spacing-small));
+    padding: var(--spacing-tiny);
 }
 
 .galleryContent {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     overflow-x: clip;
     overflow-y: auto;
