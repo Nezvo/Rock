@@ -3208,6 +3208,24 @@ export function getSectionComponentHelper(): ComponentMigrationHelper & {
                 return true;
             }
 
+            // Are there any child components that need migration?
+            if (Enumerable
+                .from(componentElement.querySelectorAll(".component"))
+                .any(c => {
+                    try {
+                        const helper = getComponentHelper(getComponentTypeName(c));
+                        return helper?.isMigrationRequired(c) ?? false;
+                    }
+                    catch (e) {
+                        // Log error and continue
+                        console.error(`Error checking migration for row component child: ${e}`);
+                        return false;
+                    }
+                })
+            ) {
+                return true;
+            }
+
             return false;
         },
 
