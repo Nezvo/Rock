@@ -267,7 +267,9 @@ type VirtualScrollReturns<RowItem> = {
  * render a small subset so there the pure number of DOM elements doesn't bog down the performance of the browser.
  *
  * This implementation only works with fixed height items to simplify the logic, but allows it to be used with a 2D grid
- * by allowing the number of items per row to be specified.
+ * by allowing the number of items per row to be specified. This implementation is temporary: we didn't have the time to
+ * generalize it to work in additional scenarios, but it is planned to be generalized in the future and merged with the
+ * implementation used by the VirtualDataRows component.
  */
 export function useVirtualScroller<RowItem>(options: VirtualScrollOptions<RowItem>): VirtualScrollReturns<RowItem> {
     const scrollContainer = options.scrollContainer ?? ref(document.documentElement || document.body);

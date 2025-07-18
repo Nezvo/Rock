@@ -125,7 +125,7 @@
     import ContentDropDownPicker from "./contentDropDownPicker.obs";
     import Loading from "./loading.obs";
     import TextBox from "./textBox.obs";
-    import ButtonDropDownList from "@Obsidian/Controls/buttonDropDownList.obs";
+    import ButtonDropDownList from "./buttonDropDownList.obs";
     import { type ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
     import { useSecurityGrantToken } from "@Obsidian/Utility/block";
     import { useHttp } from "@Obsidian/Utility/http";
@@ -133,7 +133,7 @@
     import { type IconBag, type IconLibraryBag } from "@Obsidian/ViewModels/Controls/iconLibraryBag.d";
     import { containsRequiredRule } from "@Obsidian/ValidationRules";
     import { debounce } from "@Obsidian/Utility/util";
-    import { useVirtualScroller } from "@Obsidian/Utility/virtualScroll";
+    import { useVirtualScroller } from "./Internal/virtualScroll.partial";
 
     type SearchableIcon = IconBag & {
         SearchableText: string; /* eslint-disable-line @typescript-eslint/naming-convention */
