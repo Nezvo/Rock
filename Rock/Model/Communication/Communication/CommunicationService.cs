@@ -254,7 +254,8 @@ namespace Rock.Model
                 {
                     PersonAliasId = personAliasId.Value,
                     Status = recipientStatus,
-                    SendDateTime = sendDateTime
+                    SendDateTime = sendDateTime,
+                    MediumEntityTypeId = EntityTypeCache.Get( "Rock.Communication.Medium.Email" ).Id
                 };
                 communication.Recipients.Add( communicationRecipient );
             }
