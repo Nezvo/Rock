@@ -6898,7 +6898,7 @@ td.grid-actions {
 }
 
 .input-group-btn > .btn {
-  padding: var(--spacing-xsmall) var(--spacing-medium);
+  padding: 6px var(--spacing-medium);
 }
 
 .input-group-addon,
