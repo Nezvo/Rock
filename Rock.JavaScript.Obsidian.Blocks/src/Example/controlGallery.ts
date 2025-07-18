@@ -46,7 +46,7 @@
  * - timeIntervalPicker
  */
 
-import { Component, computed, defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { Component, computed, defineComponent, onMounted, onUnmounted, ref, watch } from "vue";
 import { convertComponentName, getTemplateImportPath } from "./ControlGallery/common/utils.partial";
 import { getSecurityGrant, provideSecurityGrant, useConfigurationValues, onConfigurationValuesChanged, useReloadBlock } from "@Obsidian/Utility/block";
 import { ControlGalleryInitializationBox } from "@Obsidian/ViewModels/Blocks/Example/ControlGallery/controlGalleryInitializationBox";
@@ -255,6 +255,9 @@ import ConnectedListAddButtonGallery from "./ControlGallery/connectedListAddButt
 import ConnectedListItemGallery from "./ControlGallery/connectedListItemGallery.partial.obs";
 import ConnectedListGallery from "./ControlGallery/connectedListGallery.partial.obs";
 import IconPickerGallery from "./ControlGallery/iconPickerGallery.partial.obs";
+import ContentStackGallery from "./ControlGallery/contentStackGallery.partial.obs";
+import ContentSectionGallery from "./ControlGallery/contentSectionGallery.partial.obs";
+import ContentSectionWrapperGallery from "./ControlGallery/contentSectionWrapperGallery.partial.obs";
 
 const controlGalleryComponents: Record<string, Component> = [
     NotificationBoxGallery,
@@ -450,6 +453,9 @@ const controlGalleryComponents: Record<string, Component> = [
     ConnectedListItemGallery,
     ConnectedListGallery,
     IconPickerGallery,
+    ContentStackGallery,
+    ContentSectionGallery,
+    ContentSectionWrapperGallery,
 ]
     // Fix vue 3 SFC putting name in __name.
     .map(a => {
@@ -1046,6 +1052,12 @@ export default defineComponent({
             }
         }
 
+        function getComponentFilterFromQueryString(): void {
+            const url = new URL(window.location.href);
+
+            componentFilter.value = url.searchParams.get("q") ?? "";
+        }
+
         function filterComponents(source: Record<string, Component>): Record<string, Component> {
             const components = { ...source };
 
@@ -1072,6 +1084,13 @@ export default defineComponent({
         });
 
         getComponentFromHash();
+        getComponentFilterFromQueryString();
+
+        watch(componentFilter, () => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("q", componentFilter.value);
+            window.history.replaceState({}, "", url.toString());
+        });
 
         onMounted(() => {
             window.addEventListener("hashchange", getComponentFromHash);
