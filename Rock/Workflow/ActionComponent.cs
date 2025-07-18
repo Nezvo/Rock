@@ -334,7 +334,11 @@ namespace Rock.Workflow
                 */
                 if ( attr.FieldType.Field is Field.Types.DateFieldType )
                 {
-                    value = value.AsDateTime()?.Date.ToString( "o" ) ?? value;
+                    var dateValue = value.AsDateTime();
+                    if ( dateValue != null )
+                    {
+                        value = dateValue.Value.Date.ToString( "o" );
+                    }
                 }
 
                 if ( attr.EntityTypeId == new Rock.Model.Workflow().TypeId )
