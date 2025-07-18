@@ -321,6 +321,19 @@ namespace Rock.Workflow
                     value = Security.Encryption.EncryptString( value );
                 }
 
+                /*
+                     7/17/2025 - NA
+
+                     This trims any time component that may be present in the
+                     original value because the FieldType only represents a Date.
+
+                     Reason: To address issue #6377 by storing only the Date portion of the value.
+                */
+                if ( attr.FieldType.Field is Field.Types.DateFieldType )
+                {
+                    value = value.AsDateTime()?.Date.ToString( "yyyy-MM-dd" ) ?? string.Empty;
+                }
+
                 if ( attr.EntityTypeId == new Rock.Model.Workflow().TypeId )
                 {
                     action.Activity.Workflow.SetAttributeValue( attr.Key, value );
