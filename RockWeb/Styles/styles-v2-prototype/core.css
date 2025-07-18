@@ -6827,7 +6827,7 @@ td.grid-actions {
   color: var(--color-interface-medium);
 }
 
-.table > tbody > tr.is-deceased > td {
+.is-deceased {
   color: var(--color-danger-strong);
 }
 
