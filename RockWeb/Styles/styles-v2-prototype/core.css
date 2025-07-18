@@ -13958,7 +13958,7 @@ ul.list-group-panel .list-group-item:first-child,
   display: flex;
   flex-basis: 100%;
   flex-grow: 1;
-  align-items: center;
+  align-items: stretch;
   margin: 0 var(--spacing-xsmall) var(--spacing-medium);
   overflow-y: hidden;
   font-size: var(--font-size-h3);
@@ -13980,7 +13980,6 @@ ul.list-group-panel .list-group-item:first-child,
   align-items: center;
   justify-content: center;
   max-width: 35%;
-  height: 100%;
   font-size: 32px;
   vertical-align: top;
 }
@@ -13988,16 +13987,12 @@ ul.list-group-panel .list-group-item:first-child,
   margin-left: var(--spacing-medium);
 }
 .has-icon-bg .kpi-icon {
-  display: block;
   width: max-content;
   margin-left: 0;
 }
 .has-icon-bg .kpi-icon .kpi-content {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
