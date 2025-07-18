@@ -3,7 +3,7 @@
 
     <Panel title="Saturation Metrics" type="block">
 
-        <RockForm class="mb-4" @submit="onFilterChange">
+        <RockForm class="mb-4" @submit="applyFiltersAndLoadData">
             <div class="row">
                 <div class="col-md-6">
                     <SlidingDateRangePicker v-model="dateRange"
@@ -134,10 +134,10 @@
 
     const day = 1000 * 60 * 60 * 24;
 
-    async function onFilterChange(): Promise<void> {
+    async function applyFiltersAndLoadData(): Promise<void> {
         isLoading.value = true;
         await updatePersonPreferences();
-        await loadGridData();
+        await loadBlockData();
         isLoading.value = false;
     }
 
@@ -241,7 +241,7 @@
     /**
      * Called when the grid is requesting the row data be loaded.
      */
-    async function loadGridData(): Promise<void> {
+    async function loadBlockData(): Promise<void> {
         isLoading.value = true;
         dismissError();
         recipientsGridData.value = new Promise(() => { });
@@ -271,5 +271,5 @@
 
     // #endregion
 
-    loadGridData();
+    applyFiltersAndLoadData();
 </script>

@@ -159,7 +159,7 @@ namespace Rock.Blocks.Communication
             options.DateRangeDelimitedString = dateRangePref.IsNotNullOrWhiteSpace() ? dateRangePref : options.DateRangeDelimitedString;
             options.DataView = DataViewCache.Get( dataViewPref.AsGuid() )?.ToListItemBag();
             options.ConnectionStatus = DefinedValueCache.Get( connectionStatusPref.AsGuid() )?.ToListItemBag();
-            options.Medium = mediumPref.Any() ? mediumPref : options.Medium;
+            options.Medium = mediumPref?.Any() == true ? mediumPref : options.Medium;
             options.BulkOnly = bulkOnlyPref.AsBooleanOrNull() ?? options.BulkOnly;
 
             return options;
@@ -510,9 +510,7 @@ namespace Rock.Blocks.Communication
                     EndDate = dateRange.End;
                 }
 
-                var includedRatios = new List<int> { 1 };
-
-                var email = Rock.Enums.Communication.CommunicationType.Email.ToString();
+                var includedRatios = new List<int>();
 
                 if ( filterBag.Medium.Contains( Rock.Enums.Communication.CommunicationType.Email.ConvertToInt().ToString() ) )
                 {
@@ -529,7 +527,15 @@ namespace Rock.Blocks.Communication
                     includedRatios.Add( blockCache.GetAttributeValue( AttributeKey.PushNotificationBucketRatio ).AsInteger() );
                 }
 
-                decimal bucketRatio = includedRatios.Max();
+                if ( !includedRatios.Any() )
+                {
+                    // No mediums selected somehow despite the couple ways we have of setting a default of all of them, so add all of ratios
+                    includedRatios.Add( blockCache.GetAttributeValue( AttributeKey.EmailBucketRatio ).AsInteger() );
+                    includedRatios.Add( blockCache.GetAttributeValue( AttributeKey.SmsBucketRatio ).AsInteger() );
+                    includedRatios.Add( blockCache.GetAttributeValue( AttributeKey.PushNotificationBucketRatio ).AsInteger() );
+                }
+
+                decimal bucketRatio = includedRatios.Min();
                 decimal totalDays = ( dateRange.End - dateRange.Start )?.Days ?? 1;
 
                 BucketSize = ( int ) Math.Ceiling( totalDays / bucketRatio );
