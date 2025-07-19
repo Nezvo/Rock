@@ -141,6 +141,7 @@
 		"css.lint.duplicateProperties": "warning",
 		"css.lint.zeroUnits": "warning",
 		"css.lint.propertyIgnoredDueToDisplay": "warning",
+        "dotnet.formatting.organizeImportsOnFormat": true,
 		"jest.disabledWorkspaceFolders": [
 			"Rock.JavaScript.Obsidian.Reporting"
 		]
