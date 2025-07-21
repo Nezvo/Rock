@@ -156,6 +156,9 @@
     <Compile Include="Blocks\Communication\CommunicationTemplateDetail\CommunicationTemplateDetailCommunicationTemplateBag.cs" />
     <Compile Include="Blocks\Communication\CommunicationTemplateDetail\CommunicationTemplateDetailGetPreviewMessageRequestBag.cs" />
     <Compile Include="Blocks\Communication\CommunicationTemplateDetail\CommunicationTemplateDetailInitializationBox.cs" />
+    <Compile Include="Blocks\Connection\ConnectionOpportunitySignup\ConnectionOpportunitySignupInitializationBox.cs" />
+    <Compile Include="Blocks\Connection\ConnectionOpportunitySignup\ConnectionOpportunitySignupRequestBag.cs" />
+    <Compile Include="Blocks\Connection\ConnectionOpportunitySignup\ConnectionOpportunitySignupResultBag.cs" />
     <Compile Include="Blocks\Core\PersonSuggestionList\PersonSuggestionListOptionsBag.cs" />
     <Compile Include="Blocks\Cms\PageSearch\PageSearchPageBag.cs" />
     <Compile Include="Blocks\Cms\PageSearch\PageSearchBag.cs" />
