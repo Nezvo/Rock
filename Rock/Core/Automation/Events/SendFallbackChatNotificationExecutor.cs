@@ -162,7 +162,9 @@ namespace Rock.Core.Automation.Events
                     }
 
                     var eventCommunicationPreference = CommunicationType.RecipientPreference;
-                    if ( !MediumContainer.HasActiveSmsTransport() || systemCommunication.SMSMessage.IsNullOrWhiteSpace() )
+                    if ( !MediumContainer.HasActiveSmsTransport()
+                        || !systemCommunication.SmsFromSystemPhoneNumberId.HasValue
+                        || systemCommunication.SMSMessage.IsNullOrWhiteSpace() )
                     {
                         eventCommunicationPreference = CommunicationType.Email;
                     }
