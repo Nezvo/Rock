@@ -21,6 +21,7 @@ using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
 using Rock.Security;
+using Rock.Utility;
 using Rock.Web.Cache;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
@@ -178,6 +179,17 @@ namespace RockWeb.Blocks.Groups
                  * Reason: Campus Team Feature
                  */
                 var campusId = PageParameter( "CampusId" ).AsIntegerOrNull();
+
+                if ( campusId == null )
+                {
+                    // Fall ahead logic to allow working with Obsidian IdKey passing. Note: This can be removed
+                    // when converting to Obsidian.
+                    if ( IdHasher.Instance.TryGetId( PageParameter( "CampusId" ), out var campusIdNullable ) )
+                    {
+                        campusId = campusIdNullable;
+                    }
+                }
+
                 hfCampusId.Value = campusId.ToString();
 
                 // if we don't yet have a groupId, and a CampusId PageParameter is defined, attempt to determine the groupId from the Campus.TeamGroupId property
