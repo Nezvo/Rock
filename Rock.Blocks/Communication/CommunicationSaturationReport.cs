@@ -221,8 +221,8 @@ namespace Rock.Blocks.Communication
 
             var computedFilters = new ComputedFilters( filters, BlockCache );
 
-            parameters.Add( "StartDate", computedFilters.StartDate );
-            parameters.Add( "EndDate", computedFilters.EndDate );
+            parameters.Add( "StartDate", computedFilters.StartDate.Value.Date );
+            parameters.Add( "EndDate", computedFilters.EndDate.Value.Date );
             parameters.Add( "BucketSize", computedFilters.BucketSize );
             parameters.Add( "CommunicationType", computedFilters.CommunicationType.Select( ct => ct.ConvertToInt() ).ToList().AsDelimited( "," ) );
             parameters.Add( "IncludeNonBulk", computedFilters.IncludeNonBulk );
