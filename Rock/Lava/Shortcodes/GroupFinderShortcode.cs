@@ -93,6 +93,11 @@ namespace Rock.Lava.Shortcodes
             /// Hides groups that don't have capcity for new members.
             /// </summary>
             public const string HideOvercapacityGroups = "hideovercapacitygroups";
+
+            /// <summary>
+            /// Determines if null campus values should be considered when filtering by campus.
+            /// </summary>
+            public const string EnableStrictCampusFiltering = "enablestrictcampusfiltering";
         }
 
         /// <summary>
@@ -239,6 +244,7 @@ You can filter by time using multiple filters for ranges. Supported operators in
 	<li><strong>travelmode</strong> – Adds travel distance/time. Options: <code>drive</code>, <code>walk</code>, <code>bicycle</code>.</li>
 	<li><strong>include</strong> – Appended to the query to eager-load group properties.</li>
 	<li><strong>hideovercapacitygroups</strong> (default: true) – Hides groups over capacity (group + role capacity).</li>
+    <li><strong>enablestrictcampusfiltering</strong> (default: false) – When enabled, only returns groups that have a campus matching the filter. Groups with no campus are excluded.</li>
 </ul>
 
 <h5>Response Data</h5>
@@ -368,7 +374,8 @@ You may have noticed that distance values are returned in meters. If you're more
                 OriginPoint = GetOriginPoint( settings[ParameterKeys.Origin].ToString(), context ),
                 TravelMode = settings[ParameterKeys.TravelMode].ToString().ConvertToEnumOrNull<TravelMode>(),
                 Include = string.IsNullOrWhiteSpace( settings[ParameterKeys.Include] ) ? "Group.Schedule" : settings[ParameterKeys.Include],
-                HideOvercapacityGroups = settings[ParameterKeys.HideOvercapacityGroups].AsBooleanOrNull() ?? true
+                HideOvercapacityGroups = settings[ParameterKeys.HideOvercapacityGroups].AsBooleanOrNull() ?? true,
+                EnableStrictCampusFiltering = settings[ParameterKeys.EnableStrictCampusFiltering].AsBooleanOrNull() ?? false
             };
 
             // Create the initial queryable based on whether there is a origin provided.
@@ -384,12 +391,17 @@ You may have noticed that distance values are returned in meters. If you're more
 
             if (sourcePoint != null )
             {
-                results = groupQuery.Select( g => new GroupProximityResult
-                {
-                    StraightLineDistanceInMeters = g.Location.GeoPoint.Distance( sourcePoint ),
-                    Group = g.Group,
-                    Location = g.Location
-                } ).ToList();
+                // The nested selects are needed to ensure that the ordering is correct and that we get the correct number of records.
+                results = groupQuery
+                    .Select( x => new GroupProximityResult
+                        {
+                            StraightLineDistanceInMeters = x.Location.GeoPoint.Distance( sourcePoint ),
+                            Group = x.Group,
+                            Location = x.Location
+                        } )
+                    .OrderBy( x => x.StraightLineDistanceInMeters )
+                    .Take( options.MaxResults )
+                    .ToList();
 
                 // Append travel mode details
                 if ( options.TravelMode != null && results.Count > 0 )
@@ -410,11 +422,13 @@ You may have noticed that distance values are returned in meters. If you're more
             else
             {
                 results = groupQuery.Select( g => new GroupProximityResult
-                {
-                    StraightLineDistanceInMeters = null,
-                    Group = g.Group,
-                    Location = g.Location
-                } ).ToList();
+                        {
+                            StraightLineDistanceInMeters = null,
+                            Group = g.Group,
+                            Location = g.Location
+                        } )
+                    .Take( options.MaxResults )
+                    .ToList();
             }
 
             // Process the residual content and output results
@@ -435,14 +449,14 @@ You may have noticed that distance values are returned in meters. If you're more
             if ( options.Origin.IsNotNullOrWhiteSpace() && options.OriginPoint != null )
             {
                 return new GroupService( _rockContext )
-                    .GetNearestGroups( options.OriginPoint, options.GroupTypeIdList, options.MaxResults, options.ReturnOnlyClosestLocationPerGroup, options.MaxDistance )
+                    .GetNearestGroups( options.OriginPoint, options.GroupTypeIdList, options.ReturnOnlyClosestLocationPerGroup, options.MaxDistance )
                     .Include( options.Include );
             }
             else
             {
                 return new GroupLocationService( _rockContext ).Queryable()
                     .Where( gl => options.GroupTypeIdList.Contains( gl.Group.GroupTypeId ) )
-                    .Take( options.MaxResults );
+                    .Include( options.Include );
             }
         }
 
@@ -658,7 +672,14 @@ You may have noticed that distance values are returned in meters. If you're more
                     .Select( v => int.Parse( v.Trim() ) )
                     .ToList();
 
-            return groupQuery.Where( gl => gl.Group.CampusId == null || valueList.Contains( gl.Group.CampusId.Value ) );
+            if ( options.EnableStrictCampusFiltering )
+            {
+                return groupQuery.Where( gl => valueList.Contains( gl.Group.CampusId.Value ) );
+            }
+            else
+            {
+                return groupQuery.Where( gl => gl.Group.CampusId == null || valueList.Contains( gl.Group.CampusId.Value ) );
+            }    
         }
 
         /// <summary>
@@ -1077,6 +1098,11 @@ You may have noticed that distance values are returned in meters. If you're more
             /// Determines whether to hide groups that are over their capacity.
             /// </summary>
             public bool HideOvercapacityGroups { get; set; }
+
+            /// <summary>
+            /// Determines if null campus values should be returned when filtering on campuses.
+            /// </summary>
+            public bool EnableStrictCampusFiltering { get; set; }
         }
 
         private class ChildBlockElement
