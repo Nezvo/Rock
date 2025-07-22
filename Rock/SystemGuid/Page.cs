@@ -524,6 +524,11 @@ namespace Rock.SystemGuid
         public const string COMMUNICATION_MEDIUMS = "6FF35C53-F89F-4601-8543-2E2328C623F8";
 
         /// <summary>
+        /// Gets the Communication Saturation page guid
+        /// </summary>
+        public const string COMMUNICATION_SATURATION = "DA0F647C-5317-4368-9514-E408F2254E24";
+
+        /// <summary>
         /// Gets the Communication Templates page guid
         /// ParentPage: Communications
         /// </summary>
@@ -767,6 +772,11 @@ namespace Rock.SystemGuid
         /// Gets the Email Analytics page guid
         /// </summary>
         public const string EMAIL_ANALYTICS = "DF014200-72A3-48A0-A953-E594E5410E36";
+
+        /// <summary>
+        /// Gets the Communication Reports page guid
+        /// </summary>
+        public const string COMMUNICATION_REPORTS =  "64E589FE-020F-447A-87D6-50A38068B945";
 
         /// <summary>
         /// Gets the Mass Push Notifications page guid
@@ -1370,6 +1380,11 @@ namespace Rock.SystemGuid
         /// ParentPage: Communications
         /// </summary>
         public const string NEW_COMMUNICATION = "2A22D08D-73A8-4AAF-AC7E-220E8B2E7857";
+
+        /// <summary>
+        /// Gets the New Communication (Obsidian) page guid
+        /// </summary>
+        public const string NEW_COMMUNICATION_OBSIDIAN = "9F7AE226-CC95-4E6A-B333-C0294A2024BC";
 
         /// <summary>
         /// Gets the New Family page guid
