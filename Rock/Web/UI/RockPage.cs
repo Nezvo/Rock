@@ -50,7 +50,6 @@ using Rock.Transactions;
 using Rock.Utility;
 using Rock.ViewModels.Crm;
 using Rock.Web.Cache;
-using Rock.Web.HttpModules;
 using Rock.Web.UI.Controls;
 
 using Page = System.Web.UI.Page;
@@ -116,7 +115,7 @@ namespace Rock.Web.UI
         /// The currently running Rock version.
         /// </summary>
         private static string _rockVersion = "";
-        
+
         /// <summary>
         /// A list of blocks (their paths) that will force the obsidian libraries to be loaded.
         /// This is particularly useful when a block has a settings dialog that is dependent on
@@ -125,6 +124,9 @@ namespace Rock.Web.UI
         private static readonly List<string> _blocksToForceObsidianLoad = new List<string>
         {
             "~/Blocks/Cms/PageZoneBlocksEditor.ascx",
+            "~/Blocks/Reporting/ReportDetail.ascx",
+            "~/Blocks/Reporting/DataViewDetail.ascx",
+            "~/Blocks/Reporting/DynamicReport.ascx",
             "~/Blocks/Mobile/MobilePageDetail.ascx"
         };
 
@@ -2352,7 +2354,8 @@ Obsidian.onReady(() => {{
             {
                 Authorization.SignOut();
                 UserLoginService.UpdateLastLogin(
-                    new UpdateLastLoginArgs {
+                    new UpdateLastLoginArgs
+                    {
                         UserName = impersonatedByUser.UserName,
                         ShouldSkipWritingHistoryLog = true
                     }
@@ -3031,7 +3034,7 @@ Sys.Application.add_load(function () {
             var baseUrl = FileUrlHelper.GetImageUrl( binaryFileId );
             var url = ResolveRockUrl( $"{baseUrl}&width={size}&height={size}&mode=crop&format=png" );
             favIcon.Text = $"<link rel=\"{rel}\" sizes=\"{size}x{size}\" href=\"{url}\" />";
-             
+
             AddHtmlLink( favIcon );
         }
 
@@ -4710,7 +4713,7 @@ Sys.Application.add_load(function () {
                 return string.Empty;
             }
 
-            return WebRequestHelper.GetClientIpAddress( new HttpRequestWrapper(request) );
+            return WebRequestHelper.GetClientIpAddress( new HttpRequestWrapper( request ) );
         }
 
         #endregion
