@@ -1151,13 +1151,15 @@ namespace Rock.Lava
 
             // Get results and shape for return
             return new GroupService( rockContext )
-                .GetNearestGroups( point, numericalGroupTypeId.Value, numericalMaxResults, boolReturnOnlyClosestLocationPerGroup, numericalMaxDistance )
+                .GetNearestGroups( point, numericalGroupTypeId.Value, boolReturnOnlyClosestLocationPerGroup, numericalMaxDistance )
                 .Select( g => new 
                 {
                     Distance = g.Location.GeoPoint.Distance( point ),
                     Group =  g.Group,
                     Location = g.Location
-                } ).ToList();
+                } )
+                .Take( numericalMaxResults )
+                .ToList();
   
         }
 
