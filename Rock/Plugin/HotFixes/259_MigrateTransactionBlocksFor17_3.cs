@@ -34,6 +34,8 @@ namespace Rock.Plugin.HotFixes
 UPDATE [BlockType] SET [Name] = 'Scheduled Transaction Edit (Legacy)' WHERE [Guid] = '5171C4E5-7698-453E-9CC8-088D362296DE';
 UPDATE [BlockType] SET [Name] = 'Scheduled Transaction Edit' WHERE [Guid] = 'F1ADF375-7442-4B30-BAC3-C387EA9B6C18';
 UPDATE [BlockType] SET [Path] = '~/Blocks/Finance/TransactionEntryLegacy.ascx' WHERE [Path] = '~/Blocks/Finance/TransactionEntry.ascx';
+-- Now rename the Transaction Entry (V2) block to just 'Transaction Entry'
+UPDATE [BlockType] SET [Name] = 'Transaction Entry' WHERE [Guid] = '6316D801-40C0-4EED-A2AD-55C13870664D'
 " );
         }
 
@@ -46,6 +48,7 @@ UPDATE [BlockType] SET [Path] = '~/Blocks/Finance/TransactionEntryLegacy.ascx' W
 UPDATE [BlockType] SET [Name] = 'Scheduled Transaction Edit' WHERE [Guid] = '5171C4E5-7698-453E-9CC8-088D362296DE';
 UPDATE [BlockType] SET [Name] = 'Scheduled Transaction Edit (V2)' WHERE [Guid] = 'F1ADF375-7442-4B30-BAC3-C387EA9B6C18';
 UPDATE [BlockType] SET [Path] = '~/Blocks/Finance/TransactionEntry.ascx' WHERE [Path] = '~/Blocks/Finance/TransactionEntryLegacy.ascx';
+UPDATE [BlockType] SET [Name] = 'Transaction Entry (V2)' WHERE [Guid] = '6316D801-40C0-4EED-A2AD-55C13870664D'
 " );
         }
     }
