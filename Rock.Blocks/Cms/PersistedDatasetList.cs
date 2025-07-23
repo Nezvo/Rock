@@ -179,10 +179,10 @@ namespace Rock.Blocks.Cms
                 .AddTextField( "name", a => a.Name )
                 .AddField( "lastRefreshDateTime", a => a.LastRefreshDateTime )
                 .AddTextField( "accessKey", a => a.AccessKey )
-                .AddField( "timeToBuildMS", a => a.TimeToBuildMS.HasValue ? Math.Round( ( double ) a.TimeToBuildMS ).ToString() : "-" )
+                .AddField( "timeToBuildMS", a => a.TimeToBuildMS.HasValue ? Math.Round( ( double ) a.TimeToBuildMS ) : a.TimeToBuildMS )
                 .AddField( "allowManualRefresh", a => a.AllowManualRefresh )
                 /*
-                     7/22/2025 - [Your Initials]
+                     7/22/2025 - NA
 
                      Avoid loading all data immediately, as the dataset could be extremely large (potentially hundreds of megabytes).
                      This is a safeguard to prevent excessive memory usage and slow performance.

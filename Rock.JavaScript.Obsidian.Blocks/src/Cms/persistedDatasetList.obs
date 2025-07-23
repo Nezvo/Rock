@@ -37,14 +37,14 @@
                     visiblePriority="xs"
                     width="5%" />
 
-        <TextColumn name="timeToBuildMS"
-                    title="Time To Build (ms)"
-                    field="timeToBuildMS"
-                    :filter="textValueFilter"
-                    visiblePriority="xs"
-                    headerClass="text-right"
-                    itemClass="justify-content-end text-right"
-                    width="5%" />
+        <NumberColumn name="timeToBuildMS"
+                      title="Time To Build (ms)"
+                      field="timeToBuildMS"
+                      :filter="numberValueFilter"
+                      visiblePriority="xs"
+                      headerClass="text-right"
+                      itemClass="justify-content-end text-right"
+                      width="5%" />
 
         <NumberColumn name="resultSize"
                       title="Result Size (KB)"
@@ -76,10 +76,11 @@
                       tooltip="Refresh"
                       iconClass="fa fa-sync-alt"
                       :excludeFromExport="true"
+                      :disabled="row => !row.allowManualRefresh"
                       @click="onRefreshClick" />
 
         <ButtonColumn name="preview"
-                      tooltip="Preview"
+                      tooltip="Preview (does not save results)"
                       iconClass="fa fa-search"
                       :excludeFromExport="true"
                       @click="onPreviewClick" />
