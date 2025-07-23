@@ -5075,13 +5075,22 @@ namespace Rock.Lava
         /// <summary>
         /// Gets the integer value from from a key-hash string.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">The input value to be parsed into integer form.</param>
+        /// <returns>An integer value or null if the integer could not be parsed.</returns>
+        /// <remarks>
+        /// If the provided input represents a non-hashed integer string, this integer value will be immediately returned.
+        /// </remarks>
         public static int? FromIdHash( string input )
         {
             if ( string.IsNullOrWhiteSpace( input ) )
             {
                 return null;
+            }
+
+            var inputAsInteger = input.AsIntegerOrNull();
+            if ( inputAsInteger.HasValue )
+            {
+                return inputAsInteger;
             }
 
             return IdHasher.Instance.GetId( input );
