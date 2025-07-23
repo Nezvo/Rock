@@ -3039,9 +3039,16 @@ namespace Rock.Rest.v2
                     ? DefinedValueCache.Get( person.MaritalStatusValueId.Value )?.Value
                     : string.Empty;
 
-                var personPhoneNumber = recipientData.PhoneNumbers?.Any() == true
-                    ? recipientData.PhoneNumbers.First().NumberFormatted
-                    : string.Empty;
+                string personPhoneNumber = string.Empty;
+                if ( recipientData.PhoneNumbers?.Any() == true )
+                {
+                    // Prefer SMS phone number; fall back to first phone number.
+                    var phoneNumber = recipientData.PhoneNumbers
+                        .FirstOrDefault( p => p.IsMessagingEnabled )
+                        ?? recipientData.PhoneNumbers.First();
+
+                    personPhoneNumber = phoneNumber.NumberFormatted;
+                }
 
                 var results = new CommunicationRecipientGetActivityResultsBag
                 {

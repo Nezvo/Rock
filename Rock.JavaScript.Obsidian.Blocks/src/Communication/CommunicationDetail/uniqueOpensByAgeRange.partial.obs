@@ -1,10 +1,17 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <Chart v-if="chartData"
-           type="bar"
-           :data="chartData"
-           :options="chartOptions" />
+    <div v-if="chartData" class="communication-detail-unique-opens-by-age">
+        <Chart type="bar"
+               :data="chartData"
+               :options="chartOptions" />
+    </div>
 </template>
+
+<style scoped>
+.communication-detail-unique-opens-by-age {
+    height: 100%;
+}
+</style>
 
 <script setup lang="ts">
     import { computed, PropType } from "vue";

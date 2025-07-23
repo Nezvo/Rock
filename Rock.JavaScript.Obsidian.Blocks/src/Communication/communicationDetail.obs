@@ -22,7 +22,7 @@
                 </div>
                 <div class="action d-none d-md-block">
                     <HighlightLabel>
-                        {{ recipientCountLabel }}
+                        {{ totalRecipientCountLabel }}
                     </HighlightLabel>
                 </div>
                 <div v-if="canDuplicate" class="action d-none d-md-block">
@@ -289,11 +289,11 @@
         return communicationDetail.value?.isBulk ?? false;
     });
 
-    const recipientCountLabel = computed((): string => {
-        const recipientCount = communicationDetail.value?.totalRecipientCount ?? 0;
+    const totalRecipientCountLabel = computed((): string => {
+        const totalRecipientCount = communicationDetail.value?.totalRecipientCount ?? 0;
 
-        return recipientCount > 0
-            ? `${asFormattedString(recipientCount)} ${pluralize("Recipient")}`
+        return totalRecipientCount > 0
+            ? `${asFormattedString(totalRecipientCount)} ${pluralize("Recipient")}`
             : "No Recipients";
     });
 

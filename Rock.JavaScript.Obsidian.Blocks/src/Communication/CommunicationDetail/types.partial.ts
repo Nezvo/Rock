@@ -28,16 +28,6 @@ export const enum TabItem {
     RecipientDetails = "Recipient Details"
 }
 
-export const enum PerformanceChartItem {
-    Time = "Time",
-    Flow = "Flow"
-}
-
-export const enum PerformanceChartTimeframe {
-    First45Days = "First 45 Days",
-    AllTime = "All Time"
-}
-
 export type ChartStyles = {
     fontFamily: string;
     fontColor: string;
