@@ -409,7 +409,6 @@ namespace Rock.Model
         /// </summary>
         /// <param name="point"></param>
         /// <param name="groupTypeId"></param>
-        /// <param name="maxResults"></param>
         /// <param name="returnOnlyClosestLocationPerGroup"></param>
         /// <param name="maxDistance"></param>
         /// <returns></returns>
