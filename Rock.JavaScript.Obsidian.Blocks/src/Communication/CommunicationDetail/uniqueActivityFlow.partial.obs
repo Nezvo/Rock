@@ -59,8 +59,8 @@
 
 <script setup lang="ts">
     import { computed, nextTick, onMounted, onUnmounted, PropType, ref } from "vue";
-    import { getCssVar } from "./utils.partial";
     import SankeyDiagram from "@Obsidian/Controls/internal/SankeyDiagram/sankeyDiagram.obs";
+    import { getCssVariableValue } from "@Obsidian/Utility/cssUtils";
     import { toKebabCase } from "@Obsidian/Utility/stringUtils";
     import { CommunicationActivityFlowBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationDetail/communicationActivityFlowBag";
     import { SankeyDiagramNodeBag } from "@Obsidian/ViewModels/Controls/sankeyDiagramNodeBag";
@@ -93,7 +93,7 @@
         const n = props.activityFlow?.nodes
             ?.map(n => ({
                 ...n,
-                color: getCssVar(n.color ?? "", "#555")
+                color: getCssVariableValue(n.color ?? "", "#555")
             }))
             ?? [];
 

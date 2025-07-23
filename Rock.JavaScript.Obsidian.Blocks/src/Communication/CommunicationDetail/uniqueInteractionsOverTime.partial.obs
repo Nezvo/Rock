@@ -34,10 +34,11 @@
 
 <script setup lang="ts">
     import { computed, PropType, ref } from "vue";
-    import { getCssVar, useChartStyles, useCommunicationDetail } from "./utils.partial";
+    import { useChartStyles, useCommunicationDetail } from "./utils.partial";
     import Chart from "@Obsidian/Controls/chart.obs";
     import RadioButtonList from "@Obsidian/Controls/radioButtonList.obs";
     import { ChartData, ChartOptions } from "@Obsidian/Libs/chart";
+    import { getCssVariableValue } from "@Obsidian/Utility/cssUtils";
     import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
     import { isNullish } from "@Obsidian/Utility/util";
     import { ChartNumericDataPointBag } from "@Obsidian/ViewModels/Reporting/chartNumericDataPointBag";
@@ -153,7 +154,7 @@
             const seriesName = dp.seriesName!;
             let seriesDataSet = seriesDataSets.get(seriesName);
 
-            const color = getCssVar(dp.color!, chartStyles.value.fallbackColor);
+            const color = getCssVariableValue(dp.color!, chartStyles.value.fallbackColor);
 
             if (!seriesDataSet) {
                 seriesDataSet = {

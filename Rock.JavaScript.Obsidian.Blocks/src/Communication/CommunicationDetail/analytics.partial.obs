@@ -181,7 +181,7 @@
     import UniqueInteractionsOverTime from "./uniqueInteractionsOverTime.partial.obs";
     import UniqueOpensByAgeRange from "./uniqueOpensByAgeRange.partial.obs";
     import UniqueOpensByGender from "./uniqueOpensByGender.partial.obs";
-    import { getCssVar, provideChartStyles, useCommunicationDetail, useMediumFilter, useSelectedTab } from "./utils.partial";
+    import { provideChartStyles, useCommunicationDetail, useMediumFilter, useSelectedTab } from "./utils.partial";
     import ContentSection from "@Obsidian/Controls/contentSection.obs";
     import HighlightLabel from "@Obsidian/Controls/highlightLabel.obs";
     import LoadingIndicator from "@Obsidian/Controls/loadingIndicator.obs";
@@ -191,6 +191,7 @@
     import { AlertType } from "@Obsidian/Enums/Controls/alertType";
     import { BtnSize } from "@Obsidian/Enums/Controls/btnSize";
     import { useInvokeBlockAction } from "@Obsidian/Utility/block";
+    import { getCssVariableValue } from "@Obsidian/Utility/cssUtils";
     import { CancellationTokenSource, ICancellationToken } from "@Obsidian/Utility/cancellation";
     import { asFormattedString } from "@Obsidian/Utility/numberUtils";
     import { pluralize } from "@Obsidian/Utility/stringUtils";
@@ -313,11 +314,11 @@
 
     const chartStyles = computed((): ChartStyles => {
         return {
-            fontFamily: getCssVar("--font-family-sans-serif", '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'),
-            fontColor: getCssVar("--color-interface-stronger", "#0D1117"),
-            fontSize: parseInt(getCssVar("--font-size-small", "14")),
-            fontWeight: getCssVar("--font-weight-semibold", "600"),
-            legendBoxSize: parseInt(getCssVar("--spacing-large", "24")),
+            fontFamily: getCssVariableValue("--font-family-sans-serif", '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'),
+            fontColor: getCssVariableValue("--color-interface-stronger", "#0D1117"),
+            fontSize: parseInt(getCssVariableValue("--font-size-small", "14")),
+            fontWeight: getCssVariableValue("--font-weight-semibold", "600"),
+            legendBoxSize: parseInt(getCssVariableValue("--spacing-large", "24")),
             fallbackColor: "#8e8e93"
         };
     });
