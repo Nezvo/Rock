@@ -41,7 +41,7 @@ namespace Rock.Blocks.Finance
     [DisplayName( "Benevolence Request List" )]
     [Category( "Finance" )]
     [Description( "Block used to list Benevolence Requests." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     //[SupportedSiteTypes( Model.SiteType.Web )]
 
     [LinkedPage( "Detail Page",

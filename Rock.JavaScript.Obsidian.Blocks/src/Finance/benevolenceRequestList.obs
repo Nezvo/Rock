@@ -233,7 +233,7 @@
         if (config.options?.canAdministrate == true) {
             actions.push({
                 title: "Options",
-                iconCssClass: "fa fa-gear",
+                iconCssClass: "ti ti-settings",
                 handler: onBenevolenceTypesClick
             });
         }

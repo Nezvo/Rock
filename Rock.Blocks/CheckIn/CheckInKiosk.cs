@@ -49,7 +49,7 @@ namespace Rock.Blocks.CheckIn
     [DisplayName( "Check-in Kiosk" )]
     [Category( "Check-in" )]
     [Description( "The standard Rock block for performing check-in at a kiosk." )]
-    [IconCssClass( "fa fa-clipboard-check" )]
+    [IconCssClass( "ti ti-clipboard-check" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
     #region Block Attributes

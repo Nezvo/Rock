@@ -158,7 +158,7 @@ namespace Rock.Jobs
             }
 
             var resultMessage = new StringBuilder();
-            resultMessage.AppendLine( $"<i class='fa fa-circle text-success'></i> {updatedDatasetCount} Updated" );
+            resultMessage.AppendLine( $"<i class='ti ti-circle text-success'></i> {updatedDatasetCount} Updated" );
 
             // If there are warnings, concatenate them into the final result.
             if ( warnings.Any() )
@@ -171,7 +171,7 @@ namespace Rock.Jobs
 
         private string FormatStatusMessage( string action, string datasetName, string statusType )
         {
-            return $"<i class='fa fa-circle text-{statusType}'></i> {action}: {datasetName}";
+            return $"<i class='ti ti-circle text-{statusType}'></i> {action}: {datasetName}";
         }
     }
 }

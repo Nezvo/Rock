@@ -31,7 +31,7 @@ namespace Rock.Blocks.Cms
     [DisplayName( "File Asset Manager" )]
     [Category( "CMS" )]
     [Description( "Browse and manage files on the web server or stored on a remote server or 3rd party cloud storage" )]
-    [IconCssClass( "fa fa-question" )]
+    [IconCssClass( "ti ti-question-mark" )]
     // [SupportedSiteTypes( Model.SiteType.Web )]
 
     #region Block Attributes

@@ -1009,7 +1009,9 @@ th {
 }
 
 .carousel-control .fa-chevron-left,
-.carousel-control .fa-chevron-right {
+.carousel-control .fa-chevron-right,
+.carousel-control .ti-chevron-left,
+.carousel-control .ti-chevron-right {
   position: absolute;
   top: 50%;
   z-index: 5;
@@ -1017,11 +1019,13 @@ th {
   margin-top: -10px;
 }
 
-.carousel-control .fa-chevron-left {
+.carousel-control .fa-chevron-left,
+.carousel-control .ti-chevron-left {
   left: 40px;
 }
 
-.carousel-control .fa-chevron-right {
+.carousel-control .fa-chevron-right,
+.carousel-control .ti-chevron-right {
   right: 40px;
 }
 
@@ -3480,14 +3484,17 @@ input[type=button].btn-block {
   margin-left: 3px;
 }
 .badge .fa-square::before,
-.badge .fa-circle::before {
+.badge .fa-circle::before,
+.badge .ti-square::before,
+.badge .ti-circle::before {
   display: block;
   width: 1em;
   height: 1em;
   content: " ";
   background: currentColor;
 }
-.badge .fa-circle::before {
+.badge .fa-circle::before,
+.badge .ti-circle::before {
   border-radius: 50%;
 }
 
@@ -8322,7 +8329,8 @@ ul ul, ol ul, ul ol, ol ol {
 .panel-persondetails .panel-body .form-group.static-control.matrix-attribute .form-control-static {
   width: 100%;
 }
-.panel-persondetails .panel-body i.fa.fa-bars {
+.panel-persondetails .panel-body i.fa.fa-bars,
+.panel-persondetails .panel-body i.ti.ti-bars {
   cursor: pointer;
 }
 .panel-persondetails .attribute-values + .attribute-values {
@@ -10907,7 +10915,7 @@ ul ul, ol ul, ul ol, ol ol {
 .personlist li {
   padding-left: 15px;
 }
-.personlist li i.fa-circle {
+.personlist li i.ti-circle {
   margin-right: 7.5px;
   margin-left: -15px;
   font-size: 9px;
@@ -10948,8 +10956,9 @@ ul ul, ol ul, ul ol, ol ol {
 .clearable-input .input-group {
   float: left;
 }
-.timepicker-input i.fa-times,
-.clearable-input i.fa-times {
+.timepicker-input i.ti-x,
+.clearable-input i.fa-times,
+.clearable-input i.ti-x {
   float: left;
   padding: var(--spacing-xsmall);
   margin-top: var(--spacing-tiny);
@@ -10959,12 +10968,13 @@ ul ul, ol ul, ul ol, ol ol {
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out;
 }
-.timepicker-input:hover i.fa-times,
-.clearable-input:hover i.fa-times {
+.timepicker-input:hover i.ti-x,
+.clearable-input:hover i.fa-times,
+.clearable-input:hover i.ti-x {
   opacity: 1;
 }
 
-.touch .timepicker-input i.fa-times {
+.touch .timepicker-input i.ti-x {
   opacity: 1;
 }
 
@@ -12289,7 +12299,7 @@ div.aspNetDisabled {
   .loginstatus > li > a {
     padding: 0 var(--spacing-xsmall);
   }
-  .loginstatus > li > a .fa-caret-down {
+  .loginstatus > li > a .ti-caret-down {
     display: none;
   }
 }
@@ -12314,7 +12324,7 @@ div.aspNetDisabled {
 .loginstatus > li > a span {
   display: none;
 }
-.loginstatus > li > a .fa-caret-down::before {
+.loginstatus > li > a .ti-caret-down::before {
   content: "\f078";
 }
 .loginstatus > li > a:hover, .loginstatus > li > a:focus {
@@ -14759,7 +14769,7 @@ textarea:focus,
   width: 270px;
 }
 
-.ant-select-arrow:has(.fa.fa-plus-square) {
+.ant-select-arrow:has(.ti.ti-square-plus) {
   font-size: 24px !important;
   color: var(--color-info-strong);
   top: 35%;
@@ -14767,7 +14777,7 @@ textarea:focus,
   transition: ease-in-out 0.2s;
 }
 
-.ant-select-arrow:has(.fa.fa-plus-square):hover {
+.ant-select-arrow:has(.ti.ti-square-plus):hover {
   color: var(--color-info-soft);
 }
 
@@ -20029,7 +20039,7 @@ div.summary-sub-title {
   flex-direction: column;
 }
 
-.add-answer-button > i.fa-plus-circle {
+.add-answer-button > i.ti-circle-plus {
   border-radius: 4px;
   background-color: var(--color-default-soft);
   color: var(--color-default-strong);

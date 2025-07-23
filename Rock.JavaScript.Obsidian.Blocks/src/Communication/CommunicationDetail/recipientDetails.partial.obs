@@ -69,8 +69,8 @@
                            tooltip="deliveredDateTime"
                            :filter="booleanValueFilter">
                 <template #format="{ row }">
-                    <i v-if="(row as RecipientGridRow).delivered" class="fa fa-check"></i>
-                    <i v-else-if="getIsRowIsDeliveryFailure(row)" class="fa fa-times communication-detail-grid-cell-failure"></i>
+                    <i v-if="(row as RecipientGridRow).delivered" class="ti ti-check"></i>
+                    <i v-else-if="getIsRowIsDeliveryFailure(row)" class="ti ti-x communication-detail-grid-cell-failure"></i>
                 </template>
             </BooleanColumn>
 

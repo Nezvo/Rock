@@ -40,7 +40,7 @@ namespace Rock.Blocks.Communication
     [DisplayName( "Mass Communication Analytics" )]
     [Category( "Communication" )]
     [Description( "Shows analytics for communications." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
     #region Block Attributes

@@ -178,7 +178,7 @@
             </RockForm>
         </Panel>
 
-        <Panel :isDrawerOpen="false" title="Experimental Settings" titleIconCssClass="fa fa-flask" :hasCollapse="true">
+        <Panel :isDrawerOpen="false" title="Experimental Settings" titleIconCssClass="ti ti-flask" :hasCollapse="true">
             <RockForm @submit="onSubmitExperimentalSettingsForm">
                 <DayOfWeekPicker v-model="startingDayOfWeek"
                                  label="Starting Day of Week"

@@ -1,4 +1,4 @@
-// <copyright>
+﻿// <copyright>
 // Copyright by the Spark Development Network
 //
 // Licensed under the Rock Community License (the "License");
@@ -30,7 +30,7 @@ namespace Rock.Blocks.Utility
     [DisplayName( "Stark Detail" )]
     [Category( "Obsidian > Utility" )]
     [Description( "An example block." )]
-    [IconCssClass( "fa fa-star" )]
+    [IconCssClass( "ti ti-star" )]
 
     #region Block Attributes
 

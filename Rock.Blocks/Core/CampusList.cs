@@ -38,7 +38,7 @@ namespace Rock.Blocks.Core
     [DisplayName( "Campus List" )]
     [Category( "Core" )]
     [Description( "Displays a list of campuses." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     // [SupportedSiteTypes( Model.SiteType.Web )]
 
     [LinkedPage( "Detail Page",

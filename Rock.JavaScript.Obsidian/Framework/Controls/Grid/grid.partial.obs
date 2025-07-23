@@ -774,7 +774,7 @@
             actions.push({
                 buttonCssClass: "btn-add",
                 handler: props.onAddItem,
-                iconCssClass: "fa fa-plus-square",
+                iconCssClass: "ti ti-square-plus",
                 isPrimary: true,
                 title: "Add item",
                 tooltip: "Add a new item. (Alt+N)",
@@ -788,7 +788,7 @@
                 handler: () => {
                     emit("gridSettingsClick");
                 },
-                iconCssClass: "fa fa-sliders-h",
+                iconCssClass: "ti ti-adjustments-horizontal",
                 isPrimary: true,
                 title: "Settings",
                 tooltip: "Adjust list settings."
@@ -799,7 +799,7 @@
         if (isMergeTemplateVisible.value) {
             actions.push({
                 handler: onMergeTemplate,
-                iconCssClass: "fa fa-files-o",
+                iconCssClass: "ti ti-files",
                 title: "Merge Template",
                 tooltip: "Merge Records into Merge Template"
             });
@@ -809,7 +809,7 @@
         if (isExportVisible.value) {
             actions.push({
                 handler: onExportToExcel,
-                iconCssClass: "fa fa-file-excel",
+                iconCssClass: "ti ti-file-excel",
                 title: "Export to Excel",
                 tooltip: "Export to Excel"
             });
@@ -819,7 +819,7 @@
         if (isExportVisible.value) {
             actions.push({
                 handler: onExportToCsv,
-                iconCssClass: "fa fa-file-csv",
+                iconCssClass: "ti ti-file-spreadsheet",
                 title: "Export to CSV",
                 tooltip: "Export to CSV"
             });
@@ -829,7 +829,7 @@
         if (isLaunchWorkflowVisible.value) {
             actions.push({
                 handler: onLaunchWorkflow,
-                iconCssClass: "fa fa-cog",
+                iconCssClass: "ti ti-settings",
                 title: "Launch Workflow",
                 tooltip: "Launch Workflow"
             });
@@ -839,7 +839,7 @@
         if (isBulkUpdateVisible.value) {
             actions.push({
                 handler: onBulkUpdate,
-                iconCssClass: "fa fa-truck",
+                iconCssClass: "ti ti-truck",
                 title: "Bulk Update",
                 tooltip: "Bulk Update"
             });
@@ -849,7 +849,7 @@
         if (isMergePersonVisible.value) {
             actions.push({
                 handler: onPersonMerge,
-                iconCssClass: "fa fa-users",
+                iconCssClass: "ti ti-users",
                 title: "Merge Person Records",
                 tooltip: "Merge Person Records"
             });
@@ -859,7 +859,7 @@
         if (isMergeBusinessVisible.value) {
             actions.push({
                 handler: onPersonMerge,
-                iconCssClass: "fa fa-sign-in-alt",
+                iconCssClass: "ti ti-login-2",
                 title: "Merge Business Records",
                 tooltip: "Merge Business Records"
             });
@@ -869,7 +869,7 @@
         if (isCommunicateVisible.value) {
             actions.push({
                 handler: onCommunicate,
-                iconCssClass: "fa fa-comment",
+                iconCssClass: "ti ti-message",
                 title: "Communicate",
                 tooltip: "Communicate"
             });

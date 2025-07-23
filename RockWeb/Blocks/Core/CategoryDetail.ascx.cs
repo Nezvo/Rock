@@ -432,7 +432,7 @@ namespace RockWeb.Blocks.Core
             if ( category.Id > 0 )
             {
                 lTitle.Text = ActionTitle.Edit( Category.FriendlyTypeName ).FormatAsHtmlTitle();
-                lIcon.Text = "<i class='fa fa-square-o'></i>";
+                lIcon.Text = "<i class='ti ti-square'></i>";
             }
             else
             {
@@ -444,7 +444,7 @@ namespace RockWeb.Blocks.Core
                 }
                 else
                 {
-                    lIcon.Text = "<i class='fa fa-square-o'></i>";
+                    lIcon.Text = "<i class='ti ti-square'></i>";
                 }
             }
 
@@ -499,7 +499,7 @@ namespace RockWeb.Blocks.Core
             }
             else
             {
-                lIcon.Text = "<i class='fa fa-square-o'></i>";
+                lIcon.Text = "<i class='ti ti-square'></i>";
             }
 
             lblMainDetails.Text = new DescriptionList()

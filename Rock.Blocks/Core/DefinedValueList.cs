@@ -39,7 +39,7 @@ namespace Rock.Blocks.Core
     [DisplayName( "Defined Value List" )]
     [Category( "Core" )]
     [Description( "Block for viewing values for a defined type." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
     [DefinedTypeField( "Defined Type",

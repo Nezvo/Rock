@@ -39,7 +39,7 @@ namespace Rock.Blocks.Core
     [DisplayName( "Scheduled Job List" )]
     [Category( "Core" )]
     [Description( "Lists all scheduled jobs." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
     [LinkedPage( "Detail Page",

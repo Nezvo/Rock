@@ -492,13 +492,13 @@ const detailBlockGallery = defineComponent({
 
             return [
                 {
-                    iconCssClass: "fa fa-user",
+                    iconCssClass: "ti ti-user",
                     title: "Action 1",
                     type: "default",
                     handler: () => alert("Action 1 selected.")
                 },
                 {
-                    iconCssClass: "fa fa-group",
+                    iconCssClass: "ti ti-users",
                     title: "Action 2",
                     type: "success",
                     handler: () => alert("Action 2 selected.")
@@ -513,13 +513,13 @@ const detailBlockGallery = defineComponent({
 
             return [
                 {
-                    iconCssClass: "fa fa-user",
+                    iconCssClass: "ti ti-user",
                     title: "Action 1",
                     type: "info",
                     handler: () => alert("Action 1 selected.")
                 },
                 {
-                    iconCssClass: "fa fa-group",
+                    iconCssClass: "ti ti-users",
                     title: "Action 2",
                     type: "success",
                     handler: () => alert("Action 2 selected.")
@@ -534,13 +534,13 @@ const detailBlockGallery = defineComponent({
 
             return [
                 {
-                    iconCssClass: "fa fa-user",
+                    iconCssClass: "ti ti-user",
                     title: "Action 1",
                     type: "default",
                     handler: () => alert("Action 1 selected.")
                 },
                 {
-                    iconCssClass: "fa fa-group",
+                    iconCssClass: "ti ti-users",
                     title: "Action 2",
                     type: "success",
                     handler: () => alert("Action 2 selected.")
@@ -555,13 +555,13 @@ const detailBlockGallery = defineComponent({
 
             return [
                 {
-                    iconCssClass: "fa fa-user",
+                    iconCssClass: "ti ti-user",
                     title: "Action 1",
                     type: "default",
                     handler: () => alert("Action 1 selected.")
                 },
                 {
-                    iconCssClass: "fa fa-group",
+                    iconCssClass: "ti ti-users",
                     title: "Action 2",
                     type: "success",
                     handler: () => alert("Action 2 selected.")
@@ -576,13 +576,13 @@ const detailBlockGallery = defineComponent({
 
             return [
                 {
-                    iconCssClass: "fa fa-user",
+                    iconCssClass: "ti ti-user",
                     title: "Action 1",
                     type: "default",
                     handler: () => alert("Action 1 selected.")
                 },
                 {
-                    iconCssClass: "fa fa-group",
+                    iconCssClass: "ti ti-users",
                     title: "Action 2",
                     type: "success",
                     handler: () => alert("Action 2 selected.")

@@ -590,7 +590,7 @@ Because the contents of this setting will be rendered inside a &lt;ul&gt; elemen
                 {
                     string url = string.Format( "~/WorkflowEntry/{0}?PersonId={1}", workflowType.Id, Person.Id );
                     sbActions.AppendFormat(
-                        "<li><a href='{0}'><i class='fa-fw {1}'></i> {2}</a></li>",
+                        "<li><a href='{0}'><i class='ti-fw {1}'></i> {2}</a></li>",
                         ResolveRockUrl( url ),
                         workflowType.IconCssClass,
                         workflowType.Name );
@@ -807,7 +807,7 @@ Because the contents of this setting will be rendered inside a &lt;ul&gt; elemen
 
                 if ( smsEnabled )
                 {
-                    formattedNumber = string.Format( "{0} <small>{1} <span class='label label-success' title='SMS Enabled' data-toggle='tooptip' data-placement='top'><i class='fa fa-sms'></i></span></small>", phoneMarkup, phoneType.Value );
+                    formattedNumber = string.Format( "{0} <small>{1} <span class='label label-success' title='SMS Enabled' data-toggle='tooptip' data-placement='top'><i class='ti ti-device-mobile-message'></i></span></small>", phoneMarkup, phoneType.Value );
                 }
                 else
                 {

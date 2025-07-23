@@ -591,16 +591,16 @@ namespace RockWeb.Blocks.Communication
                     switch ( this.CommunicationType )
                     {
                         case CommunicationType.RecipientPreference:
-                            iconCssClass = "fa fa-user fa-lg";
+                            iconCssClass = "ti ti-user ti-lg";
                             break;
                         case CommunicationType.Email:
-                            iconCssClass = "fa fa-envelope fa-lg";
+                            iconCssClass = "ti ti-mail ti-lg";
                             break;
                         case CommunicationType.SMS:
-                            iconCssClass = "fa fa-comment fa-lg";
+                            iconCssClass = "ti ti-message ti-lg";
                             break;
                         case CommunicationType.PushNotification:
-                            iconCssClass = "fa fa-bell fa-lg";
+                            iconCssClass = "ti ti-bell ti-lg";
                             break;
                         default:
                             break;

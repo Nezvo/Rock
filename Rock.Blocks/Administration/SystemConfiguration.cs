@@ -46,7 +46,7 @@ namespace Rock.Blocks.Administration
     [DisplayName( "System Configuration" )]
     [Category( "Administration" )]
     [Description( "Used for making configuration changes to configurable items in the web.config." )]
-    [IconCssClass( "fa fa-question" )]
+    [IconCssClass( "ti ti-question-mark" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
     [SystemGuid.EntityTypeGuid( "7ECDCE1B-D63F-42AA-88B6-7C5585E1F33A" )]

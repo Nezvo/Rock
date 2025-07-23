@@ -358,22 +358,22 @@ export function getComponentTypeName(componentElement: Element): ComponentTypeNa
 
 export function getComponentIconHtml(componentTypeName: EditorComponentTypeName): string {
     function createIconElement(iconCssClass: string): string {
-        return `<i class="${iconCssClass} fa-lg"></i>`;
+        return `<i class="${iconCssClass} ti-lg"></i>`;
     }
 
     switch (componentTypeName) {
         case "title":
-            return createIconElement("fa fa-font");
+            return createIconElement("ti ti-typography");
         case "video":
-            return createIconElement("fa fa-play-circle-o");
+            return createIconElement("ti");
         case "button":
             return `
 <div style="background-color: var(--color-interface-strong); width: 60px; border-radius: var(--border-radius-base);">
-    <i class="fa fa-mouse-pointer fa-sm" style="color: var(--color-interface-softest);"></i>
+    <i class="ti ti-pointer ti-sm" style="color: var(--color-interface-softest);"></i>
 </div>
 `;
         case "text":
-            return createIconElement("fa fa-align-left");
+            return createIconElement("ti ti-align-left");
         case "divider":
             return `
 <div class="d-flex flex-column align-items-center" style="gap: var(--spacing-tiny);">
@@ -382,13 +382,13 @@ export function getComponentIconHtml(componentTypeName: EditorComponentTypeName)
     <div style="width: 42px; height: 10px; background-color: var(--color-interface-soft);"></div>
 </div>`;
         case "message":
-            return createIconElement("fa fa-user");
+            return createIconElement("ti ti-user");
         case "image":
-            return createIconElement("fa fa-image");
+            return createIconElement("ti ti-photo");
         case "code":
-            return createIconElement("fa fa-code");
+            return createIconElement("ti ti-code");
         case "rsvp":
-            return createIconElement("fa fa-check-square-o");
+            return createIconElement("ti ti-square-check");
         case "section":
             return createIconElement("rk rk-one-column");
         case "one-column-section":
@@ -438,7 +438,7 @@ export function getComponentIconHtml(componentTypeName: EditorComponentTypeName)
 `;
         default:
             console.warn(`Unable to retrieve the icon for the unknown component type: '${componentTypeName}'. Returning the default icon.`);
-            return createIconElement("fa fa-question");
+            return createIconElement("ti ti-question-mark");
     }
 }
 

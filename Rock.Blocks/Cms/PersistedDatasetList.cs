@@ -41,7 +41,7 @@ namespace Rock.Blocks.Cms
     [DisplayName( "Persisted Dataset List" )]
     [Category( "CMS" )]
     [Description( "Displays a list of persisted datasets." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
     [LinkedPage( "Detail Page",

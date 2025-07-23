@@ -366,7 +366,7 @@ namespace Rock.Jobs
 
             if ( rockCleanupJobResultList.Any( a => a.HasException ) )
             {
-                jobSummaryBuilder.AppendLine( "\n<i class='fa fa-circle text-warning'></i> Some jobs have errors. See exception log for details." );
+                jobSummaryBuilder.AppendLine( "\n<i class='ti ti-circle text-warning'></i> Some jobs have errors. See exception log for details." );
             }
 
             this.Result = jobSummaryBuilder.ToString();
@@ -463,11 +463,11 @@ namespace Rock.Jobs
         {
             if ( result.HasException )
             {
-                return $"<i class='fa fa-circle text-danger'></i> {result.Title} ({result.Elapsed.TotalMilliseconds:N0}ms)";
+                return $"<i class='ti ti-circle text-danger'></i> {result.Title} ({result.Elapsed.TotalMilliseconds:N0}ms)";
             }
             else
             {
-                var icon = "<i class='fa fa-circle text-success'></i>";
+                var icon = "<i class='ti ti-circle text-success'></i>";
                 var title = result.Title.PluralizeIf( result.RowsAffected != 1 ).ApplyCase( LetterCasing.Title );
                 return $"{icon} {result.RowsAffected} {title} ({result.Elapsed.TotalMilliseconds:N0}ms)";
             }

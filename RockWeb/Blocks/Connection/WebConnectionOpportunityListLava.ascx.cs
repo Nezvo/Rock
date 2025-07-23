@@ -44,7 +44,7 @@ namespace RockWeb.Blocks.Connection
     [DisplayName( "Connection Opportunity List" )]
     [Category( "Connection > WebView" )]
     [Description( "Displays the list of connection opportunities for a single connection type." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
 
     #region Block Attributes
     [CodeEditorField( "Opportunity Template",

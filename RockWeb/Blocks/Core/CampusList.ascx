@@ -6,7 +6,7 @@
         
         <div class="panel panel-block">
             <div class="panel-heading">
-                <h1 class="panel-title"><i class="fa fa-building-o"></i> Campus List</h1>
+                <h1 class="panel-title"><i class="ti ti-building"></i> Campus List</h1>
             </div>
             <div class="panel-body">
 
