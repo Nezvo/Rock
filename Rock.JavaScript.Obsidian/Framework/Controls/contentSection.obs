@@ -15,7 +15,8 @@
                     <slot name="headerActions" />
                 </div>
 
-                <button type="button"
+                <button v-if="!disableCollapse"
+                        type="button"
                         class="btn btn-action"
                         @click="section.isCollapsed.value = !section.isCollapsed.value">
                     <i class="ti ti-chevron-up"></i>
@@ -24,7 +25,7 @@
         </div>
 
         <TransitionVerticalCollapse>
-            <div v-show="!section.isCollapsed.value">
+            <div v-show="disableCollapse || !section.isCollapsed.value">
                 <div class="content-section-body">
                     <slot />
                 </div>
@@ -106,6 +107,9 @@
     padding: var(--spacing-small) var(--spacing-large);
     display: flex;
     justify-content: space-between;
+}
+
+.content-section-collapsible > .content-section-header {
     cursor: pointer;
 }
 
@@ -160,7 +164,7 @@ content-section-body-overflow {
     gap: var(--spacing-xlarge);
 }
 
-.content-section-body {
+.content-section-header + div > .content-section-body {
     border-top: 1px var(--color-interface-soft) solid;
 }
 
@@ -302,6 +306,15 @@ content-section-body-overflow {
         light: {
             type: Boolean as PropType<boolean>,
             default: false
+        },
+
+        /**
+         * A section can be collapsed by default. This will disable that so the
+         * section is always expanded.
+         */
+        disableCollapse: {
+            type: Boolean as PropType<boolean>,
+            default: false
         }
     });
 
@@ -324,6 +337,10 @@ content-section-body-overflow {
      */
     const additionalSectionClasses = computed((): string[] => {
         const classes: string[] = [];
+
+        if (!props.disableCollapse) {
+            classes.push("content-section-collapsible");
+        }
 
         if (section.isCollapsed.value) {
             classes.push("content-section-collapsed");

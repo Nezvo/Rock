@@ -2,9 +2,10 @@
     <GalleryAndResult :importCode="importCode"
                       :exampleCode="exampleCode"
                       demoMode>
-        <ContentSection title="Sample Section"
-                        icon="ti ti-icons"
-                        :light="isLight">
+        <ContentSection :title="title"
+                        :icon="icon"
+                        :light="isLight"
+                        :disableCollapse="disableCollapse">
             <template v-if="hasHeaderActions" #headerActions>
                 <button type="button" class="btn btn-action">
                     <i class="ti ti-question-mark"></i>
@@ -41,9 +42,12 @@
         <template #settings>
             <div class="row">
                 <CheckBox formGroupClasses="col-md-3" label="Light" v-model="isLight" />
+                <CheckBox formGroupClasses="col-md-3" label="Title" v-model="hasTitle" />
+                <CheckBox formGroupClasses="col-md-3" label="Icon" v-model="hasIcon" />
                 <CheckBox formGroupClasses="col-md-3" label="Header Actions" v-model="hasHeaderActions" />
                 <CheckBox formGroupClasses="col-md-3" label="Footer Actions" v-model="hasFooterActions" />
                 <CheckBox formGroupClasses="col-md-3" label="Footer Secondary Actions" v-model="hasFooterSecondaryActions" />
+                <CheckBox formGroupClasses="col-md-3" label="Disable Collapse" v-model="disableCollapse" />
                 <CheckBox formGroupClasses="col-md-3" label="Overflow" v-model="hasOverflow" />
                 <NumberUpDown formGroupClasses="col-md-3" label="Stack Count" v-model="stackCount" :min="1" :max="10" />
             </div>
@@ -62,19 +66,31 @@
     import { ComponentUsage, getNumberWord, getSfcControlImportPath } from "./common/utils.partial";
 
     const isLight = ref(false);
+    const hasTitle = ref(true);
+    const hasIcon = ref(true);
     const hasHeaderActions = ref(false);
     const hasFooterActions = ref(false);
     const hasFooterSecondaryActions = ref(false);
+    const disableCollapse = ref(false);
     const hasOverflow = ref(false);
     const stackCount = ref(2);
+
+    const title = computed((): string | undefined => {
+        return hasTitle.value ? "Sample Section" : undefined;
+    });
+
+    const icon = computed((): string | undefined => {
+        return hasIcon.value ? "ti ti-icons" : undefined;
+    });
 
     const importCode = getSfcControlImportPath("contentSection");
     const exampleCode = computed(() => {
         const usage = new ComponentUsage("ContentSection");
 
-        usage.addAttribute("title", "Sample Section");
-        usage.addAttribute("icon", "ti ti-icons");
+        usage.addAttribute("title", title.value);
+        usage.addAttribute("icon", icon.value);
         usage.addAttribute("light", isLight.value, false);
+        usage.addAttribute("disableCollapse", disableCollapse.value, false);
 
         if (hasHeaderActions.value) {
             usage.addBody("<template #headerActions>");
