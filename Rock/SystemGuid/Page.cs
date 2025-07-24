@@ -525,6 +525,7 @@ namespace Rock.SystemGuid
 
         /// <summary>
         /// Gets the Communication Saturation page guid
+        /// ParentPage: Communications
         /// </summary>
         public const string COMMUNICATION_SATURATION = "DA0F647C-5317-4368-9514-E408F2254E24";
 
@@ -776,14 +777,14 @@ namespace Rock.SystemGuid
         /// <summary>
         /// Gets the Communication Reports page guid
         /// </summary>
-        public const string COMMUNICATION_REPORTS =  "64E589FE-020F-447A-87D6-50A38068B945";
+        public const string COMMUNICATION_REPORTS = "64E589FE-020F-447A-87D6-50A38068B945";
 
         /// <summary>
         /// Gets the Mass Push Notifications page guid
         /// ParentPage: Communications
         /// </summary>
         public const string MASS_PUSH_NOTIFICATIONS = "3D97725E-5E17-411F-856C-F4B79B9BFF15";
-        
+
         /// <summary>
         /// The mobile site pages
         /// </summary>
@@ -1798,7 +1799,7 @@ namespace Rock.SystemGuid
         /// ParentPage: CMS Configuration
         /// </summary>
         public const string SITES = "7596D389-4EAB-4535-8BEE-229737F46F44";
-        
+
         /// <summary>
         /// The SMS phone numbers
         /// ParentPage: Communications
