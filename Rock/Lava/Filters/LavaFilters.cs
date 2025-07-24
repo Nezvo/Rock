@@ -5013,7 +5013,7 @@ namespace Rock.Lava
 
                     if ( entityTypeCache != null )
                     {
-                        RockContext _rockContext = LavaHelper.GetRockContextFromLavaContext( context );
+                        RockContext rockContext = LavaHelper.GetRockContextFromLavaContext( context );
 
                         Type entityType = entityTypeCache.GetEntityType();
                         if ( entityType != null )
@@ -5021,7 +5021,7 @@ namespace Rock.Lava
                             Type[] modelType = { entityType };
                             Type genericServiceType = typeof( Rock.Data.Service<> );
                             Type modelServiceType = genericServiceType.MakeGenericType( modelType );
-                            Rock.Data.IService serviceInstance = Activator.CreateInstance( modelServiceType, new object[] { _rockContext } ) as IService;
+                            Rock.Data.IService serviceInstance = Activator.CreateInstance( modelServiceType, new object[] { rockContext } ) as IService;
 
                             MethodInfo getMethod = serviceInstance.GetType().GetMethod( "Get", new Type[] { typeof( int ) } );
 
