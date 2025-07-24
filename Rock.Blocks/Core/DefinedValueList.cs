@@ -26,7 +26,6 @@ using Rock.Data;
 using Rock.Model;
 using Rock.Obsidian.UI;
 using Rock.Security;
-using Rock.Security.SecurityGrantRules;
 using Rock.ViewModels.Blocks;
 using Rock.ViewModels.Blocks.Core.DefinedValueList;
 using Rock.Web.Cache;
@@ -109,10 +108,19 @@ namespace Rock.Blocks.Core
         {
             var securityGrant = new Rock.Security.SecurityGrant();
 
-            securityGrant.AddRule( new AssetAndFileManagerSecurityGrantRule( Rock.Security.Authorization.VIEW ) );
-            securityGrant.AddRule( new AssetAndFileManagerSecurityGrantRule( Rock.Security.Authorization.EDIT ) );
-            securityGrant.AddRule( new AssetAndFileManagerSecurityGrantRule( Rock.Security.Authorization.DELETE ) );
-            securityGrant.AddRule( new EmailEditorSecurityGrantRule() );
+            var fieldTypes = FieldTypeCache.All();
+
+            foreach ( var fieldType in fieldTypes )
+            {
+                if ( fieldType.Field is Rock.Field.ISecurityGrantFieldType grantFieldType )
+                {
+                    grantFieldType.AddRulesToSecurityGrant( securityGrant, new Dictionary<string, string>() );
+                }
+            }
+
+            var entity = GetDefinedType();
+            var attributes = AttributeCache.GetByEntityTypeQualifier( new DefinedValue().TypeId, "DefinedTypeId", entity.Id.ToString(), true );
+            securityGrant.AddRulesForAttributes( attributes );
 
             return securityGrant.ToToken();
         }
