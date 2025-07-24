@@ -18,11 +18,11 @@
         </ContentSectionWrapper>
 
         <template #settings>
-            <div class="row">
-                <DropDownList formGroupClasses="col-md-3" label="Sidebar" v-model="sidebar" :items="sidebarItems" :showBlankItem="false" />
-                <CheckBox formGroupClasses="col-md-3" label="Right Sidebar" v-model="rightSidebar" />
-                <NumberUpDown formGroupClasses="col-md-3" label="Section Count" v-model="sectionCount" :min="1" :max="10" />
-                <NumberUpDown formGroupClasses="col-md-3" label="Stack Count" v-model="stackCount" :min="1" :max="10" />
+            <div class="automatic-layout">
+                <DropDownList label="Sidebar" v-model="sidebar" :items="sidebarItems" :showBlankItem="false" />
+                <CheckBox label="Right Sidebar" v-model="rightSidebar" />
+                <NumberUpDown label="Section Count" v-model="sectionCount" :min="1" :max="10" />
+                <NumberUpDown label="Stack Count" v-model="stackCount" :min="1" :max="10" />
             </div>
         </template>
     </GalleryAndResult>

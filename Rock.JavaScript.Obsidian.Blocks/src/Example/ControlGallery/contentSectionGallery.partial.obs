@@ -5,8 +5,13 @@
         <ContentSection :title="title"
                         :icon="icon"
                         :light="isLight"
-                        :disableCollapse="disableCollapse">
+                        :disableCollapse="disableCollapse"
+                        :overflowText="overflowText">
             <template v-if="hasHeaderActions" #headerActions>
+                <span class="label label-info">Header Action</span>
+            </template>
+
+            <template v-if="hasHeaderSecondaryActions" #headerSecondaryActions>
                 <button type="button" class="btn btn-action">
                     <i class="ti ti-question-mark"></i>
                 </button>
@@ -40,16 +45,18 @@
         </ContentSection>
 
         <template #settings>
-            <div class="row">
-                <CheckBox formGroupClasses="col-md-3" label="Light" v-model="isLight" />
-                <CheckBox formGroupClasses="col-md-3" label="Title" v-model="hasTitle" />
-                <CheckBox formGroupClasses="col-md-3" label="Icon" v-model="hasIcon" />
-                <CheckBox formGroupClasses="col-md-3" label="Header Actions" v-model="hasHeaderActions" />
-                <CheckBox formGroupClasses="col-md-3" label="Footer Actions" v-model="hasFooterActions" />
-                <CheckBox formGroupClasses="col-md-3" label="Footer Secondary Actions" v-model="hasFooterSecondaryActions" />
-                <CheckBox formGroupClasses="col-md-3" label="Disable Collapse" v-model="disableCollapse" />
-                <CheckBox formGroupClasses="col-md-3" label="Overflow" v-model="hasOverflow" />
-                <NumberUpDown formGroupClasses="col-md-3" label="Stack Count" v-model="stackCount" :min="1" :max="10" />
+            <div class="automatic-layout">
+                <CheckBox label="Light" v-model="isLight" />
+                <CheckBox label="Title" v-model="hasTitle" />
+                <CheckBox label="Icon" v-model="hasIcon" />
+                <CheckBox label="Header Actions" v-model="hasHeaderActions" />
+                <CheckBox label="Header Secondary Actions" v-model="hasHeaderSecondaryActions" />
+                <CheckBox label="Footer Actions" v-model="hasFooterActions" />
+                <CheckBox label="Footer Secondary Actions" v-model="hasFooterSecondaryActions" />
+                <CheckBox label="Disable Collapse" v-model="disableCollapse" />
+                <CheckBox label="Overflow" v-model="hasOverflow" />
+                <TextBox label="Overflow Text" v-model="overflowText" />
+                <NumberUpDown label="Stack Count" v-model="stackCount" :min="1" :max="10" />
             </div>
         </template>
     </GalleryAndResult>
@@ -69,10 +76,12 @@
     const hasTitle = ref(true);
     const hasIcon = ref(true);
     const hasHeaderActions = ref(false);
+    const hasHeaderSecondaryActions = ref(false);
     const hasFooterActions = ref(false);
     const hasFooterSecondaryActions = ref(false);
     const disableCollapse = ref(false);
     const hasOverflow = ref(false);
+    const overflowText = ref("Show More");
     const stackCount = ref(2);
 
     const title = computed((): string | undefined => {
@@ -91,9 +100,17 @@
         usage.addAttribute("icon", icon.value);
         usage.addAttribute("light", isLight.value, false);
         usage.addAttribute("disableCollapse", disableCollapse.value, false);
+        usage.addAttribute("overflowText", overflowText.value, "Show More");
 
         if (hasHeaderActions.value) {
             usage.addBody("<template #headerActions>");
+            usage.addBody("    <span class=\"label label-info\">Header Action</span>");
+            usage.addBody("</template>");
+            usage.addBody("");
+        }
+
+        if (hasHeaderSecondaryActions.value) {
+            usage.addBody("<template #headerSecondaryActions>");
             usage.addBody("    <button type=\"button\" class=\"btn btn-action\">");
             usage.addBody("        <i class=\"ti ti-question-mark\"></i>");
             usage.addBody("    </button>");

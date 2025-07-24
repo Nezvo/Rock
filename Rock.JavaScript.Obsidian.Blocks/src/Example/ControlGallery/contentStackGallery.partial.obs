@@ -11,11 +11,11 @@
         </ContentStack>
 
         <template #settings>
-            <div class="row">
-                <CheckBox formGroupClasses="col-md-3" label="Has Title" v-model="hasTitle" />
-                <CheckBox formGroupClasses="col-md-3" label="Has Description" v-model="hasDescription" />
-                <CheckBox formGroupClasses="col-md-3" label="Right Sidebar" v-model="rightSidebar" />
-                <NumberUpDown formGroupClasses="col-md-3" label="Field Count" v-model="fieldCount" :min="1" :max="10" />
+            <div class="automatic-layout">
+                <CheckBox label="Has Title" v-model="hasTitle" />
+                <CheckBox label="Has Description" v-model="hasDescription" />
+                <CheckBox label="Right Sidebar" v-model="rightSidebar" />
+                <NumberUpDown label="Field Count" v-model="fieldCount" :min="1" :max="10" />
             </div>
         </template>
     </GalleryAndResult>

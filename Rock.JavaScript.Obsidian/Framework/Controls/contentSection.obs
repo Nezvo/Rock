@@ -11,9 +11,12 @@
             </h5>
 
             <div class="content-section-header-actions">
-                <div class="content-section-header-reveal-actions">
-                    <slot name="headerActions" />
+                <div v-if="$slots.headerSecondaryActions"
+                     class="content-section-header-reveal-actions">
+                    <slot name="headerSecondaryActions" />
                 </div>
+
+                <slot name="headerActions" />
 
                 <button v-if="!disableCollapse"
                         type="button"
@@ -37,7 +40,7 @@
                         <button type="button"
                                 class="btn btn-link"
                                 @click="isOverflowCollapsed = !isOverflowCollapsed">
-                            <span>Show More</span>
+                            <span>{{ overflowText || "Show More" }}</span>
                             <i class="ti ti-chevron-up"></i>
                         </button>
                     </div>
@@ -315,7 +318,15 @@ content-section-body-overflow {
         disableCollapse: {
             type: Boolean as PropType<boolean>,
             default: false
-        }
+        },
+
+        /**
+         * The text to display for the button to show the overflow content.
+         */
+        overflowText: {
+            type: String as PropType<string>,
+            required: false
+        },
     });
 
     // #region Values
