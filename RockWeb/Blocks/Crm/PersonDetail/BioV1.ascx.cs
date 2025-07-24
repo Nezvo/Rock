@@ -433,9 +433,9 @@ Because the contents of this setting will be rendered inside a &lt;ul&gt; elemen
                         {
                             url = r.Value.Value,
                             name = r.QualifierValues[NAME_KEY].Value,
-                            icon = r.Attribute.QualifierValues[ICONCSSCLASS_KEY].Value.Contains( "fa-fw" ) ?
+                            icon = r.Attribute.QualifierValues[ICONCSSCLASS_KEY].Value.Contains( "ti-fw" ) ?
                                     r.Attribute.QualifierValues[ICONCSSCLASS_KEY].Value :
-                                    r.Attribute.QualifierValues[ICONCSSCLASS_KEY].Value + " fa-fw",
+                                    r.Attribute.QualifierValues[ICONCSSCLASS_KEY].Value + " ti-fw",
                             color = r.Attribute.QualifierValues[COLOR_KEY].Value,
                         } )
                         .ToList();

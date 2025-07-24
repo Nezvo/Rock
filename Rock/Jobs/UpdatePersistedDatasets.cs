@@ -163,7 +163,7 @@ namespace Rock.Jobs
             // If there are warnings, concatenate them into the final result.
             if ( warnings.Any() )
             {
-                resultMessage.AppendLine( $"<i class='fa fa-circle text-warning'></i> {warnings.Count} Warning{( warnings.Count == 1 ? "" : "s" )}. Run manually or see exception log for details." );
+                resultMessage.AppendLine( $"<i class='ti ti-circle text-warning'></i> {warnings.Count} Warning{( warnings.Count == 1 ? "" : "s" )}. Run manually or see exception log for details." );
                 resultMessage.AppendLine(string.Join( "<br>", warnings ));
             }
             this.Result = resultMessage.ToString();

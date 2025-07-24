@@ -223,7 +223,7 @@
     };
 
     const getLeaderIcon = (isLeader: boolean): string => {
-        return isLeader ? "<span class='node-type-icon' title='Leader'><i class='fa fa-user-tie'></i></span>" : "";
+        return isLeader ? "<span class='node-type-icon' title='Leader'><i class='ti ti-speakerphone'></i></span>" : "";
     };
 
     const getCurrentJobRunnerIcon = (isCurrentJobRunner: boolean): string => {

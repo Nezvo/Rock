@@ -92,7 +92,7 @@ $.ajax({{
             var groupIcon = data.GroupTypeIconCss;
 
             if (groupIcon == '') {{
-                groupIcon = 'fa fa-x';
+                groupIcon = 'ti ti-x';
             }}
 
             var badgeHtml = '<i class=\'badge-icon ' + groupIcon + '\'></i>';

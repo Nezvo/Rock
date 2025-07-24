@@ -24,7 +24,7 @@
                             Show Cookies
                         </a>
                         <a href="#" id="btnShowVariables" runat="server" class="js-btn-show-servervars btn btn-default">
-                            <i class="fa fa-hdd-o"></i>
+                            <i class="ti ti-server-2"></i>
                             Show Server Variables
 
                         </a>

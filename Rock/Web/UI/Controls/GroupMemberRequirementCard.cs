@@ -341,7 +341,7 @@ namespace Rock.Web.UI.Controls
                 {
                     writer.AddAttribute( HtmlTextWriterAttribute.Class, "flex-shrink-0" );
                     writer.RenderBeginTag( HtmlTextWriterTag.Span );
-                    writer.AddAttribute( HtmlTextWriterAttribute.Class, TypeIconCssClass + " fa-fw icon" );
+                    writer.AddAttribute( HtmlTextWriterAttribute.Class, TypeIconCssClass + " ti-fw icon" );
                     writer.RenderBeginTag( HtmlTextWriterTag.I );
 
                     // End the I tag.

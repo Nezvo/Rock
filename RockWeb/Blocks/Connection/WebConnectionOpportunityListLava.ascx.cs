@@ -108,7 +108,7 @@ namespace RockWeb.Blocks.Connection
                 <a href=""{{ DetailPage | PageRoute:pageRouteParams }}"" class=""stretched-link""></a>
                 {% endif %}
                 <div class=""card-body d-flex flex-wrap align-items-center"" style=""min-height:60px;"">
-                    <i class=""{{ connectionOpportunity.IconCssClass }} fa-2x text-muted""></i>
+                    <i class=""{{ connectionOpportunity.IconCssClass }} ti-2x text-muted""></i>
                     <div class=""px-3 flex-fill"">
                         <span class=""d-block text-color""><strong>{{ connectionOpportunity.Name }}</strong></span>
                         <span class=""text-muted text-sm"">{{ connectionOpportunity.Summary | Truncate:100,'...' }}</span>

@@ -22,7 +22,7 @@
                     :btnType="adaptiveFontSize.length > 0 ? 'primary' : 'default'"
                     btnSize="sm"
                     @click="onAdaptiveFontSizeClick">
-            <i class="fa fa-text-width"></i>
+            <i class="ti ti-ruler-measure"></i>
         </RockButton>
 
         <slot name="iconButtons" />

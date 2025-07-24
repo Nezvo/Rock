@@ -285,7 +285,7 @@ namespace RockWeb.Blocks.Administration
             pdAuditDetails.SetEntity( page, ResolveRockUrl( "~" ) );
 
             string pageIconHtml = !string.IsNullOrWhiteSpace( page.IconCssClass ) ?
-                pageIconHtml = string.Format( "<i class='{0} fa-2x' ></i>", page.IconCssClass ) : string.Empty;
+                pageIconHtml = string.Format( "<i class='{0} ti-2x' ></i>", page.IconCssClass ) : string.Empty;
 
             lTitle.Text = page.InternalName.FormatAsHtmlTitle();
             if ( !string.IsNullOrEmpty( page.IconCssClass ) )

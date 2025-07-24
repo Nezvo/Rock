@@ -489,7 +489,7 @@ namespace RockWeb.Blocks.Core
             SetEditMode( false );
 
             string categoryIconHtml = !string.IsNullOrWhiteSpace( category.IconCssClass ) ?
-                categoryIconHtml = string.Format( "<i class='{0} fa-2x' ></i>", category.IconCssClass ) : "";
+                categoryIconHtml = string.Format( "<i class='{0} ti-2x' ></i>", category.IconCssClass ) : "";
 
             hfCategoryId.SetValue( category.Id );
             lTitle.Text = category.Name.FormatAsHtmlTitle();
