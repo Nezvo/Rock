@@ -55,7 +55,7 @@
     import { IContentSectionHolder, IContentSectionWrapperHolder, provideSectionWrapper } from "@Obsidian/Core/Controls/contentSection";
     import { usePersonPreferences } from "@Obsidian/Utility/block";
     import { asBooleanOrNull } from "@Obsidian/Utility/booleanUtils";
-    import { computed, onBeforeUnmount, PropType, ref, shallowRef, watch } from "vue";
+    import { computed, PropType, ref, shallowRef, watch } from "vue";
 
     const props = defineProps({
         /**
@@ -83,31 +83,16 @@
 
     let nextSectionId = 1;
     const sections = shallowRef<IContentSectionHolder[]>([]);
-    const sectionWatchers = new Map<string, (() => void)[]>();
     const autoCollapse = ref(asBooleanOrNull(preferences.getValue("content-section-auto-collapse")) ?? true);
 
     const wrapper: IContentSectionWrapperHolder = {
         addSection(section) {
             section.anchor.value = `section-${nextSectionId++}`;
-            section.isCollapsed.value = sections.value.length > 0;
-            sectionWatchers.set(section.anchor.value, [
-                watch(section.isCollapsed, () => onSectionCollapsedChanged(section))
-            ]);
 
             sections.value = [...sections.value, section];
         },
         removeSection(section) {
             sections.value = sections.value.filter(s => s !== section);
-
-            if (section.anchor.value) {
-                const watchers = sectionWatchers.get(section.anchor.value);
-
-                // Destroy all our watchers for this section.
-                if (watchers) {
-                    sectionWatchers.delete(section.anchor.value);
-                    watchers.forEach(watcher => watcher());
-                }
-            }
         }
     };
 
@@ -132,38 +117,9 @@
 
     // #endregion
 
-    /**
-     * Handles when a section's collapsed state changes. If auto-collapse is
-     * enabled, it will collapse all other sections.
-     *
-     * @param section The section that has changed its collapsed state.
-     */
-    function onSectionCollapsedChanged(section: IContentSectionHolder): void {
-        const isCollapsed = section.isCollapsed.value;
-
-        if (isCollapsed || !autoCollapse.value) {
-            return;
-        }
-
-        // If the section is being expanded, collapse all other sections.
-        sections.value.forEach(s => {
-            if (s !== section) {
-                s.isCollapsed.value = true;
-            }
-        });
-    }
-
     watch(autoCollapse, () => {
         preferences.setValue("content-section-auto-collapse", autoCollapse.value ? "true" : "false");
         preferences.save();
-    });
-
-    onBeforeUnmount((): void => {
-        // Destroy all our watchers.
-        sectionWatchers.forEach(watchers => {
-            watchers.forEach(watcher => watcher());
-        });
-        sectionWatchers.clear();
     });
 
     provideSectionWrapper(wrapper);

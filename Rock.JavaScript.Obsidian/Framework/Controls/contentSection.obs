@@ -2,7 +2,8 @@
     <div :id="section.anchor.value"
          class="content-section"
          :class="additionalSectionClasses">
-        <div class="content-section-header"
+        <div v-if="title"
+             class="content-section-header"
              @click="onSectionHeaderClick">
             <h5 class="content-section-title">
                 <i v-if="icon" :class="icon"></i>
@@ -23,7 +24,7 @@
         </div>
 
         <TransitionVerticalCollapse>
-            <div v-if="!section.isCollapsed.value">
+            <div v-show="!section.isCollapsed.value">
                 <div class="content-section-body">
                     <slot />
                 </div>
@@ -41,7 +42,7 @@
                     </div>
 
                     <TransitionVerticalCollapse>
-                        <div v-if="!isOverflowCollapsed" class="content-section-body-overflow-content">
+                        <div v-show="!isOverflowCollapsed" class="content-section-body-overflow-content">
                             <slot name="overflow" />
                         </div>
                     </TransitionVerticalCollapse>
@@ -283,7 +284,7 @@ content-section-body-overflow {
          */
         title: {
             type: String as PropType<string>,
-            required: true
+            required: false
         },
 
         /**
@@ -306,7 +307,7 @@ content-section-body-overflow {
 
     // #region Values
 
-    const title = computed((): string => props.title);
+    const title = computed((): string | undefined => props.title);
     const icon = computed((): string | undefined => props.icon);
     const isOverflowCollapsed = ref(true);
 

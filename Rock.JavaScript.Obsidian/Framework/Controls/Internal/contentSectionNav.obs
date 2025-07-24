@@ -30,9 +30,9 @@
            :href="`#${section.anchor.value}`"
            class="list-group-item nav-link"
            :class="{ active: section.anchor.value === activeSectionId }"
-           @click="section.isCollapsed.value = false">
+           @click.prevent.stop="onOpenSectionClick(section)">
             <i v-if="section.icon.value" :class="section.icon.value"></i>
-            {{ section.title.value }}
+            {{ section.title.value || "Primary" }}
         </a>
     </div>
 </template>
@@ -137,6 +137,28 @@
     function onHashChange(): void {
         activeSectionId.value = window.location.hash.replace("#", "");
 
+    }
+
+    /**
+     * Handles the click event on a section link to open the section.
+     * This will automatically collapse other sections before opening the
+     * clicked section.
+     *
+     * @param section The section that was clicked.
+     */
+    function onOpenSectionClick(section: IContentSectionHolder): void {
+        props.sections
+            .filter(s => !!s.title.value)
+            .forEach(s => {
+                if (s !== section) {
+                    s.isCollapsed.value = true;
+                }
+            });
+
+        section.isCollapsed.value = false;
+
+        const url = `${window.location.href.split("#")[0]}#${section.anchor.value}`;
+        window.history.replaceState(null, "", url);
     }
 
     // #endregion

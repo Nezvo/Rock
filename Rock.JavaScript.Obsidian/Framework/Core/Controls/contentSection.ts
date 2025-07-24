@@ -27,7 +27,7 @@ const sectionHolderKey = Symbol("contentSectionWrapperHolder");
  */
 export interface IContentSectionHolder {
     /** The title of the section. */
-    readonly title: Readonly<Ref<string>>;
+    readonly title: Readonly<Ref<string | undefined>>;
 
     /** The icon for the section, if any. */
     readonly icon: Readonly<Ref<string | undefined>>;
@@ -93,7 +93,7 @@ export function useSectionWrapper(): IContentSectionWrapperHolder {
  *
  * @returns A new content section holder to be registered with the content section wrapper.
  */
-export function createSection(title: Readonly<Ref<string>>, icon: Readonly<Ref<string | undefined>>): IContentSectionHolder {
+export function createSection(title: Readonly<Ref<string | undefined>>, icon: Readonly<Ref<string | undefined>>): IContentSectionHolder {
     const isCollapsed = ref(false);
     const anchor = ref<string>();
 
