@@ -83,6 +83,7 @@
                              :itemTerm="gridState.itemTerm"
                              :markInactiveRows="markInactiveRows"
                              :rowClass="rowClass"
+                             :keyField="keyField"
                              :emptyDataText="emptyDataText"
                              @width="calculateOverflow"
                              @click="onRowClick" />

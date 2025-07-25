@@ -15,10 +15,7 @@
 // </copyright>
 //
 
-// Originally from: https://github.com/tangbc/vue-virtual-scroll-list.
-// This is a conversion to TypeScript and also to simplify a few things that
-// we don't have a use for. It also reworks a few things to be a bit
-// more friendly to TypeScript style of doing things.
+import { computed, onBeforeUnmount, onMounted, Ref, ref, watch } from "vue";
 
 /**
  * The type of size calculation type to be used.
@@ -77,6 +74,11 @@ export type VirtualOptions = {
      */
     uniqueIds: string[];
 };
+
+// Originally from: https://github.com/tangbc/vue-virtual-scroll-list.
+// This is a conversion to TypeScript and also to simplify a few things that
+// we don't have a use for. It also reworks a few things to be a bit
+// more friendly to TypeScript style of doing things.
 
 /**
  * Helper class to handle virtual scrolling. There is no DOM interaction here.
@@ -145,7 +147,7 @@ export default class VirtualScroller {
      * Performs any cleanup on the virtual scroller that is needed. This should
      * be called when the scroller will no longer be used.
      */
-    destroy(): void {
+    public destroy(): void {
         this.heights.clear();
     }
 
@@ -429,4 +431,269 @@ export default class VirtualScroller {
     }
 
     // #endregion
+}
+
+
+type VirtualScrollOptions<RowItem> = {
+    /** The data for each row in the list */
+    items: Ref<RowItem[]>
+
+    /**
+     * The field that contains the unique identifier for each item. This must
+     * represent a string field value.
+     */
+    itemKey: string;
+
+    /**
+     * The HTML element that wraps the list, marking the top and bottom of the
+     * list. This is required to determine the scroll container.
+     */
+    container: Ref<HTMLElement | null | undefined>
+
+    /** The estimated height of each item in the list. */
+    estimatedItemHeight: number,
+};
+
+type VirtualScrollReturns<RowItem> = {
+    virtualItems: Ref<RowItem[]>;
+
+    beforePadStyle: Ref<{ height: string }>;
+
+    afterPadStyle: Ref<{ height: string }>;
+
+    range: Ref<Range>;
+
+    /**
+  * Informs the virtual scroller that the height of a single item has
+  * changed.
+  *
+  * @param id The identifier of the item whose height changed.
+  * @param height The new height of the item.
+  */
+    updateItemHeight(id: string, height: number): void;
+};
+
+/**
+ * A composable function that provides the actual items to render, along with the spacer sizes above and below the items,
+ * given the options provided to produce a virtual scroller. This allows you to have a massive list of items, but only
+ * render a small subset so there the pure number of DOM elements doesn't bog down the performance of the browser.
+ *
+ * This implementation only works with fixed height items to simplify the logic, but allows it to be used with a 2D grid
+ * by allowing the number of items per row to be specified. This implementation is temporary: we didn't have the time to
+ * generalize it to work in additional scenarios, but it is planned to be generalized in the future and merged with the
+ * implementation used by the VirtualDataRows component.
+ */
+export function useVirtualScroller<RowItem>(options: VirtualScrollOptions<RowItem>): VirtualScrollReturns<RowItem> {
+    const range = ref<Range>({ startIndex: 0, endIndex: 0, padBefore: 0, padAfter: 0 });
+    let virtualScroller: VirtualScroller | undefined;
+
+    /** Contains the set of virtual rows to be rendered in the DOM. */
+    const virtualItems = computed((): RowItem[] => {
+        const isInvalidRange = !range.value
+            || range.value.startIndex >= options.items.value.length
+            || range.value.endIndex >= options.items.value.length;
+
+        if (isInvalidRange) {
+            return [];
+        }
+
+        return options.items.value.slice(range.value.startIndex, range.value.endIndex + 1);
+    });
+
+    /** Contains the CSS styles for the padding item before the rows. */
+    const beforePadStyle = computed(() => ({
+        height: `${range.value.padBefore}px`
+    }));
+
+    /** Contains the CSS styles for the padding item after the rows. */
+    const afterPadStyle = computed(() => ({
+        height: `${range.value.padAfter}px`
+    }));
+
+    /** The closest scroll container to the rows container, including itself. */
+    const closestScrollContainer = computed((): HTMLElement | undefined => {
+        if (!options.container?.value) {
+            return undefined;
+        }
+
+        let elem: HTMLElement | null = options.container.value;
+
+        // If the element is scrollable, use it.
+        while (elem && elem !== document.body && elem !== document.documentElement) {
+            const style = window.getComputedStyle(elem);
+
+            if (style.overflowY === "auto" || style.overflowY === "scroll") {
+                return elem;
+            }
+
+            elem = elem.parentElement;
+        }
+
+        return undefined;
+    });
+
+    const scrollContainer = computed((): HTMLElement => {
+        return closestScrollContainer.value ?? document.documentElement;
+    });
+
+    /**
+     * Gets the current scroll offset.
+     */
+    function getScrollOffset(): number {
+        if (!scrollContainer.value) {
+            return document.documentElement.scrollTop || document.body.scrollTop;
+        }
+        else {
+            return scrollContainer.value.scrollTop;
+        }
+    }
+
+    /**
+     * Gets the height of the visible area in the scrollable element.
+     */
+    function getClientHeight(): number {
+        if (!scrollContainer.value) {
+            return document.documentElement.clientHeight || document.body.clientHeight;
+        }
+        else {
+            return scrollContainer.value.clientHeight;
+        }
+    }
+
+    /**
+     * Gets the total height of the scrollable content.
+     */
+    function getScrollHeight(): number {
+        if (!scrollContainer.value) {
+            return document.documentElement.scrollHeight || document.body.scrollHeight;
+        }
+        else {
+            return scrollContainer.value.scrollHeight;
+        }
+    }
+
+    /**
+     * Create the virtual scroller we will use to calculate which items to display.
+     */
+    function createVirtualScroller(): VirtualScroller {
+        const largestEdge = Math.max(window.screen.width, window.screen.height);
+        const visibleCount = Math.floor(largestEdge / options.estimatedItemHeight);
+
+        return new VirtualScroller({
+            visibleCount,
+            bufferCount: Math.round(visibleCount / 3),
+            estimatedHeight: options.estimatedItemHeight,
+            uniqueIds: options.items.value.map(r => r[options.itemKey]).filter(r => r !== undefined) as string[]
+        }, range => onRangeChanged(range));
+    }
+
+    function removeScrollListener(element: HTMLElement): void {
+        if (element !== document.documentElement) {
+            element.removeEventListener("scroll", onScroll);
+        }
+        else {
+            document.removeEventListener("scroll", onScroll);
+        }
+    }
+
+    function addScrollListener(element: HTMLElement): void {
+        if (element !== document.documentElement) {
+            element.addEventListener("scroll", onScroll, { passive: false });
+        }
+        else {
+            document.addEventListener("scroll", onScroll, { passive: false });
+        }
+    }
+
+    /**
+     * Called when the range of the virtual scroller has changed.
+     *
+     * @param r The new range value.
+     */
+    function onRangeChanged(r: Range): void {
+        range.value = r;
+    }
+
+    /**
+     * Called whenever the element we are monitoring has scrolled.
+     */
+    function onScroll(): void {
+        const offset = getScrollOffset();
+        const clientSize = getClientHeight();
+        const scrollSize = getScrollHeight();
+
+        // If the scroll is outside the scrollable area, it is probably an
+        // overscroll like iOS bounce back effect. Ignore it.
+        if (offset < 0 || (offset + clientSize > scrollSize + 1) || !scrollSize) {
+            return;
+        }
+
+        // Determine the offset inside the scrollable of our list. Meaning,
+        // the grid probably doesn't start at the top of the page. So if the
+        // grid starts 200 pixels down the page, our offset should be zero when
+        // they have scrolled down by 200 pixels. That is, the top edge of the
+        // grid is at the top edge of the scrollable.
+        let scrollableOffset = 0;
+
+        if (options.container?.value && options.container?.value !== scrollContainer.value) {
+            scrollableOffset = options.container.value.getBoundingClientRect().top + offset;
+        }
+
+        virtualScroller?.handleScroll(Math.floor(Math.max(0, offset - scrollableOffset)));
+    }
+
+    watch(options.items, () => {
+        virtualScroller?.dataSourceChanged(options.items.value.map(r => r[options.itemKey]).filter(r => r !== undefined) as string[]);
+    });
+
+    watch(scrollContainer, (value, oldValue) => {
+        if (oldValue === value) {
+            return;
+        }
+
+        if (oldValue) {
+            removeScrollListener(oldValue);
+        }
+        addScrollListener(value);
+    }, { immediate: true });
+
+    onBeforeUnmount(() => {
+        if (scrollContainer.value !== document.documentElement) {
+            scrollContainer.value.removeEventListener("scroll", onScroll);
+        }
+        else {
+            document.removeEventListener("scroll", onScroll);
+        }
+
+        if (virtualScroller) {
+            virtualScroller.destroy();
+            virtualScroller = undefined;
+        }
+    });
+
+    onMounted(() => {
+        virtualScroller = createVirtualScroller();
+
+        if (getScrollOffset() > 0) {
+            onScroll();
+        }
+
+        if (scrollContainer.value !== document.documentElement) {
+            scrollContainer.value.addEventListener("scroll", onScroll, { passive: false });
+        }
+        else {
+            document.addEventListener("scroll", onScroll, { passive: false });
+        }
+    });
+
+    return {
+        virtualItems,
+        beforePadStyle,
+        afterPadStyle,
+        range,
+        updateItemHeight(id: string, height: number): void {
+            virtualScroller?.updateHeight(id, height);
+        }
+
+    };
 }

@@ -36,18 +36,22 @@
 
         <Loading v-if="!useCustom" :isLoading="loadingState.icons.isLoading.value">
 
-            <div class="d-flex gap-2 align-items-start flex-wrap" ref="itemsContainer">
-                <div class="virtual-scroll-padding" :style="beforePadStyle"></div>
-                <template v-for="iconOption in virtualItems" :key="iconOption.StyleClass ?? ''">
-                    <button
+            <div class="d-flex flex-column gap-2" ref="itemsContainer">
+                <div :style="beforePadStyle"></div>
+
+                <div v-for="iconRow in virtualItems"
+                     class="d-flex gap-2"
+                     :key="iconRow.key">
+                    <button v-for="iconOption in iconRow.icons"
                             class="btn btn-default icon-picker-select-btn"
                             :class="icon === iconOption ? 'active' : ''"
                             @click.prevent="selectIcon(iconOption)"
                             :title="iconOption.Title ?? ''"
                             v-html="iconOption.IconSvg ?? ''">
                     </button>
-                </template>
-                <div class="virtual-scroll-padding" :style="afterPadStyle"></div>
+                </div>
+
+                <div :style="afterPadStyle"></div>
             </div>
         </Loading>
 
@@ -110,13 +114,6 @@
     margin-top: -4px;
     margin-right: 10px;
 }
-
-.virtual-scroll-padding {
-    flex: 0 0 100%;
-    width: 100%;
-    height: 10px;
-    background: transparent;
-}
 </style>
 
 <script setup lang="ts">
@@ -133,10 +130,15 @@
     import { type IconBag, type IconLibraryBag } from "@Obsidian/ViewModels/Controls/iconLibraryBag.d";
     import { containsRequiredRule } from "@Obsidian/ValidationRules";
     import { debounce } from "@Obsidian/Utility/util";
-    import { useVirtualScroller } from "./Internal/virtualScroll.partial";
+    import { useVirtualScroller } from "@Obsidian/Core/Utilities/virtualScroll";
 
     type SearchableIcon = IconBag & {
         SearchableText: string; /* eslint-disable-line @typescript-eslint/naming-convention */
+    };
+
+    type IconRow = {
+        key: string;
+        icons: IconBag[];
     };
 
     const props = defineProps({
@@ -217,7 +219,6 @@
         icon.value = value;
 
         customIcon.value = "";
-        // searchValue.value = "";
         showPopup.value = false;
     }
 
@@ -235,19 +236,12 @@
         virtualItems,
         beforePadStyle,
         afterPadStyle
-    } = useVirtualScroller<SearchableIcon>({
+    } = useVirtualScroller({
         items: iconOptions,
-        itemsPerRow: 6,
-        scrollContainer: scrollContainer,
-        scrollContainerHeight: 320,
-        rowHeight: 48, // Height of each icon button + padding
-        visibleRowCount: 7
+        itemKey: "key",
+        container: itemsContainer,
+        estimatedItemHeight: 48, // Height of row + padding
     });
-
-    watch([virtualItems, beforePadStyle, afterPadStyle], () => {
-        // If the virtual rows change, update the icon options.
-        console.debug("Virtual rows updated", virtualItems.value?.length, beforePadStyle.value.height, afterPadStyle.value.height);
-    }, { immediate: true });
 
     watch(internalModelValue, (newValue) => {
         // Emit the new value to the parent control.
@@ -309,16 +303,29 @@
         customIcon.value = "";
     }
 
-    function getIconOptions(): SearchableIcon[] {
+    function getIconOptions(): IconRow[] {
+        let iconsToDisplay: SearchableIcon[] = [...iconsForSelectedLibrary.value];
+
         // If the search value is empty, return all icons.
         if (searchValue.value !== "") {
-            return iconsForSelectedLibrary.value.filter(icon => {
-                // const searchableText = ((icon.SearchTerms?.join(" ") ?? "") + " " + icon.StyleClass + " " + icon.Title).toLowerCase();
+            iconsToDisplay = iconsForSelectedLibrary.value.filter(icon => {
                 return icon.SearchableText.includes(searchValue.value.toLowerCase());
             });
         }
 
-        return iconsForSelectedLibrary.value;
+        const iconRows: IconRow[] = [];
+
+        while (iconsToDisplay.length > 0) {
+            const icons = iconsToDisplay.splice(0, 6);
+
+            iconRows.push({
+                key: `row-${icons.map(i => i.StyleClass).join(";")}`,
+                icons: icons
+            });
+        }
+
+        console.log("got options", iconRows.length);
+        return iconRows;
     }
 
     // #endregion
