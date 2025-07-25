@@ -32,6 +32,7 @@ using System.Web.UI.WebControls;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Rock.Attribute;
 using Rock.Blocks;
@@ -1295,13 +1296,38 @@ namespace Rock.Web.UI
                     Page.Trace.Warn( "Creating JS objects" );
                     if ( !ClientScript.IsStartupScriptRegistered( "rock-js-object" ) )
                     {
+                        var realTimeUrl = "/rock-rt";
+                        var realTimeHostname = SystemSettings.GetValue( SystemKey.SystemSetting.REALTIME_HOSTNAME );
+
+                        if ( realTimeHostname.IsNotNullOrWhiteSpace() )
+                        {
+                            try
+                            {
+                                var requestUrl = HttpContext.Current.Request.Url;
+
+                                realTimeUrl = new UriBuilder
+                                {
+                                    Scheme = requestUrl.Scheme,
+                                    Host = realTimeHostname,
+                                    Port = requestUrl.Port,
+                                    Path = "/rock-rt"
+                                }.ToString();
+                            }
+                            catch ( Exception ex )
+                            {
+                                RockLogger.LoggerFactory.CreateLogger( GetType().FullName )
+                                    .LogError( ex, "Unable to create URL for real-time engine." );
+                            }
+                        }
+
                         var script = $@"
 Rock.settings.initialize({{
     siteId: {_pageCache.Layout.SiteId},
     layoutId: {_pageCache.LayoutId},
     pageId: {_pageCache.Id},
     layout: '{_pageCache.Layout.FileName}',
-    baseUrl: '{ResolveUrl( "~" )}'
+    baseUrl: '{ResolveUrl( "~" )}',
+    realTimeUrl: '{realTimeUrl}',
 }});";
 
                         ClientScript.RegisterStartupScript( this.Page.GetType(), "rock-js-object", script, true );
