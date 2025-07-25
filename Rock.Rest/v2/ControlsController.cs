@@ -2421,7 +2421,7 @@ namespace Rock.Rest.v2
                     return Unauthorized();
                 }
 
-                var items = new BinaryFileService( new RockContext() )
+                var items = new BinaryFileService( rockContext )
                     .Queryable()
                     .Where( f => f.BinaryFileType.Guid == options.BinaryFileTypeGuid && !f.IsTemporary )
                     .OrderBy( f => f.FileName )
