@@ -667,7 +667,7 @@
 
     const showPointer = computed(() => isCtrlKeyHeld.value && isPersonCardHovered.value);
 
-    const selectedPeopleCount = computed(() => selectedPersonIdKeys.value.size);
+    const selectedPeopleCount = computed(() => selectedPersonIdKeys.value.size.toLocaleString());
 
     const isCardTransitionEnabled = computed(() => filteredAndSortedPeopleToPlace.value.length <= 50);
 
