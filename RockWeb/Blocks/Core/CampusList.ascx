@@ -20,6 +20,7 @@
                             <Rock:RockBoundField DataField="LeaderPersonAlias.Person.FullName" HeaderText="Campus Leader" />
                             <Rock:DefinedValueField DataField="CampusTypeValueId" HeaderText="Campus Type" />
                             <Rock:DefinedValueField DataField="CampusStatusValueId" HeaderText="Campus Status" />
+                            <Rock:RockBoundField DataField="AverageWeekendAttendance" HeaderText="Avg. Attendance" DataFormatString="{0:N0}" ItemStyle-HorizontalAlign="Right" HeaderStyle-HorizontalAlign="Right" />
                             <Rock:BoolField DataField="IsActive" HeaderText="Active" />
                         </Columns>
                     </Rock:Grid>

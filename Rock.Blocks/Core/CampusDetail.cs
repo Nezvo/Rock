@@ -508,6 +508,7 @@ namespace Rock.Blocks.Core
                 Url = entity.Url,
                 ClosedDate = entity.ClosedDate,
                 OpenedDate = entity.OpenedDate,
+                AverageWeekendAttendance = entity.AverageWeekendAttendance
             };
         }
 

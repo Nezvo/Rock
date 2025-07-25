@@ -14,17 +14,30 @@
 // limitations under the License.
 // </copyright>
 //
-
-namespace Rock.ViewModels.Blocks.Core.CampusList
+namespace Rock.Migrations
 {
+    using System;
+    using System.Data.Entity.Migrations;
+    
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    public class CampusListOptionsBag
+    public partial class AddCampusAvgAttendanceProperty : Rock.Migrations.RockMigration
     {
         /// <summary>
-        /// Gets or sets whether the Campus Phone Number column should be shown.
+        /// Operations to be performed during the upgrade process.
         /// </summary>
-        public bool ShowCampusPhoneNumber { get; set; }
+        public override void Up()
+        {
+            AddColumn("dbo.Campus", "AverageWeekendAttendance", c => c.Int());
+        }
+        
+        /// <summary>
+        /// Operations to be performed during the downgrade process.
+        /// </summary>
+        public override void Down()
+        {
+            DropColumn("dbo.Campus", "AverageWeekendAttendance");
+        }
     }
 }
