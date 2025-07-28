@@ -12,7 +12,9 @@
         <RockForm @submit="onSubmit">
             <div class="row">
                 <div class="col-md-6">
-                    <TextBox v-model="firstName" label="First Name" rules="required" />
+                    <FirstNameTextBox v-model="firstName"
+                                      label="First Name"
+                                      :rules="['required', 'nospecialcharacters', 'noemojisorspecialfonts']" />
                 </div>
                 <div class="col-md-6">
                     <TextBox v-model="lastName" label="Last Name" rules="required" />
@@ -64,6 +66,7 @@
     import { ref, onMounted } from "vue";
     import NotificationBox from "@Obsidian/Controls/notificationBox.obs";
     import TextBox from "@Obsidian/Controls/textBox.obs";
+    import FirstNameTextBox from "@Obsidian/Controls/firstNameTextBox.obs";
     import EmailBox from "@Obsidian/Controls/emailBox.obs";
     import PhoneNumberBoxWithSms from "@Obsidian/Controls/phoneNumberBoxWithSms.obs";
     import DropDownList from "@Obsidian/Controls/dropDownList.obs";

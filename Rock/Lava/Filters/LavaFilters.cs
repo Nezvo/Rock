@@ -1974,8 +1974,9 @@ namespace Rock.Lava
         /// <param name="input">The input.</param>
         /// <param name="attributeKey">The attribute key.</param>
         /// <param name="qualifier">The qualifier.</param>
+        /// <param name="securityEnabled">If true, security is enabled; if false, security checks are bypassed. Defaults to true.</param>
         /// <returns></returns>
-        public static object Attribute( ILavaRenderContext context, object input, string attributeKey, string qualifier = "" )
+        public static object Attribute( ILavaRenderContext context, object input, string attributeKey, string qualifier = "", bool securityEnabled = true )
         {
             Attribute.IHasAttributes item = null;
 
@@ -2090,7 +2091,7 @@ namespace Rock.Lava
             {
                 Person currentPerson = GetCurrentPerson( context );
 
-                if ( attribute.IsAuthorized( Authorization.VIEW, currentPerson ) )
+                if ( !securityEnabled || attribute.IsAuthorized( Authorization.VIEW, currentPerson ) )
                 {
                     // Check qualifier for 'Raw' if present, just return the raw unformatted value
                     if ( qualifier.Equals( "RawValue", StringComparison.OrdinalIgnoreCase ) )
