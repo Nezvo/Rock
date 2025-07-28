@@ -8330,7 +8330,7 @@ ul ul, ol ul, ul ol, ol ol {
   width: 100%;
 }
 .panel-persondetails .panel-body i.fa.fa-bars,
-.panel-persondetails .panel-body i.ti.ti-bars {
+.panel-persondetails .panel-body i.ti.ti-menu-2 {
   cursor: pointer;
 }
 .panel-persondetails .attribute-values + .attribute-values {
@@ -10956,6 +10956,7 @@ ul ul, ol ul, ul ol, ol ol {
 .clearable-input .input-group {
   float: left;
 }
+.timepicker-input i.fa-times,
 .timepicker-input i.ti-x,
 .clearable-input i.fa-times,
 .clearable-input i.ti-x {
@@ -10968,12 +10969,13 @@ ul ul, ol ul, ul ol, ol ol {
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out;
 }
-.timepicker-input:hover i.ti-x,
+.timepicker-input:hover i.fa-times, .timepicker-input:hover i.ti-x,
 .clearable-input:hover i.fa-times,
 .clearable-input:hover i.ti-x {
   opacity: 1;
 }
 
+.touch .timepicker-input i.fa-times,
 .touch .timepicker-input i.ti-x {
   opacity: 1;
 }
@@ -12299,7 +12301,7 @@ div.aspNetDisabled {
   .loginstatus > li > a {
     padding: 0 var(--spacing-xsmall);
   }
-  .loginstatus > li > a .ti-caret-down {
+  .loginstatus > li > a .fa-caret-down {
     display: none;
   }
 }
@@ -12324,7 +12326,7 @@ div.aspNetDisabled {
 .loginstatus > li > a span {
   display: none;
 }
-.loginstatus > li > a .ti-caret-down::before {
+.loginstatus > li > a .fa-caret-down::before {
   content: "\f078";
 }
 .loginstatus > li > a:hover, .loginstatus > li > a:focus {
