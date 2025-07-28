@@ -252,7 +252,7 @@ namespace Rock.Model
 
                 // Set the LearningParticipant current class grade values.
                 participant.LearningGradePercent = gradePercent;
-                participant.LearningGradingSystemScaleId = gradeScaleEarned.Id;
+                participant.LearningGradingSystemScaleId = gradeScaleEarned?.Id;
                 participant.LearningCompletionStatus = hasIncompleteAssignments || hasUngradedAssignments ? Enums.Lms.LearningCompletionStatus.Incomplete : currentGradePassFailStatus;
 
                 RockContext.SaveChanges();

@@ -654,9 +654,19 @@ namespace Rock.Jobs
                 // Add the merge objects to support this notification.
                 var mergeFields = LavaHelper.GetCommonMergeFields( null );
                 mergeFields.AddOrReplace( "Person", personProgramInfo.Person );
-                mergeFields.AddOrReplace( "ActivityCount", personProgramInfo.Courses.SelectMany( c => c.Classes ).Sum( c => c.ActivityCount ) );
-                mergeFields.AddOrReplace( "Program", personProgramInfo.Program );
-                mergeFields.AddOrReplace( "Courses", personProgramInfo.Courses );
+
+                // Additional Merge Fields need to be stored on Communication Recipient when sending an SMS message.
+                // Common merge fields are excluded to minimize storage and keep the payload lightweight.
+                var additionalMergeFields = new Dictionary<string, object>();
+                additionalMergeFields.AddOrReplace( "ActivityCount", personProgramInfo.Courses.SelectMany( c => c.Classes ).Sum( c => c.ActivityCount ) );
+                additionalMergeFields.AddOrReplace( "Program", personProgramInfo.Program );
+                additionalMergeFields.AddOrReplace( "Courses", personProgramInfo.Courses );
+
+                // Add extras into mergeFields
+                foreach ( var kvp in additionalMergeFields )
+                {
+                    mergeFields.AddOrReplace( kvp.Key, kvp.Value );
+                }
 
                 // If the person's communication preference for their course is not SMS or Email then use their Person's communication preference.
                 var communicationPreference = personProgramInfo.CommunicationPreference;
@@ -665,7 +675,7 @@ namespace Rock.Jobs
                     communicationPreference = personProgramInfo.Person.CommunicationPreference;
                 }
                 
-                var communicationId = SendCommunication( personProgramInfo.Person, communicationPreference, systemCommunication, mergeFields );
+                var communicationId = SendCommunication( personProgramInfo.Person, communicationPreference, systemCommunication, mergeFields, additionalMergeFields );
 
                 if ( communicationId.HasValue )
                 {
@@ -690,8 +700,9 @@ namespace Rock.Jobs
         /// <param name="communicationPreference">The person's communication preference.</param>
         /// <param name="systemCommunication">The <see cref="SystemCommunication"/> that provides the content.</param>
         /// <param name="mergeFields">The merge fields used to prepare the content.</param>
+        /// <param name="additionalMergeFields">The additional merge fields used to prepare the content for SMS messages.</param>
         /// <returns>The identifier of the <see cref="Communication"/> that was sent.</returns>
-        private int? SendCommunication( Person person, CommunicationType communicationPreference, SystemCommunication systemCommunication, Dictionary<string, object> mergeFields )
+        private int? SendCommunication( Person person, CommunicationType communicationPreference, SystemCommunication systemCommunication, Dictionary<string, object> mergeFields, Dictionary<string, object> additionalMergeFields )
         {
             var logger = RockLogger.LoggerFactory.CreateLogger<CommunicationHelper>();
 
@@ -758,6 +769,12 @@ namespace Rock.Jobs
                     };
 
                     communication = communicationService.CreateSMSCommunication( createSMSCommunicationArgs );
+
+                    if ( communication.Recipients != null )
+                    {
+                        var communicationRecipient = communication.Recipients.FirstOrDefault();
+                        communicationRecipient.AdditionalMergeValues = additionalMergeFields;
+                    }
 
                     rockContext.SaveChanges();
 
