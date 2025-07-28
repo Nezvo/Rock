@@ -74,6 +74,12 @@
             </template>
         </TextColumn>
 
+        <TextColumn name="persistedScheduleInfo"
+                    title="Persisted Schedule"
+                    field="persistedScheduleInfo"
+                    :filter="textValueFilter"
+                    visiblePriority="sm" />
+
         <NumberColumn name="timeToUpdateDurationMilliseconds"
                       title="Time To Update (ms)"
                       field="timeToUpdateDurationMilliseconds"
