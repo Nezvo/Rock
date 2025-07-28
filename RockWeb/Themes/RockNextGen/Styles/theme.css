@@ -324,7 +324,7 @@ body.navbar-side-open {
   border-radius: 999px;
   flex-direction: row-reverse;
 }
-.rock-top-header .smartsearch .fa.fa-search {
+.rock-top-header .smartsearch .ti.ti-search {
   display: none;
 }
 @media (min-width: 768px) {
