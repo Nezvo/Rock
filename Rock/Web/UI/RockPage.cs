@@ -30,7 +30,6 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -2293,10 +2292,19 @@ Obsidian.init({{ debug: true, fingerprint: ""v={_obsidianFingerprint}"" }});
             var requestFilterIds = new List<int>();
             foreach ( var requestFilter in requestFilters )
             {
-                if ( requestFilter.RequestMeetsCriteria( this.Request, this.Site ) )
+                try
                 {
-                    requestFilterIds.Add( requestFilter.Id );
+                    if ( requestFilter.RequestMeetsCriteria( this.Request, this.Site ) )
+                    {
+                        requestFilterIds.Add( requestFilter.Id );
+                    }
                 }
+                catch ( Exception ex )
+                {
+                    ExceptionLogService.LogException( new Exception( $"Error processing personalization request filter: {requestFilter.Name ?? requestFilter.RequestFilterKey}.", ex ) );
+                    throw;
+                }
+
             }
 
             this.PersonalizationRequestFilterIds = requestFilterIds.ToArray();
