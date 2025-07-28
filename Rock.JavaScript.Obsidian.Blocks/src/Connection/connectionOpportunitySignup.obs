@@ -46,10 +46,10 @@
             <TextBox v-model="comments" :label="commentFieldLabel" textMode="multiline" :rows="3" />
 
             <div class="captcha-container">
-                <Captcha v-if="!config.disableCaptchaSupport" ref="captchaElement" rules="required" validationTitle="Captcha" />
+                <Captcha v-if="!config.disableCaptchaSupport" ref="captchaElement" validationTitle="Captcha" />
             </div>
 
-            <RockButton btnType="primary" type="submit">Connect</RockButton>
+            <RockButton v-if="isCaptchaComplete" btnType="primary" type="submit">Connect</RockButton>
         </RockForm>
     </template>
 </template>
@@ -61,7 +61,7 @@
 </style>
 
 <script setup lang="ts">
-    import { ref } from "vue";
+    import { ref, onMounted } from "vue";
     import NotificationBox from "@Obsidian/Controls/notificationBox.obs";
     import TextBox from "@Obsidian/Controls/textBox.obs";
     import EmailBox from "@Obsidian/Controls/emailBox.obs";
@@ -100,10 +100,23 @@
     const comments = ref("");
 
     const captchaElement = ref<InstanceType<typeof Captcha> | undefined>();
+    const captchaToken = ref<string | undefined>();
+    const isCaptchaComplete = ref(false);
 
     // #endregion Values
 
     // #region Functions
+
+    async function waitForCaptcha(): Promise<void> {
+        if (config.disableCaptchaSupport || !captchaElement.value) {
+            isCaptchaComplete.value = true;
+            return;
+        }
+
+        const token = await captchaElement.value.getToken();
+        isCaptchaComplete.value = !!token;
+        captchaToken.value = token;
+    }
 
     /**
      * Handles the form submission for the connection opportunity signup.
@@ -126,7 +139,7 @@
         };
         const actionContext: BlockActionContextBag = {};
         if (!config.disableCaptchaSupport && captchaElement.value) {
-            actionContext.captcha = await captchaElement.value.getToken();
+            actionContext.captcha = captchaToken.value;
             captchaElement.value.refreshToken();
         }
         const result = await invokeBlockAction<ConnectionOpportunitySignupResultBag>("Signup", { bag: requestBag }, actionContext);
@@ -155,4 +168,12 @@
     }
 
     // #endregion Functions
+
+    // #region Lifecycle Hooks
+
+    onMounted(() => {
+        waitForCaptcha();
+    });
+
+    // #endregion Lifecycle Hooks
 </script>
