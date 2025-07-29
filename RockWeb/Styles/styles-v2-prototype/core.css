@@ -340,7 +340,6 @@ th {
   --spacing-large: 24px;
   --spacing-xlarge: 48px;
   --spacing-huge: 80px;
-  --file-asset-manager-padding-override: -18px;
   --adminbar-bg: #45474c;
   --modal-backdrop: rgba(94, 94, 94, 0.6);
   --box-shadow: rgba(145, 158, 171, 0.2) 0px 0px 2px 0px,rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
@@ -8652,7 +8651,7 @@ ul ul, ol ul, ul ol, ol ol {
 }
 
 .panel-footer-content {
-  padding: var(--panel-body-padding);
+  padding: var(--spacing-medium);
   background: var(--color-interface-softer);
   border-top: 1px solid var(--color-interface-soft);
 }
@@ -14791,7 +14790,7 @@ textarea:focus,
   padding: 8px 18px;
   margin: -18px -18px 0;
   background: var(--color-interface-softer);
-  border-bottom: 1px solid var(--theme-light);
+  border-bottom: 1px solid var(--color-interface-soft);
 }
 
 .add-step-buttons .add-step-label {
@@ -14931,7 +14930,7 @@ textarea:focus,
 
 .step-card .btn-delete:hover {
   color: var(--color-interface-softest);
-  background-color: var(--color-danger);
+  background-color: var(--color-danger-strong);
 }
 
 .has-overflow .step-records-table-container,
@@ -14958,7 +14957,7 @@ textarea:focus,
 .step-records-table td {
   width: 50px;
   vertical-align: middle;
-  border: 1px solid var(--theme-light);
+  border: 1px solid var(--color-interface-soft);
 }
 
 .step-records-table .steps-status {
@@ -16372,8 +16371,8 @@ iframe.file-browser {
   }
 }
 .structured-content-container:focus-within {
-  border: var(--focus-state-border);
-  box-shadow: var(--focus-state-shadow);
+  border: 1px solid var(--color-primary);
+  box-shadow: var(--input-focus-box-shadow);
 }
 .structured-content-container .codex-editor {
   max-width: 800px;
@@ -18859,8 +18858,8 @@ iframe.file-browser {
 }
 
 .note-editor-standard .meta-body:focus, .note-editor-standard .meta-body:focus-within, .note-editor-standard .meta-body.focus-within {
-  border: var(--focus-state-border);
-  box-shadow: var(--focus-state-shadow);
+  border: 1px solid var(--color-primary);
+  box-shadow: var(--input-focus-box-shadow);
 }
 .note-editor-standard .noteentry-control .form-control {
   background: transparent;
@@ -20520,7 +20519,7 @@ iframe.email-body {
   margin-bottom: var(--spacing-large);
   overflow: hidden;
   color: var(--color-interface-stronger);
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--color-interface-soft);
   outline-offset: -1px;
 }
 .communication-template:focus, .communication-template:hover {

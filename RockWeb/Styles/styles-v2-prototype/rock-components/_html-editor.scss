@@ -147,8 +147,8 @@ iframe.file-browser {
   }
 
   &:focus-within {
-    border:       var(--focus-state-border);
-    box-shadow:   var(--focus-state-shadow);
+    border:       1px solid var(--color-primary);
+    box-shadow:   var(--input-focus-box-shadow);
   }
 
   .codex-editor {

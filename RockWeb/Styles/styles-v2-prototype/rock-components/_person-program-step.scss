@@ -8,7 +8,7 @@
     padding:        8px 18px;
     margin:         -18px -18px 0;
     background:     var(--color-interface-softer);
-    border-bottom:  1px solid var(--theme-light);
+    border-bottom:  1px solid var(--color-interface-soft);
   }
   
 .add-step-buttons .add-step-label {
@@ -152,7 +152,7 @@
 
 .step-card .btn-delete:hover {
   color:              var(--color-interface-softest);
-  background-color:   var(--color-danger);
+  background-color:   var(--color-danger-strong);
 }
 
 .has-overflow .step-records-table-container,
@@ -179,7 +179,7 @@
 .step-records-table td {
   width:            50px;
   vertical-align:   middle;
-  border:           1px solid var(--theme-light);
+  border:           1px solid var(--color-interface-soft);
 }
 
 .step-records-table .steps-status {

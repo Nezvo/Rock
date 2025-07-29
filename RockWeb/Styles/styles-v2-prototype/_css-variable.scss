@@ -61,7 +61,7 @@
   --color-warning-shade:    var(--base-warning);
   
   /* System colors */
-  --color-primary-soft:          var(--base-primary);
+  --color-primary-soft:     var(--base-primary);
   --color-primary:          var(--base-primary);
   --color-primary-tint:     var(--base-primary);
   --color-primary-shade:    var(--base-primary);
@@ -197,8 +197,6 @@
   --spacing-xlarge:    48px;
   --spacing-huge:      80px; 
 
-  --file-asset-manager-padding-override: -18px;
-
   // ========================== END SPACING ===========================
 
 
@@ -212,7 +210,7 @@
   --dropdown-box-shadow:      0 4px 8px 0 rgba(145, 158, 171,.12);
   --input-box-shadow:         0 1px 1px rgba(24, 36, 51, 0.06);
   --input-focus-box-shadow:   0 0 0 2px var(--color-primary-tint);
-  --input-after-box-shadow:     0 .125rem .375rem 0 rgba(var(--color-primary), 0.3);
+  --input-after-box-shadow:   0 .125rem .375rem 0 rgba(var(--color-primary), 0.3);
 
   // BORDER RADIUS
   --rounded-tiny:       2px;

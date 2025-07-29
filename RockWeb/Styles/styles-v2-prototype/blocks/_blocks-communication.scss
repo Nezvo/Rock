@@ -81,7 +81,7 @@ iframe.email-body {
   margin-bottom:        var(--spacing-large);
   overflow:             hidden;
   color:                var(--color-interface-stronger);
-  border:               1px solid var(--panel-border);
+  border:               1px solid var(--color-interface-soft);
   outline-offset:       -1px;
 
   &:focus,
