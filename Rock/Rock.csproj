@@ -788,6 +788,7 @@
     <Compile Include="Jobs\PostUpdateJobs\PostV173UpdateAttendanceOccurrenceIndex.cs" />
     <Compile Include="Jobs\PostUpdateJobs\PostV171UpdateCommunicationRecipientIndex.cs" />
     <Compile Include="Jobs\PostUpdateJobs\PostV171AddCommunicationRecipientIndex.cs" />
+    <Compile Include="Jobs\PostUpdateJobs\PostV173UpdateNamelessSchedules.cs" />
     <Compile Include="Jobs\RunLava.cs" />
     <Compile Include="Model\CRM\UserLogin\UpdateLastLoginArgs.cs" />
     <Compile Include="Data\AttributeValueExpressionVisitor.cs" />
