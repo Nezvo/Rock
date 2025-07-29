@@ -7,6 +7,9 @@
     <Content Include="InstallWelcome.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\StatementGenerator.csproj" />
   </ItemGroup>
   <ItemGroup>
