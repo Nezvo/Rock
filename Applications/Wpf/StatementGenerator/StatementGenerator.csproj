@@ -177,6 +177,7 @@
     <Compile Include="..\..\..\Rock.Version\AssemblySharedInfo.cs">
       <Link>Properties\AssemblySharedInfo.cs</Link>
     </Compile>
+    <Compile Include="Client\FinancialStatementGeneratorOptions.cs" />
     <Compile Include="ConfigSettingsStringConverter.cs" />
     <Compile Include="FinancialStatementGeneratorRecipientExtensions.cs" />
     <Compile Include="GeneratorConfig.cs" />
@@ -313,10 +314,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Rock.Client\Rock.Client.csproj">
-      <Project>{6ea64bb9-9740-453a-939b-df43ad9ac164}</Project>
-      <Name>Rock.Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Rock.Wpf\Rock.Wpf.csproj">
       <Project>{90440596-fa0a-45e7-8872-3da47786f6a7}</Project>
       <Name>Rock.Wpf</Name>
