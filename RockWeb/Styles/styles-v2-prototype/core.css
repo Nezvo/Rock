@@ -29339,6 +29339,12 @@ body.rock-modal-page {
   overflow: auto;
 }
 
+.help-inline {
+  font-size: var(--font-size-regular);
+  color: var(--color-interface-medium);
+  cursor: pointer;
+}
+
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: var(--font-family-sans);

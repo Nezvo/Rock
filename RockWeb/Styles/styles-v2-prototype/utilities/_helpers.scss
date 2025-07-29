@@ -57,3 +57,8 @@
   overflow: auto;
 }
 
+.help-inline {
+  font-size: var(--font-size-regular);
+  color: var(--color-interface-medium);
+  cursor: pointer;
+}
