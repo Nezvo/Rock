@@ -6915,6 +6915,10 @@ td.grid-actions {
   padding: 6px var(--spacing-medium);
 }
 
+.input-group-btn > .btn-square {
+  padding: 6px 0;
+}
+
 .input-group-addon,
 .input-group-btn,
 .input-group .form-control {
