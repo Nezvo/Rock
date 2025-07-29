@@ -271,7 +271,6 @@ function() {
             var slidingDateRangePicker = new SlidingDateRangePicker();
             slidingDateRangePicker.Label = "Date Range";
             slidingDateRangePicker.ID = filterControl.ID + "_slidingDateRangePicker";
-            slidingDateRangePicker.EnabledSlidingDateRangeTypes = new[] { SlidingDateRangeType.Current, SlidingDateRangeType.Previous, SlidingDateRangeType.Last, SlidingDateRangeType.DateRange };
             slidingDateRangePicker.AddCssClass( "js-sliding-date-range" );
             filterControl.Controls.Add( slidingDateRangePicker );
 
@@ -362,7 +361,7 @@ function() {
                     .Distinct()
                     .Select( s => new ListItem
                     {
-                        Text = s.Name,
+                        Text = ( s.Name == null || s.Name == string.Empty ) ? s.Description : s.Name, // Nameless Schedules have a friendly name in their Description.
                         Value = s.Guid.ToString()
                     } )
                     .ToList();

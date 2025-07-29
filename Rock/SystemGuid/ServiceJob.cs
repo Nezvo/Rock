@@ -500,6 +500,11 @@ namespace Rock.SystemGuid
         public const string DATA_MIGRATIONS_173_UPDATE_ATTENDANCEOCCURRENCE_INDEX = "FFF8E02C-9FAA-4E23-99EE-4B008549F088";
 
         /// <summary>
+        /// The job to run Post v17.3 Data Migrations to update the Nameless Schedules.
+        /// </summary>
+        public const string DATA_MIGRATIONS_173_UPDATE_NAMELESS_SCHEDULES = "4C7CC0FC-12A7-4578-B9B1-FEF2732EB912";
+
+        /// <summary>
         /// The job to run Post v18.0 Data Migrations to update an existing index on the CommunicationRecipient table.
         /// </summary>
         public const string DATA_MIGRATIONS_180_UPDATE_COMMUNICATIONRECIPIENT_INDEX = "FE519BCE-CCB8-42B7-A14C-1620859F23E8";
