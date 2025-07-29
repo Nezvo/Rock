@@ -3671,7 +3671,7 @@ input[type=button].btn-block {
   display: block;
   width: 0.2222em;
   min-height: 2px;
-  background: #99bbd9;
+  background: rgb(153.1818181818, 186.7355371901, 216.8181818182);
 }
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   .badge-disc .badge-disc-chart li span {
@@ -3997,6 +3997,14 @@ a .label:hover, a .label:focus {
 }
 .well > h1, .well > h2, .well > h3, .well > h4 {
   margin-top: 0;
+}
+.well.well-conditional {
+  margin-left: var(--spacing-medium);
+  border-radius: 0;
+  border: 0;
+  border-left: 2px var(--color-info-strong) solid;
+  box-shadow: none;
+  background-color: var(--color-interface-softer);
 }
 
 .well-lg {
@@ -17831,8 +17839,8 @@ iframe.file-browser {
 }
 
 .avatar-sms {
-  color: #d05e10 !important;
-  background-color: #fdece1 !important;
+  color: rgb(207.7957446809, 94.3659574468, 16.2042553191) !important;
+  background-color: rgb(252.6713617021, 236.370893617, 225.1386382979) !important;
 }
 
 .avatar-push {
@@ -19534,8 +19542,8 @@ iframe.file-browser {
   color: color-mix(in srgb, var(--color-interface-medium) 100%, #000 10%);
 }
 .group-scheduler-v2 .circle-plus:active {
-  color: #6b6b6d;
-  border-color: #aeaeae;
+  color: rgb(106.875, 106.875, 109.125);
+  border-color: rgb(173.5, 173.5, 173.5);
 }
 .group-scheduler-v2 .resource-notes {
   font-size: var(--font-size-xsmall);
