@@ -859,7 +859,14 @@ namespace Rock.Web.UI
 
             if ( _pageCache != null )
             {
-                RequestContext.PrepareRequestForPage( _pageCache );
+                try
+                {
+                    RequestContext.PrepareRequestForPage( _pageCache );
+                }
+                catch
+                {
+                    /* Ignore any exceptions here and keep loading the page.  Earlier problems should have been logged by now. */
+                }
             }
 
             _showDebugTimings = this.PageParameter( "ShowDebugTimings" ).AsBoolean();
@@ -1223,8 +1230,16 @@ namespace Rock.Web.UI
                     if ( Site.EnablePersonalization )
                     {
                         Page.Trace.Warn( "Loading Personalization Data" );
-                        LoadPersonalizationSegments();
-                        LoadPersonalizationRequestFilters();
+                        try
+                        {
+                            LoadPersonalizationSegments();
+                            LoadPersonalizationRequestFilters();
+                        }
+                        catch ( Exception ex )
+                        {
+                            // Catch and log this exception, but don't stop the page from loading.
+                            ExceptionLogService.LogException( new Exception( "Error loading personalization data (segments and or request filters).", ex ) );
+                        }
                     }
 
                     // Set current models (context)
