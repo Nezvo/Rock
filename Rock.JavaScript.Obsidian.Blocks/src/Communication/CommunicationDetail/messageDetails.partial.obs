@@ -2,7 +2,7 @@
 <template>
     <div v-if="messagePreview" class="communication-detail-message-details">
 
-        <ContentSection title="Details" icon="ti ti-list">
+        <ContentSection title="Details" icon="ti ti-list" disableCollapse>
             <div class="communication-detail-message-details-metadata">
                 <NotficationBox v-if="isFutureSend" :alertType="AlertType.Info" heading="Future Send">
                     This communication is scheduled to be sent {{ futureSendDateTimeElapsed }} <small>({{ futureSendDateTimeFormatted }})</small>.
@@ -135,7 +135,7 @@
             </div>
         </ContentSection>
 
-        <ContentSection title="Preview" icon="ti ti-eye">
+        <ContentSection title="Preview" icon="ti ti-eye" disableCollapse>
 
             <EmailPreview v-if="isEmail" :message="messagePreview?.emailMessage ?? ''" />
 

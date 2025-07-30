@@ -72,18 +72,18 @@
 
         <Column name="communicationType"
                 field="type"
+                title="Communication Type"
                 :exportValue="getCommunicationTypeTextValue"
                 :hideOnScreen="true" />
 
-        <Column name="name" field="name" :hideOnScreen="true" />
-        <Column name="summary" field="summary" :hideOnScreen="true" />
+        <Column name="name" field="name" title="Name" :hideOnScreen="true" />
+        <Column name="summary" field="summary" title="Summary" :hideOnScreen="true" />
 
         <Column name="displayName"
-                field="displayName"
                 title="Name"
                 sortField="name"
                 width="40%"
-                :quickFilterValue="getDisplayNameTextValue"
+                :quickFilterValue="getDisplayQuickFilterValue"
                 :excludeFromExport="true">
             <template #format="{ row }">
                 <DisplayName :row="(row as Row)" />
@@ -115,10 +115,10 @@
             </template>
         </Column>
 
-        <Column name="deliveredCount" field="deliveredCount" :hideOnScreen="true" />
-        <Column name="openedCount" field="openedCount" :hideOnScreen="true" />
-        <Column name="failedCount" field="failedCount" :hideOnScreen="true" />
-        <Column name="unsubscribedCount" field="unsubscribedCount" :hideOnScreen="true" />
+        <Column name="deliveredCount" field="deliveredCount" title="Delivered Count" :hideOnScreen="true" />
+        <Column name="openedCount" field="openedCount" title="Opened Count" :hideOnScreen="true" />
+        <Column name="failedCount" field="failedCount" title="Failed Count" :hideOnScreen="true" />
+        <Column name="unsubscribedCount" field="unsubscribedCount" title="Unsubscribed Count" :hideOnScreen="true" />
 
         <LabelColumn name="topic"
                      field="topic"
@@ -446,12 +446,39 @@
     }
 
     /**
-     * Gets the text value for the "[Display]Name" column.
+     * Gets the quick filter value for the "[Display]Name" column.
      *
      * @param row The row whose value to get.
      */
-    function getDisplayNameTextValue(row: Record<string, unknown>): string {
-        return (row as Row).name?.toString() ?? "";
+    function getDisplayQuickFilterValue(row: Record<string, unknown>): string {
+        const r = row as Row;
+        const searchStrings: string[] = [];
+
+        if (r.name) {
+            searchStrings.push(r.name);
+        }
+
+        if (r.summary) {
+            searchStrings.push(r.summary);
+        }
+
+        if (r.deliveredCount > 0) {
+            searchStrings.push(r.deliveredCount.toString());
+        }
+
+        if (r.openedCount > 0) {
+            searchStrings.push(r.openedCount.toString());
+        }
+
+        if (r.failedCount > 0) {
+            searchStrings.push(r.failedCount.toString());
+        }
+
+        if (r.unsubscribedCount > 0) {
+            searchStrings.push(r.unsubscribedCount.toString());
+        }
+
+        return searchStrings.join(" ");
     }
 
     /**

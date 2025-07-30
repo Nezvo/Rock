@@ -9,7 +9,7 @@
         </NotifificationBox>
 
         <template v-else-if="recipientActivity">
-            <ContentSection v-if="!isPersonHeaderHidden" title="Recipient" icon="ti ti-user">
+            <ContentSection v-if="!isPersonHeaderHidden" title="Recipient" icon="ti ti-user" disableCollapse>
                 <div v-if="!isPersonHeaderHidden" class="communication-recipient-activity-person-bio row">
 
                     <div class="communication-recipient-activity-person-avatar-name-email col-lg-2">
@@ -43,7 +43,7 @@
                 No activity found for this recipient.
             </NotifificationBox>
 
-            <ContentSection v-else title="Activity Timeline" icon="ti ti-timeline">
+            <ContentSection v-else title="Activity Timeline" icon="ti ti-timeline" disableCollapse>
                 <template v-if="$slots.timelineHeaderActions" #headerActions>
                     <slot name="timelineHeaderActions" />
                 </template>
