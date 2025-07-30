@@ -939,10 +939,17 @@ namespace RockWeb.Blocks.Connection
                     pnlTransferDetails.Visible = true;
 
                     ddlTransferOpportunity.Items.Clear();
-                    foreach ( var opportunity in connectionRequest.ConnectionOpportunity.ConnectionType.ConnectionOpportunities
-                        .Where( o => o.IsActive )
+
+                    // Filter opportunities to only those associated with the current request's campus
+                    var currentCampusId = connectionRequest.CampusId;
+                    var associatedCampusOpportunities = connectionRequest.ConnectionOpportunity.ConnectionType.ConnectionOpportunities
+                        .Where( 
+                            o => o.IsActive && 
+                            o.ConnectionOpportunityCampuses.Any( c => currentCampusId.HasValue && c.CampusId == currentCampusId.Value ) )
                         .OrderBy( o => o.Order )
-                        .ThenBy( o => o.Name ) )
+                        .ThenBy( o => o.Name );
+
+                    foreach ( var opportunity in associatedCampusOpportunities )
                     {
                         ddlTransferOpportunity.Items.Add( new ListItem( opportunity.Name, opportunity.Id.ToString().ToUpper() ) );
                     }
@@ -2443,6 +2450,9 @@ namespace RockWeb.Blocks.Connection
             rblStatus.SelectedValue = connectionRequest.ConnectionStatusId.ToString();
 
             // Campus
+            var campusIds = connectionRequest.ConnectionOpportunity.ConnectionOpportunityCampuses.Select(c => c.CampusId).ToList();
+            var campuses = CampusCache.All(false).Where(c => campusIds.Contains(c.Id) && (c.IsActive ?? false)).ToList();
+            cpCampus.Campuses = campuses;
             cpCampus.SelectedCampusId = connectionRequest.CampusId;
 
             hfGroupMemberAttributeValues.Value = connectionRequest.AssignedGroupMemberAttributeValues;
