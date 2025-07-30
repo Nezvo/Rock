@@ -15962,7 +15962,7 @@ textarea:focus,
 }
 
 .grid-column-header.sortable:hover {
-  background-color: var(--color-interface-soft);
+  background-color: var(--color-info-soft);
 }
 
 .grid-column-title {
@@ -16090,7 +16090,7 @@ textarea:focus,
 }
 
 .grid-hover .grid-row:hover {
-  background-color: var(--color-interface-soft);
+  background-color: var(--color-info-soft);
 }
 
 .grid-cell {
