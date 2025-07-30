@@ -1,11 +1,11 @@
 /* CSS Overrides Top Start */
-@import url('/Styles/styles-v2-prototype/icons/fontawesome-icon.css');
-@import url('/Styles/styles-v2-prototype/icons/fontawesome-solid.css');
-@import url('/Styles/styles-v2-prototype/icons/tabler-icon.css');
+@import url('/Styles/styles-v2/icons/fontawesome-icon.css');
+@import url('/Styles/styles-v2/icons/fontawesome-solid.css');
+@import url('/Styles/styles-v2/icons/tabler-icon.css');
 /* CSS Overrides Top End */
 
 @import "../../../Styles/summernote/summernote.min.css";
-@import "../../../Styles/styles-v2-prototype/core.css";
+@import "../../../Styles/styles-v2/core.css";
 :root {
   --panel-body-padding: 16px;
 }
