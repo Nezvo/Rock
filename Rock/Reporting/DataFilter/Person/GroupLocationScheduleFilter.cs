@@ -208,12 +208,12 @@ function() {
                     resultSb.Append( $"In group: {group.Name}" );
                     if ( location != null )
                     {
-                        resultSb.Append( $", assigned to location: {location.Name}" );
+                        resultSb.Append( $", assigned to location: {location.ToString( true )}" );
                     }
 
                     if ( groupLocationSchedules.Count() > 0 )
                     {
-                        resultSb.Append( $", and scheduled at: {groupLocationSchedules.Select( a => a.Name ).ToList().AsDelimited( ", " )}" );
+                        resultSb.Append( $", and scheduled at: {groupLocationSchedules.Select( a => a.ToFriendlyScheduleText( true ) ).ToList().AsDelimited( ", " )}" );
                     }
 
                     if ( groupMemberStatus.HasValue )
@@ -318,9 +318,10 @@ function() {
 
                 var locations = new GroupLocationService( new RockContext() ).Queryable()
                     .Where( gl => gl.GroupId == groupId )
+                    .AsEnumerable()
                     .Select( gl => new ListItem
                     {
-                        Text = gl.Location.Name,
+                        Text = gl.Location.ToString( true ),
                         Value = gl.Location.Id.ToString()
                     } )
                     .ToList();
@@ -358,12 +359,12 @@ function() {
                 var groupLocationSchedules = new GroupLocationService( new RockContext() ).Queryable()
                     .Where( gl => gl.GroupId == groupId && gl.LocationId == groupLocationId )
                     .SelectMany( gl => gl.Schedules )
-                    .Distinct()
                     .Select( s => new ListItem
                     {
-                        Text = ( s.Name == null || s.Name == string.Empty ) ? s.Description : s.Name, // Nameless Schedules have a friendly name in their Description.
+                        Text = string.IsNullOrEmpty( s.Name ) ? s.Description : s.Name, // Nameless Schedules have a friendly name in their Description.
                         Value = s.Guid.ToString()
                     } )
+                    .Distinct()
                     .ToList();
 
                 foreach ( var item in groupLocationSchedules )
