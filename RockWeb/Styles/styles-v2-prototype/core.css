@@ -23119,6 +23119,10 @@ body.rock-modal-page {
   background: var(--color-interface-softer);
 }
 
+.card.card-profile.card-profile-bio {
+  overflow: visible;
+}
+
 /* Background Colors */
 .bg-interface-strongest {
   background-color: var(--color-interface-strongest);

@@ -98,7 +98,7 @@
   background-color: rgba(0,0,0,.03);
   border-top: 1px solid var(--color-interface-softer);
   background-color: var(--color-interface-softest);
-  
+
   &:last-child {
     border-radius: 0 0 calc(var(--rounded-small) - 1px) calc(var(--rounded-small) - 1px);
   }
@@ -291,4 +291,9 @@
   &.schedule-unavailable {
     background: var(--color-interface-softer);
   }
+}
+
+// Profile Card - remove clipping from popover
+.card.card-profile.card-profile-bio {
+  overflow: visible;
 }
