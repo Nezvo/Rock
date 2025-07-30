@@ -523,5 +523,10 @@ namespace Rock.SystemGuid
         /// The job to run Post v18.0 Data Migrations to populate the newly-added [CommunicationRecipient].[DeliveredDateTime] field.
         /// </summary>
         public const string DATA_MIGRATIONS_180_POPULATE_COMMUNICATIONRECIPIENT_DELIVEREDDATETIME = "EF2CF0AC-7A83-4BEB-8824-41D3B5B8B832";
+
+        /// <summary>
+        /// The job to run Post v18.0 Data Migrations to Delete Self-Service Kiosk Site, Blocks, BlockTypes and KioskStark theme.
+        /// </summary>
+        public const string DATA_MIGRATIONS_180_DELETE_SELFSERVICE_KIOSK_SITE_AND_RELATED = "6696B495-3EB0-442B-8DAB-82E861B92B41";
     }
 }
