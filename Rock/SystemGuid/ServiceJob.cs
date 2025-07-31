@@ -528,5 +528,10 @@ namespace Rock.SystemGuid
         /// The job to run Post v18.0 Data Migrations to Delete Self-Service Kiosk Site, Blocks, BlockTypes and KioskStark theme.
         /// </summary>
         public const string DATA_MIGRATIONS_180_DELETE_SELFSERVICE_KIOSK_SITE_AND_RELATED = "6696B495-3EB0-442B-8DAB-82E861B92B41";
+
+        /// <summary>
+        /// The job to run Post v18.0 Data Migrations to update the Nameless Locations.
+        /// </summary>
+        public const string DATA_MIGRATIONS_180_UPDATE_NAMELESS_LOCATIONS = "6C3EE640-A442-4F9C-92ED-23E353BA8509";
     }
 }
