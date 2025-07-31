@@ -1962,13 +1962,12 @@ namespace Rock.Lava
         }
 
         /// <summary>
-        /// Converts a integer to a enum value
+        /// Converts a integer to a enum name
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="input"></param>
-        /// <param name=""></param>
-        /// <returns></returns>
-        public static string AsEnum( ILavaRenderContext context, object input, string enumTypeName )
+        /// <param name="input">The value to be converted to an enum name.</param>
+        /// <param name="enumTypeName">The full type name of the enum, such as 'Rock.Model.SiteType'.</param>
+        /// <returns>A string that represents the name of the enum value, or <c>null</c> if the parameters were not valid.</returns>
+        public static string AsEnum( object input, string enumTypeName )
         {
             if ( input == null || string.IsNullOrWhiteSpace( enumTypeName ) )
             {
