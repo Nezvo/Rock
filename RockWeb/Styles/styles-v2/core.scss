@@ -3,11 +3,11 @@
 // This file compiles into core.css, which is then imported by theme.scss in the TestStyleV2 Themes.
 
 // ====================================================================================================
-//  + Fully Format: This means the file is formatted for ease of reading. 
+//  + Fully Format: This means the file is formatted for ease of reading.
 //  ---------------------------------------------------------------------------------------------------
 //  + ** WORK IN PROGRESS **: This mean the opposite of the fully polish.
 //  ---------------------------------------------------------------------------------------------------
-//  + After you have "Fully Format" or "** WORK IN PROGRESS**" always have a full stop "." 
+//  + After you have "Fully Format" or "** WORK IN PROGRESS**" always have a full stop "."
 //    then follow by the note you want to leave for the file.
 // ====================================================================================================
 
@@ -25,9 +25,9 @@
 
 /* ===================== LEGACY  =================== */
 @import 'legacy/jumbotron';                 // Fully Format. When color-mix() use, go in the file there's TODO comments at where it is need to be use.
-@import 'legacy/media';                     // Fully Format. 
-@import 'legacy/spacing-utilitiesLegacy';      
-@import 'legacy/carousel';      
+@import 'legacy/media';                     // Fully Format.
+@import 'legacy/spacing-utilitiesLegacy';
+@import 'legacy/carousel';
 
 
 /* ======================= CORE  ======================*/
@@ -87,7 +87,7 @@
 @import 'rock-components/tree';                     // Fully Format. There are Some hard coded value.
 @import 'rock-components/well-message';             // Fully Format. There are Some hard coded value.
 @import 'rock-components/wizard';                   // Fully Format. There are Some hard coded value.
-@import 'rock-components/checkbox';                 // Fully Format. There are Some hard coded value.   
+@import 'rock-components/checkbox';                 // Fully Format. There are Some hard coded value.
 @import 'rock-components/switch';                   // Fully Format. There are Some hard coded color.
 @import 'rock-components/smart-search';             // Fully Format. There are Some hard coded value.
 @import 'rock-components/number-increment';         // Fully Format.
@@ -99,8 +99,8 @@
 @import 'rock-components/typeahead-support';        // Fully Format. There are Some hard coded value.
 @import 'rock-components/image-cropper';            // Fully Format. There are Some hard coded value.
 @import 'rock-components/sliding-date-range';       // Fully Format. There are Some hard coded value.
-@import 'rock-components/paneled-list';             // Fully Format.            
-@import 'rock-components/person-directory';         // Fully Format.  
+@import 'rock-components/paneled-list';             // Fully Format.
+@import 'rock-components/person-directory';         // Fully Format.
 @import 'rock-components/picker-date';              // Fully Format. There are Some hard coded value.
 @import 'rock-components/asset-manager';            // Fully Format.
 @import 'rock-components/update-panel-status';      // Fully Format. There are Some hard coded value.
@@ -110,9 +110,9 @@
 @import 'rock-components/vue-select';               // Fully Format. There are Some hard coded value.
 @import 'rock-components/paging-navigation';        // Fully Format.
 @import 'rock-components/list-extensions';          // Fully Format. There are Some hard coded value.
-@import 'rock-components/kpi';                      // Fully Format. There are Some hard coded value. 
+@import 'rock-components/kpi';                      // Fully Format. There are Some hard coded value.
 @import 'rock-components/key-value';                // Fully Format.
-@import 'rock-components/billboard';                // Fully Format. There are Some hard coded value. 
+@import 'rock-components/billboard';                // Fully Format. There are Some hard coded value.
 @import 'rock-components/modal';                    // Fully Format. Must import below the bootstrap modal.
 @import 'rock-components/pickers';                  // Fully Format. There are Some hard coded value.
 @import 'rock-components/person-program-step';      // Fully Format.
@@ -123,7 +123,7 @@
 @import 'rock-components/color-selector';           // Fully Format.
 @import 'rock-components/picker-geo';               // Fully Format.
 @import 'rock-components/custom-select';            // Fully Format.
-@import 'rock-components/grid-obsidian';           
+@import 'rock-components/grid-obsidian';
 @import 'rock-components/html-editor';
 @import 'rock-components/ant-select';
 @import 'rock-components/profile';
@@ -132,6 +132,7 @@
 @import 'rock-components/tox-overrides';
 @import 'rock-components/workflow';
 @import 'rock-components/segment-and';              // Fully Format.
+@import 'rock-components/tabbed-bar';
 
 /* ===================== BLOCK =================== */
 @import 'blocks/blocks-core';                       // Fully Format. There are Some hard coded value.
