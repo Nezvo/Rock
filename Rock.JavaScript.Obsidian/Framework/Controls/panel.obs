@@ -285,6 +285,12 @@
         panelHeadingCssClass: {
             type: String as PropType<string>,
             default: ""
+        },
+
+        /** Removes the borders of a panel. Only works with RockNextGen theme! */
+        isBorderlessPanel: {
+            type: Boolean as PropType<boolean>,
+            default: false
         }
     });
 
@@ -347,6 +353,10 @@
 
         if (props.worksurfaceMode) {
             classes.push("panel-worksurface");
+        }
+
+        if (props.isBorderlessPanel) {
+            classes.push("borderless-panel");
         }
 
         return classes;
