@@ -261,7 +261,7 @@ namespace Rock.Jobs
 
             if ( _databaseMaintenanceTaskResults.Any( a => a.HasException ) )
             {
-                jobSummaryBuilder.AppendLine( "\n<i class='fa fa-circle text-warning'></i> Some jobs have errors. See exception log for details." );
+                jobSummaryBuilder.AppendLine( "\n<i class='ti ti-circle text-warning'></i> Some jobs have errors. See exception log for details." );
             }
 
             this.Result = jobSummaryBuilder.ToString();
@@ -284,11 +284,11 @@ namespace Rock.Jobs
         {
             if ( result.HasException )
             {
-                return $"<i class='fa fa-circle text-danger'></i> { result.Title}";
+                return $"<i class='ti ti-circle text-danger'></i> { result.Title}";
             }
             else
             {
-                var icon = "<i class='fa fa-circle text-success'></i>";
+                var icon = "<i class='ti ti-circle text-success'></i>";
                 return $"{icon} {result.Title} ({result.Elapsed.TotalMilliseconds:N0}ms)";
             }
         }
@@ -441,6 +441,10 @@ namespace Rock.Jobs
                 var rebuildFillFactorOption = $"FILLFACTOR = {indexInfo.FillFactor}";
                 var isFillFactorEighty = ( indexInfo.FillFactor == 80 );
                 if ( isFillFactorEighty )
+                {
+                    rebuildFillFactorOption = "FILLFACTOR = 100";
+                }
+                else if ( indexInfo.FillFactor == 0 )
                 {
                     rebuildFillFactorOption = "FILLFACTOR = 100";
                 }

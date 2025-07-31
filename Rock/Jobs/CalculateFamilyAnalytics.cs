@@ -21,6 +21,8 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 
+using Microsoft.EntityFrameworkCore;
+
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
@@ -119,7 +121,7 @@ namespace Rock.Jobs
                 throw new Exception( "Family analytic attributes could not be found" );
             }
 
-            resultContext.Database.CommandTimeout = commandTimeout;
+            resultContext.Database.SetCommandTimeout( commandTimeout );
 
             this.UpdateLastStatusMessage( "Getting Family Analytics Era Dataset..." );
 
@@ -139,7 +141,7 @@ namespace Rock.Jobs
                 // Create new rock context for each family (https://weblog.west-wind.com/posts/2014/Dec/21/Gotcha-Entity-Framework-gets-slow-in-long-Iteration-Loops)
                 RockContext updateContext = new RockContext();
                 updateContext.SourceOfChange = SOURCE_OF_CHANGE;
-                updateContext.Database.CommandTimeout = commandTimeout;
+                updateContext.Database.SetCommandTimeout( commandTimeout );
                 var attributeValueService = new AttributeValueService( updateContext );
                 var historyService = new HistoryService( updateContext );
                 var stepService = new StepService( updateContext );

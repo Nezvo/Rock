@@ -27,7 +27,7 @@
         <asp:Panel ID="pnlOverview" runat="server" CssClass="panel panel-block">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <i class="fa fa-mobile"></i>
+                    <i class="ti ti-device-mobile"></i>
                     <asp:Literal ID="ltAppName" runat="server" />
                 </h3>
                 <div class="panel-labels">
@@ -85,7 +85,7 @@
                                     <asp:LinkButton ID="lbEdit" runat="server" CssClass="btn btn-primary" Text="Edit" OnClick="lbEdit_Click" data-shortcut-key="e" AccessKey="m" ToolTip="Alt+e" />
                                     <asp:LinkButton ID="lbCancel" runat="server" CssClass="btn btn-link" Text="Cancel" OnClick="lbCancel_Click" CausesValidation="false" data-shortcut-key="c" ToolTip="Alt+c" />
                                     <div class="pull-right">
-                                        <asp:LinkButton ID="lbDeploy" runat="server" CssClass="btn btn-default" OnClick="lbDeploy_Click" OnClientClick="Rock.dialogs.confirmPreventOnCancel( event, 'Are you sure you wish to replace the current package and deploy a new one?');"><i class="fa fa-upload"></i> Deploy</asp:LinkButton>
+                                        <asp:LinkButton ID="lbDeploy" runat="server" CssClass="btn btn-default" OnClick="lbDeploy_Click" OnClientClick="Rock.dialogs.confirmPreventOnCancel( event, 'Are you sure you wish to replace the current package and deploy a new one?');"><i class="ti ti-upload"></i> Deploy</asp:LinkButton>
                                     </div>
                                 </div>
 
@@ -184,15 +184,18 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <Rock:ColorPicker ID="cpBarBackgroundColor" runat="server" Label="Navigation Bar Background Color" Help="The background color of the navigation bar." />
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <Rock:RockCheckBox ID="cbNavbarTransclucent" runat="server" AutoPostBack="true" OnCheckedChanged="CbNavbarTransclucent_CheckedChanged" Label="Enable Navigation Bar Transparency" Help="Please note, your bar background color must have an opacity less than 100% for this to work. Enable to view different blurring options. (iOS Only)" />
                                             <Rock:RockDropDownList ID="ddlNavbarBlurStyle" runat="server" Label="Navigation Bar Blur Style" Help="Select between the different blur styles of the navigation bar. (iOS Only)" />
                                         </div>
-                                        <div class="col-md-4">
-                                            <Rock:ImageUploader ID="imgEditHeaderImage" runat="server" Label="Navigation Bar Image" Help="The image that appears on the top header. While the size is dependent on design we recommend a height of 120px and minimum width of 560px." />
+                                        <div class="col-md-3">
+                                            <Rock:ImageUploader ID="imgEditHeaderImage" runat="server" Label="Light Navigation Bar Image" Help="The image that appears on the top header. While the size is dependent on design we recommend a height of 120px and minimum width of 560px." />
+                                        </div>
+                                         <div class="col-md-3">
+                                            <Rock:ImageUploader ID="imgEditHeaderDarkImage" runat="server" Label="Dark Navigation Bar Image" Help="The image that appears on the top header. While the size is dependent on design we recommend a height of 120px and minimum width of 560px." />
                                         </div>
                                     </div>
                                 </div>
@@ -297,7 +300,7 @@
 
                                 <div class="actions margin-t-md">
                                     <Rock:BootstrapButton ID="lbStylesEditSave" runat="server" CssClass="btn btn-primary" Text="Save" OnClick="lbStylesEditSave_Click"
-                                        DataLoadingText="&lt;i class='fa fa-refresh fa-spin'&gt;&lt;/i&gt; Saving"
+                                        DataLoadingText="&lt;i class='ti ti-refresh ti-spin'&gt;&lt;/i&gt; Saving"
                                         CompletedText="Saved"
                                         CompletedMessage="<div class='margin-t-md alert alert-success'>Changes have been saved.</div>"
                                         CompletedDuration="5"></Rock:BootstrapButton>

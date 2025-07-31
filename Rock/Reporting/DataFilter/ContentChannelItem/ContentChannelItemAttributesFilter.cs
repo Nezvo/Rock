@@ -76,9 +76,16 @@ namespace Rock.Reporting.DataFilter.ContentChannelItem
         /// <inheritdoc/>
         public override DynamicComponentDefinitionBag GetComponentDefinition( Type entityType, string selection, RockContext rockContext, RockRequestContext requestContext )
         {
+            var channelTypeService = new ContentChannelTypeService( rockContext );
+            var contentChannelTypes = channelTypeService.Queryable().OrderBy( a => a.Name ).ToList();
+
             return new DynamicComponentDefinitionBag
             {
-                Url = requestContext.ResolveRockUrl( "~/Obsidian/Reporting/DataFilters/ContentChannelItem/contentChannelItemAttributesFilter.obs" )
+                Url = requestContext.ResolveRockUrl( "~/Obsidian/Reporting/DataFilters/ContentChannelItem/contentChannelItemAttributesFilter.obs" ),
+                Options = new Dictionary<string, string>
+                {
+                    { "contentChannelTypeOptions", contentChannelTypes.Select( a => a.ToListItemBag() ).ToList().ToCamelCaseJson( false, true ) }
+                },
             };
         }
 
@@ -91,8 +98,6 @@ namespace Rock.Reporting.DataFilter.ContentChannelItem
             var channelTypeService = new ContentChannelTypeService( rockContext );
 
             var contentChannelTypes = channelTypeService.Queryable().OrderBy( a => a.Name ).ToList();
-            data.AddOrReplace( "contentChannelTypeOptions", contentChannelTypes.Select( a => a.ToListItemBag() ).ToList().ToCamelCaseJson( false, true ) );
-
             var fieldFilterSourcesByContentChannelType = new Dictionary<Guid, List<FieldFilterSourceBag>>();
 
             // Prime the dictionary with empty lists to make it easier to add the entity fields
@@ -209,6 +214,11 @@ namespace Rock.Reporting.DataFilter.ContentChannelItem
             };
 
             var filterValue = attribute.FieldType.Field.GetPrivateFilterValue( comparisonValue, attribute.ConfigurationValues ).FromJsonOrNull<List<string>>();
+
+            if ( filterValue.Count >= 2 && filterValue[0] == "0" )
+            {
+                filterValue = filterValue.Skip( 1 ).ToList();
+            }
 
             selectionValues.Add( entityField.UniqueName );
             selectionValues = selectionValues.Concat( filterValue ).ToList();

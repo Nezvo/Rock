@@ -54,8 +54,6 @@
                       title="Started"
                       field="startedCount"
                       :filter="numberValueFilter"
-                      headerClass="justify-content-end text-right"
-                      itemClass="justify-content-end text-right"
                       visiblePriority="md"
                       width="5%" />
 
@@ -63,14 +61,13 @@
                       title="Completed"
                       field="completedCount"
                       :filter="numberValueFilter"
-                      headerClass="justify-content-end text-right text-nowrap"
-                      itemClass="justify-content-end text-right"
+                      headerClass="text-nowrap"
                       visiblePriority="md"
                       width="20%" />
 
         <ButtonColumn v-if="config.options?.isBulkEntryColumnVisible"
                       name="bulkEntry"
-                      iconClass="fa fa-truck"
+                      iconClass="ti ti-truck"
                       visiblePriority="md"
                       @click="bulkEntry" />
 

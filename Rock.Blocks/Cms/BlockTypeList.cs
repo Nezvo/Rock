@@ -42,7 +42,7 @@ namespace Rock.Blocks.Cms
     [DisplayName( "Block Type List" )]
     [Category( "CMS" )]
     [Description( "Displays a list of block types." )]
-    [IconCssClass( "fa fa-list" )]
+    [IconCssClass( "ti ti-list" )]
     // [SupportedSiteTypes( Model.SiteType.Web )]
 
     [LinkedPage( "Detail Page",
@@ -208,6 +208,12 @@ namespace Rock.Blocks.Cms
                 IsSystem = bt.IsSystem,
                 Status = GetBlockTypeStatus( bt.Path, bt.EntityTypeId, rockContext )
             } ).AsQueryable();
+        }
+
+        /// <inheritdoc/>
+        protected override IQueryable<BlockTypeListBag> GetOrderedListQueryable( IQueryable<BlockTypeListBag> queryable, RockContext rockContext )
+        {
+            return queryable.OrderBy( a => a.Name ).ThenBy( a => a.Category );
         }
 
         /// <inheritdoc/>
