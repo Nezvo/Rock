@@ -225,7 +225,8 @@ namespace Rock.Blocks.Engagement
                     new ListItemBag() { Text = "Step Completed", Value = StepWorkflowTrigger.WorkflowTriggerCondition.IsComplete.ToString() },
                     new ListItemBag() { Text = "Status Changed", Value = StepWorkflowTrigger.WorkflowTriggerCondition.StatusChanged.ToString() },
                     new ListItemBag() { Text = "Manual", Value = StepWorkflowTrigger.WorkflowTriggerCondition.Manual.ToString() }
-                }
+                },
+                StepPrograms = GetStepPrograms( stepType?.StepProgramId )
             };
 
             return options;
@@ -239,6 +240,49 @@ namespace Rock.Blocks.Engagement
         {
             var stepProgramId = GetStepProgramId( stepType );
             return _stepStatuses ?? ( _stepStatuses = new StepStatusService( GetRockContext() ).Queryable().Where( s => s.StepProgramId == stepProgramId ).ToList() );
+        }
+
+        /// <summary>
+        /// Gets all active Step Programs that the current person has view permissions for.
+        /// </summary>
+        /// <returns>Step Programs in a list of list item bags</returns>
+        private List<StepProgramBag> GetStepPrograms( int? currentStepProgramId )
+        {
+            if ( !currentStepProgramId.HasValue )
+            {
+                return null;
+            }
+
+            var stepProgramService = new StepProgramService( RockContext );
+
+            var authorizedStepPrograms = stepProgramService.Queryable()
+                .AsNoTracking()
+                .Where( s => s.IsActive && s.Id != currentStepProgramId )
+                .Select( s => new
+                {
+                    StepProgram = s,
+                    StepStatuses = s.StepStatuses
+                        .Where( ss => ss.IsActive )
+                        .Select( ss => new ListItemBag {
+                            Text = ss.Name,
+                            Value = ss.Guid.ToString()
+                        } )
+                        .ToList()
+                } )
+                .ToList()
+                .Where( sp => sp.StepProgram.IsAuthorized( Authorization.VIEW, RequestContext.CurrentPerson ) )
+                .Select( sp => new StepProgramBag
+                {
+                    StepProgram = new ListItemBag
+                    {
+                        Text = sp.StepProgram.Name,
+                        Value = sp.StepProgram.Guid.ToString()
+                    },
+                    StepStatuses = sp.StepStatuses
+                } )
+                .ToList();
+
+            return authorizedStepPrograms;
         }
 
         /// <summary>
@@ -1440,6 +1484,96 @@ namespace Rock.Blocks.Engagement
             var kpi = GetKpi( dateRange );
 
             return ActionOk( new StepTypeBag() { ChartData = chartDataJson, Kpi = kpi, ShowChart = showActivitySummary } );
+        }
+
+        /// <summary>
+        /// Transfers the Step Type to a different Step Program
+        /// </summary>
+        /// <param name="transferBag"></param>
+        /// <returns></returns>
+        [BlockAction]
+        public BlockActionResult TransferStepType( StepTypeTransferBag transferBag )
+        {
+            if ( !TryGetEntityForEditAction( transferBag.StepTypeIdKey, RockContext, out var stepType, out var actionError ) )
+            {
+                return actionError;
+            }
+
+            if ( !transferBag.TargetStepProgramGuid.HasValue )
+            {
+                return ActionBadRequest( "Target Step Program is required." );
+            }
+
+            var targetStepProgram = StepProgramCache.Get( transferBag.TargetStepProgramGuid.Value );
+
+            if ( targetStepProgram == null )
+            {
+                return ActionBadRequest( "Target Step Program not found." );
+            }
+
+            // Fetch all Step Statuses from the current Step Program
+            // This query pulls every status (Guid, Id, Name) that belongs to
+            // the current Step Program associated with the Step Type.
+            // We'll need both the Guid (for matching mappings) and the Id 
+            // (for updating Step records later).
+            var currentStatuses = new StepStatusService( RockContext )
+                .Queryable()
+                .Where( ss => ss.StepProgramId == stepType.StepProgramId )
+                .Select( ss => new { ss.Guid, ss.Id, ss.Name } )
+                .ToList();
+
+            // Fetch all Step Statuses from the target Step Program
+            // We load the target program's statuses into a dictionary keyed
+            // by Guid (for fast lookups when validating mappings). The value
+            // is the database Id so we can assign it to Steps.
+            var targetStatuses = new StepStatusService( RockContext )
+                .Queryable()
+                .Where( ss => ss.StepProgramId == targetStepProgram.Id )
+                .ToDictionary( ss => ss.Guid, ss => ss.Id );
+
+            // Validate that every current status has a valid mapping
+            // We loop over each status from the current program and check:
+            //   - Does it have an entry in transferBag.StepStatusMappings?
+            //   - Does the mapped Guid exist in the target program's statuses?
+            // If either check fails, we return a descriptive error message.
+            foreach ( var status in currentStatuses )
+            {
+                if ( !transferBag.StepStatusMappings.TryGetValue( status.Guid.ToString(), out var mappedGuidString ) )
+                {
+                    return ActionBadRequest( $"A mapping for status '{status.Name}' is required." );
+                }
+
+                var mappedGuid = mappedGuidString.AsGuid();
+                if ( !targetStatuses.ContainsKey( mappedGuid ) )
+                {
+                    return ActionBadRequest( $"The mapped status for '{status.Name}' is not valid in the target program." );
+                }
+            }
+
+            var stepsToUpdate = new StepService( RockContext )
+                .Queryable()
+                .Where( s => s.StepTypeId == stepType.Id )
+                .ToList();
+
+            // Update each Step's StepStatusId to match the target program mapping
+            foreach ( var step in stepsToUpdate )
+            {
+                var oldStatusGuid = currentStatuses
+                    .FirstOrDefault( cs => cs.Id == step.StepStatusId )?.Guid;
+
+                if ( oldStatusGuid.HasValue
+                     && transferBag.StepStatusMappings.TryGetValue( oldStatusGuid.Value.ToString(), out var mappedGuidString ) )
+                {
+                    var newStatusGuid = mappedGuidString.AsGuid();
+                    step.StepStatusId = targetStatuses[newStatusGuid];
+                }
+            }
+
+            stepType.StepProgramId = targetStepProgram.Id;
+
+            RockContext.SaveChanges();
+
+            return ActionOk( targetStepProgram.IdKey );
         }
 
         #endregion

@@ -23,15 +23,15 @@ namespace Rock.ViewModels.Blocks.Engagement.StepTypeDetail
     /// <summary>
     /// 
     /// </summary>
-    public class StepTypeDetailOptionsBag
+    public class StepProgramBag
     {
         /// <summary>
-        /// Gets or sets the trigger types.
+        /// Gets or sets a Step Program.
         /// </summary>
         /// <value>
-        /// The trigger types.
+        /// The step program.
         /// </value>
-        public List<ListItemBag> TriggerTypes { get; set; }
+        public ListItemBag StepProgram { get; set; }
 
         /// <summary>
         /// Gets or sets the step statuses.
@@ -40,13 +40,5 @@ namespace Rock.ViewModels.Blocks.Engagement.StepTypeDetail
         /// The step statuses.
         /// </value>
         public List<ListItemBag> StepStatuses { get; set; }
-
-        /// <summary>
-        /// Gets or sets the step programs.
-        /// </summary>
-        /// <value>
-        /// The step programs.
-        /// </value>
-        public List<StepProgramBag> StepPrograms { get; set; }
     }
 }

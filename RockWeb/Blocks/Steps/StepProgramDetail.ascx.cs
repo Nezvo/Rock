@@ -1208,7 +1208,7 @@ namespace RockWeb.Blocks.Steps
         {
             if ( stepProgram == null )
             {
-                stepProgram = new StepProgram();
+                stepProgram = new Rock.Model.StepProgram();
                 stepProgram.IconCssClass = "ti ti-minimize";
             }
 
