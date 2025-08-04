@@ -204,6 +204,13 @@
         }
     }
 
+    function onStepTypeMove(): void {
+        // Clear old error messages
+        transferModalErrorText.value = "";
+
+        isStepTypeMoveModalVisible.value = true;
+    }
+
     // #endregion
 
     // #region Event Handlers
@@ -214,13 +221,6 @@
         if (bulkEntryPageUrl) {
             window.location.href = makeUrlRedirectSafe(bulkEntryPageUrl);
         }
-    }
-
-    function onStepTypeMove(): void {
-        // Clear old error messages
-        transferModalErrorText.value = "";
-
-        isStepTypeMoveModalVisible.value = true;
     }
 
     /**
