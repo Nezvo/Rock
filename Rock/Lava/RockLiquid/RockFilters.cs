@@ -3129,11 +3129,11 @@ namespace Rock.Lava
                             // it's a child
                             if ( person.Gender == Gender.Female )
                             {
-                                photoUrl.Append( "Assets/Images/lava-filter/photo-child-female.png" );
+                                photoUrl.Append( "Assets/Images/LavaFilter/photo-child-female.png" );
                             }
                             else
                             {
-                                photoUrl.Append( "Assets/Images/lava-filter/photo-child-male.png" );
+                                photoUrl.Append( "Assets/Images/LavaFilter/photo-child-male.png" );
                             }
                         }
                         else
@@ -3141,11 +3141,11 @@ namespace Rock.Lava
                             // it's an adult
                             if ( person.Gender == Gender.Female )
                             {
-                                photoUrl.Append( "Assets/Images/lava-filter/photo-adult-female.png" );
+                                photoUrl.Append( "Assets/Images/LavaFilter/photo-adult-female.png" );
                             }
                             else
                             {
-                                photoUrl.Append( "Assets/Images/lava-filter/photo-adult-male.png" );
+                                photoUrl.Append( "Assets/Images/LavaFilter/photo-adult-male.png" );
                             }
                         }
 
