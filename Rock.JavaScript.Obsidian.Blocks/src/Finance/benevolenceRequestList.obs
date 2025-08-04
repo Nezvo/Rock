@@ -42,8 +42,8 @@
                 visiblePriority="xs">
             <template #format="{ row }">
                 <div class="flex-grow-1">
-                    <span v-if="row.requestedBy"><a :href="`/person/${row.requestedByIdKey}`">{{ row.requestedByFullName }}</a></span>
-                    <span v-else>{{ row.firstName }} {{ row.lastName }}</span>
+                    <span v-if="row.requestedBy"><a :href="`/person/${row.requestedByIdKey}`"><strong>{{ row.requestedByFullName }}</strong></a></span>
+                    <span v-else><strong>{{ row.firstName }} {{ row.lastName }}</strong></span>
                     <div class="text-muted">{{ row.connectionStatus }}</div>
                 </div>
             </template>
@@ -65,7 +65,8 @@
                     title="Government ID"
                     field="governmentId"
                     :filter="textValueFilter"
-                    visiblePriority="md" />
+                    headerClass="break-word"
+                    visiblePriority="lg" />
 
         <TextColumn name="requestText"
                     title="Request"
@@ -89,7 +90,7 @@
                     disableSort
                     :filter="textValueFilter"
                     width="25%"
-                    visiblePriority="md" />
+                    visiblePriority="lg" />
 
         <Column name="resultSpecifics"
                 title="Result Specifics"
@@ -172,6 +173,10 @@
 <style>
 .title-right .grid-column-title {
     text-align: right;
+}
+
+.break-word {
+    word-break: normal;
 }
 </style>
 
