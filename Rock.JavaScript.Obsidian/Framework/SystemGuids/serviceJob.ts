@@ -202,6 +202,8 @@ export const ServiceJob = {
     Post170UpdateHistoryEntitytypeidIndex: "48D7629C-1FB5-425A-AFAB-E8F220ABADB0",
     /** A run once job after a new installation. The purpose of this job is to populate generated datasets after an initial installation using RockInstaller that are too large to include in the installer. */
     PostInstallDataMigrations: "322984F1-A7A0-4D1B-AE6F-D7F043F66EB3",
+    /** The job for processing communication flows. Rock.Jobs.ProcessCommunicationFlows */
+    ProcessCommunicationFlows: "8D79FB3B-F0B1-4B57-A8DA-EEE46B38A08B",
     /** The Process Elevated Security Job. Rock.Jobs.ProcessElevatedSecurity */
     ProcessElevatedSecurity: "A1AF9D7D-E968-4AF6-B203-6BB4FD625714",
     /** The Rock.Jobs.ProcessReminders job. */

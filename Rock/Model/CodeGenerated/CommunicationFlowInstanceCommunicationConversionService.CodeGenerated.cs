@@ -29,15 +29,15 @@ using Rock.Data;
 namespace Rock.Model
 {
     /// <summary>
-    /// CommunicationFlowInstanceConversionHistory Service class
+    /// CommunicationFlowInstanceCommunicationConversion Service class
     /// </summary>
-    public partial class CommunicationFlowInstanceConversionHistoryService : Service<CommunicationFlowInstanceConversionHistory>
+    public partial class CommunicationFlowInstanceCommunicationConversionService : Service<CommunicationFlowInstanceCommunicationConversion>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommunicationFlowInstanceConversionHistoryService"/> class
+        /// Initializes a new instance of the <see cref="CommunicationFlowInstanceCommunicationConversionService"/> class
         /// </summary>
         /// <param name="context">The context.</param>
-        public CommunicationFlowInstanceConversionHistoryService(RockContext context) : base(context)
+        public CommunicationFlowInstanceCommunicationConversionService(RockContext context) : base(context)
         {
         }
 
@@ -49,15 +49,15 @@ namespace Rock.Model
         /// <returns>
         ///   <c>true</c> if this instance can delete the specified item; otherwise, <c>false</c>.
         /// </returns>
-        public bool CanDelete( CommunicationFlowInstanceConversionHistory item, out string errorMessage )
+        public bool CanDelete( CommunicationFlowInstanceCommunicationConversion item, out string errorMessage )
         {
             errorMessage = string.Empty;
             return true;
         }
     }
 
-    [HasQueryableAttributes( typeof( CommunicationFlowInstanceConversionHistory.CommunicationFlowInstanceConversionHistoryQueryableAttributeValue ), nameof( CommunicationFlowInstanceConversionHistoryAttributeValues ) )]
-    public partial class CommunicationFlowInstanceConversionHistory
+    [HasQueryableAttributes( typeof( CommunicationFlowInstanceCommunicationConversion.CommunicationFlowInstanceCommunicationConversionQueryableAttributeValue ), nameof( CommunicationFlowInstanceCommunicationConversionAttributeValues ) )]
+    public partial class CommunicationFlowInstanceCommunicationConversion
     {
         /// <summary>
         /// Gets the entity attribute values. This should only be used inside
@@ -66,10 +66,10 @@ namespace Rock.Model
         /// or selecting values. Do <b>not</b> use it for accessing the
         /// attributes after the entity has been loaded.
         /// </summary>
-        public virtual ICollection<CommunicationFlowInstanceConversionHistoryQueryableAttributeValue> CommunicationFlowInstanceConversionHistoryAttributeValues { get; set; } 
+        public virtual ICollection<CommunicationFlowInstanceCommunicationConversionQueryableAttributeValue> CommunicationFlowInstanceCommunicationConversionAttributeValues { get; set; } 
 
         /// <inheritdoc/>
-        public class CommunicationFlowInstanceConversionHistoryQueryableAttributeValue : QueryableAttributeValue
+        public class CommunicationFlowInstanceCommunicationConversionQueryableAttributeValue : QueryableAttributeValue
         {
         }
     }
@@ -77,36 +77,36 @@ namespace Rock.Model
     /// <summary>
     /// Generated Extension Methods
     /// </summary>
-    public static partial class CommunicationFlowInstanceConversionHistoryExtensionMethods
+    public static partial class CommunicationFlowInstanceCommunicationConversionExtensionMethods
     {
         /// <summary>
-        /// Clones this CommunicationFlowInstanceConversionHistory object to a new CommunicationFlowInstanceConversionHistory object
+        /// Clones this CommunicationFlowInstanceCommunicationConversion object to a new CommunicationFlowInstanceCommunicationConversion object
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="deepCopy">if set to <c>true</c> a deep copy is made. If false, only the basic entity properties are copied.</param>
         /// <returns></returns>
-        public static CommunicationFlowInstanceConversionHistory Clone( this CommunicationFlowInstanceConversionHistory source, bool deepCopy )
+        public static CommunicationFlowInstanceCommunicationConversion Clone( this CommunicationFlowInstanceCommunicationConversion source, bool deepCopy )
         {
             if (deepCopy)
             {
-                return source.Clone() as CommunicationFlowInstanceConversionHistory;
+                return source.Clone() as CommunicationFlowInstanceCommunicationConversion;
             }
             else
             {
-                var target = new CommunicationFlowInstanceConversionHistory();
+                var target = new CommunicationFlowInstanceCommunicationConversion();
                 target.CopyPropertiesFrom( source );
                 return target;
             }
         }
 
         /// <summary>
-        /// Clones this CommunicationFlowInstanceConversionHistory object to a new CommunicationFlowInstanceConversionHistory object with default values for the properties in the Entity and Model base classes.
+        /// Clones this CommunicationFlowInstanceCommunicationConversion object to a new CommunicationFlowInstanceCommunicationConversion object with default values for the properties in the Entity and Model base classes.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns></returns>
-        public static CommunicationFlowInstanceConversionHistory CloneWithoutIdentity( this CommunicationFlowInstanceConversionHistory source )
+        public static CommunicationFlowInstanceCommunicationConversion CloneWithoutIdentity( this CommunicationFlowInstanceCommunicationConversion source )
         {
-            var target = new CommunicationFlowInstanceConversionHistory();
+            var target = new CommunicationFlowInstanceCommunicationConversion();
             target.CopyPropertiesFrom( source );
 
             target.Id = 0;
@@ -123,15 +123,15 @@ namespace Rock.Model
         }
 
         /// <summary>
-        /// Copies the properties from another CommunicationFlowInstanceConversionHistory object to this CommunicationFlowInstanceConversionHistory object
+        /// Copies the properties from another CommunicationFlowInstanceCommunicationConversion object to this CommunicationFlowInstanceCommunicationConversion object
         /// </summary>
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
-        public static void CopyPropertiesFrom( this CommunicationFlowInstanceConversionHistory target, CommunicationFlowInstanceConversionHistory source )
+        public static void CopyPropertiesFrom( this CommunicationFlowInstanceCommunicationConversion target, CommunicationFlowInstanceCommunicationConversion source )
         {
             target.Id = source.Id;
-            target.CommunicationFlowCommunicationId = source.CommunicationFlowCommunicationId;
-            target.CommunicationFlowInstanceId = source.CommunicationFlowInstanceId;
+            target.CommunicationFlowInstanceCommunicationId = source.CommunicationFlowInstanceCommunicationId;
+            target.CommunicationRecipientId = source.CommunicationRecipientId;
             target.Date = source.Date;
             target.ForeignGuid = source.ForeignGuid;
             target.ForeignKey = source.ForeignKey;

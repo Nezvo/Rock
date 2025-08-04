@@ -27,23 +27,23 @@ using Rock.Data;
 namespace Rock.Model
 {
     /// <summary>
-    /// Represents a Communication Flow Instance Conversion History in Rock.
+    /// Represents a Communication Flow Instance Communication Conversion in Rock.
     /// </summary>
     [RockDomain( "Communication" )]
-    [Table( "CommunicationFlowInstanceConversionHistory" )]
+    [Table( "CommunicationFlowInstanceCommunicationConversion" )]
     [DataContract]
     [CodeGenerateRest]
-    [Rock.SystemGuid.EntityTypeGuid( Rock.SystemGuid.EntityType.COMMUNICATION_FLOW_INSTANCE_CONVERSION_HISTORY )]
-    public partial class CommunicationFlowInstanceConversionHistory : Model<CommunicationFlowInstanceConversionHistory>
+    [Rock.SystemGuid.EntityTypeGuid( Rock.SystemGuid.EntityType.COMMUNICATION_FLOW_INSTANCE_COMMUNICATION_CONVERSION )]
+    public partial class CommunicationFlowInstanceCommunicationConversion : Model<CommunicationFlowInstanceCommunicationConversion>
     {
         #region Entity Properties
 
         /// <summary>
-        /// Gets or sets the identifier of the Communication Flow Instance.
+        /// Gets or sets the identifier of the Communication Flow Instance Communication.
         /// </summary>
         [Required]
         [DataMember]
-        public int CommunicationFlowInstanceId { get; set; }
+        public int CommunicationFlowInstanceCommunicationId { get; set; }
         
         /// <summary>
         /// Gets or sets the date that the conversion occurred.
@@ -59,21 +59,21 @@ namespace Rock.Model
         public int PersonAliasId { get; set; }
 
         /// <summary>
-        /// Gets or sets the Communication Flow Communication identifier which this conversion is for.
+        /// Gets or sets the identifier of the Communication Recipient whom this conversion is for.
         /// </summary>
         [Required]
         [DataMember]
-        public int CommunicationFlowCommunicationId { get; set; }
+        public int CommunicationRecipientId { get; set; }
 
         #endregion Entity Properties
 
         #region Navigation Properties
 
         /// <summary>
-        /// Gets or sets the Communication Flow Instance.
+        /// Gets or sets the Communication Flow Instance Communication.
         /// </summary>
         [DataMember]
-        public virtual CommunicationFlowInstance CommunicationFlowInstance { get; set; }
+        public virtual CommunicationFlowInstanceCommunication CommunicationFlowInstanceCommunication { get; set; }
 
         /// <summary>
         /// Gets or sets the Person Alias whom this conversion is for.
@@ -82,10 +82,10 @@ namespace Rock.Model
         public virtual PersonAlias PersonAlias { get; set; }
 
         /// <summary>
-        /// Gets or sets the Communication Flow Communication which this conversion is for.
+        /// Gets or sets the Person Alias whom this conversion is for.
         /// </summary>
         [DataMember]
-        public virtual CommunicationFlowCommunication CommunicationFlowCommunication { get; set; }
+        public virtual CommunicationRecipient CommunicationRecipient { get; set; }
 
         #endregion Navigation Properties
     }
@@ -93,18 +93,18 @@ namespace Rock.Model
     #region Entity Configuration
 
     /// <summary>
-    /// Communication Flow Instance Conversion History Configuration class.
+    /// Communication Flow Instance Communication Conversion Configuration class.
     /// </summary>
-    public partial class CommunicationFlowInstanceConversionHistoryConfiguration : EntityTypeConfiguration<CommunicationFlowInstanceConversionHistory>
+    public partial class CommunicationFlowInstanceCommunicationConversionConfiguration : EntityTypeConfiguration<CommunicationFlowInstanceCommunicationConversion>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommunicationFlowInstanceConversionHistoryConfiguration"/> class.
+        /// Initializes a new instance of the <see cref="CommunicationFlowInstanceCommunicationConversionConfiguration"/> class.
         /// </summary>
-        public CommunicationFlowInstanceConversionHistoryConfiguration()
+        public CommunicationFlowInstanceCommunicationConversionConfiguration()
         {
-            this.HasRequired( c => c.CommunicationFlowInstance ).WithMany( i => i.CommunicationFlowInstanceConversionHistories ).HasForeignKey( c => c.CommunicationFlowInstanceId ).WillCascadeOnDelete( false );
+            this.HasRequired( c => c.CommunicationFlowInstanceCommunication ).WithMany( i => i.CommunicationFlowInstanceCommunicationConversions ).HasForeignKey( c => c.CommunicationFlowInstanceCommunicationId ).WillCascadeOnDelete( true );
             this.HasRequired( c => c.PersonAlias ).WithMany().HasForeignKey( c => c.PersonAliasId ).WillCascadeOnDelete( false );
-            this.HasRequired( c => c.CommunicationFlowCommunication ).WithMany().HasForeignKey( c => c.CommunicationFlowCommunicationId ).WillCascadeOnDelete( false );
+            this.HasRequired( c => c.CommunicationRecipient ).WithMany().HasForeignKey( c => c.CommunicationRecipientId ).WillCascadeOnDelete( false );
         }
     }
 

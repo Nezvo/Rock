@@ -291,6 +291,14 @@
         isBorderlessPanel: {
             type: Boolean as PropType<boolean>,
             default: false
+        },
+
+        /**
+         * Removes the padding from the body of the panel.
+         */
+        hasNoBodyPadding: {
+            type: Boolean as PropType<boolean>,
+            default: false
         }
     });
 
@@ -357,6 +365,10 @@
 
         if (props.isBorderlessPanel) {
             classes.push("borderless-panel");
+        }
+
+        if (props.hasNoBodyPadding) {
+            classes.push("panel-body-flush");
         }
 
         return classes;

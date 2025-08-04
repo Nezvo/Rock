@@ -46,11 +46,11 @@ namespace Rock.Rest.v2.Models
 #endif
 
     /// <summary>
-    /// Provides data API endpoints for Communication Flow Instance Conversion Histories.
+    /// Provides data API endpoints for Communication Flow Instance Communication Conversions.
     /// </summary>
-    [RoutePrefix( "api/v2/models/communicationflowinstanceconversionhistories" )]
-    [Rock.SystemGuid.RestControllerGuid( "2e7c3912-c770-5431-8507-c46d9d84f06e" )]
-    public partial class CommunicationFlowInstanceConversionHistoriesController : ApiControllerBase
+    [RoutePrefix( "api/v2/models/communicationflowinstancecommunicationconversions" )]
+    [Rock.SystemGuid.RestControllerGuid( "1db8a4bd-d6f1-54dc-b061-87ee5d81b478" )]
+    public partial class CommunicationFlowInstanceCommunicationConversionsController : ApiControllerBase
     {
         /// <summary>
         /// Gets a single item from the database.
@@ -62,14 +62,14 @@ namespace Rock.Rest.v2.Models
         [Authenticate]
         [Secured( Security.Authorization.EXECUTE_READ )]
         [ExcludeSecurityActions( Security.Authorization.EXECUTE_WRITE, Security.Authorization.EXECUTE_UNRESTRICTED_WRITE )]
-        [ProducesResponseType( HttpStatusCode.OK, Type = typeof( Rock.Model.CommunicationFlowInstanceConversionHistory ) )]
+        [ProducesResponseType( HttpStatusCode.OK, Type = typeof( Rock.Model.CommunicationFlowInstanceCommunicationConversion ) )]
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "8777f4e5-4724-5cb3-aa2a-b669de6a66df" )]
+        [SystemGuid.RestActionGuid( "337cff62-63ce-5c40-b660-1f0e001dafd7" )]
         public IActionResult GetItem( string id )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_READ );
 
@@ -90,10 +90,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "d6c95faa-9a88-56f9-9f37-3d1ba2d54390" )]
-        public IActionResult PostItem( [FromBody] Rock.Model.CommunicationFlowInstanceConversionHistory value )
+        [SystemGuid.RestActionGuid( "90ad5785-5f0c-5b2b-9c13-f770cb544193" )]
+        public IActionResult PostItem( [FromBody] Rock.Model.CommunicationFlowInstanceCommunicationConversion value )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_WRITE );
 
@@ -116,10 +116,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "360d854b-7076-5027-a12a-1e514935adf4" )]
-        public IActionResult PutItem( string id, [FromBody] Rock.Model.CommunicationFlowInstanceConversionHistory value )
+        [SystemGuid.RestActionGuid( "d39bda4c-1104-5d7c-a1b1-7e770055f22d" )]
+        public IActionResult PutItem( string id, [FromBody] Rock.Model.CommunicationFlowInstanceCommunicationConversion value )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_WRITE );
 
@@ -142,10 +142,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "bfc56622-e860-5932-98f6-ad81d71731be" )]
+        [SystemGuid.RestActionGuid( "a0edbd6f-d6a3-502d-b057-f49ef5881b82" )]
         public IActionResult PatchItem( string id, [FromBody] Dictionary<string, object> values )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_WRITE );
 
@@ -166,10 +166,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "578e35a5-31c1-56d8-9ca5-f6e1ac318cd6" )]
+        [SystemGuid.RestActionGuid( "5fca8824-5252-5f90-9a2f-c34060b3fd93" )]
         public IActionResult DeleteItem( string id )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_WRITE );
 
@@ -190,10 +190,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "7777c39e-6c4b-53f2-9a20-90bdc785dc29" )]
+        [SystemGuid.RestActionGuid( "076b021c-78ec-5248-82c3-acee4ce9566c" )]
         public IActionResult GetAttributeValues( string id )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_READ );
 
@@ -216,10 +216,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "5be43c51-554c-5d15-8233-f43a89728a5b" )]
+        [SystemGuid.RestActionGuid( "f6ceedd7-c128-548c-b45b-3cf06cbd1bbd" )]
         public IActionResult PatchAttributeValues( string id, [FromBody] Dictionary<string, string> values )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_WRITE );
 
@@ -237,10 +237,10 @@ namespace Rock.Rest.v2.Models
         [Secured( Security.Authorization.EXECUTE_UNRESTRICTED_READ )]
         [ExcludeSecurityActions( Security.Authorization.EXECUTE_READ, Security.Authorization.EXECUTE_WRITE, Security.Authorization.EXECUTE_UNRESTRICTED_WRITE )]
         [ProducesResponseType( HttpStatusCode.OK, Type = typeof( object ) )]
-        [SystemGuid.RestActionGuid( "ded1bb8e-8bcd-5982-b4ec-890bbe8bbd6f" )]
+        [SystemGuid.RestActionGuid( "380b837d-bafe-5d10-8515-c764785bb907" )]
         public IActionResult PostSearch( [FromBody] EntitySearchQueryBag query )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             return helper.Search( query );
         }
@@ -258,10 +258,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.OK, Type = typeof( object ) )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "ed2f9723-aac8-55ac-b06d-82989a50eed1" )]
+        [SystemGuid.RestActionGuid( "2e3ccd20-a168-53ea-b7ea-2773c7e90b16" )]
         public IActionResult GetSearchByKey( string searchKey )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_READ );
 
@@ -283,10 +283,10 @@ namespace Rock.Rest.v2.Models
         [ProducesResponseType( HttpStatusCode.BadRequest )]
         [ProducesResponseType( HttpStatusCode.NotFound )]
         [ProducesResponseType( HttpStatusCode.Unauthorized )]
-        [SystemGuid.RestActionGuid( "573b737c-8e55-5e59-a796-ced1d6d23972" )]
+        [SystemGuid.RestActionGuid( "b5516531-a5e4-5ed4-aeea-0eac1347cbb8" )]
         public IActionResult PostSearchByKey( string searchKey, [FromBody] EntitySearchQueryBag query )
         {
-            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceConversionHistory, Rock.Model.CommunicationFlowInstanceConversionHistoryService>( this );
+            var helper = new CrudEndpointHelper<Rock.Model.CommunicationFlowInstanceCommunicationConversion, Rock.Model.CommunicationFlowInstanceCommunicationConversionService>( this );
 
             helper.IsSecurityIgnored = IsCurrentPersonAuthorized( Security.Authorization.EXECUTE_UNRESTRICTED_READ );
 

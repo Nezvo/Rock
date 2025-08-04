@@ -21,20 +21,10 @@
 // </copyright>
 //
 
-using Rock.Model;
-using Rock.SystemGuid;
+import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 
-namespace Rock.Rest.Controllers
-{
-    /// <summary>
-    /// CommunicationFlowInstanceConversionHistories REST API
-    /// </summary>
-    [RestControllerGuid( "2C6E7436-489C-463C-A0E5-762AABFB8184" )]
-    public partial class CommunicationFlowInstanceConversionHistoriesController : Rock.Rest.ApiController<Rock.Model.CommunicationFlowInstanceConversionHistory>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommunicationFlowInstanceConversionHistoriesController"/> class.
-        /// </summary>
-        public CommunicationFlowInstanceConversionHistoriesController() : base( new Rock.Model.CommunicationFlowInstanceConversionHistoryService( new Rock.Data.RockContext() ) ) { } 
-    }
-}
+/** The conversion goal settings for the Communication Flow Performance block when the conversion goal type is "Joined Specific Group". */
+export type JoinedGroupSettingsBag = {
+    /** Gets or sets the Group that needs to be joined for the conversion goal to be achieved. */
+    group?: ListItemBag | null;
+};
