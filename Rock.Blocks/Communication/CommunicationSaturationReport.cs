@@ -47,21 +47,21 @@ namespace Rock.Blocks.Communication
 
     [IntegerField( "Email Bucket Ratio",
         Key = AttributeKey.EmailBucketRatio,
-        Description = "This ratio determines the number of days each x-axis bucket represents on the chart. A value of 10 means that for every 10 days in the date range, 1 day is added to the bucket size.",
+        Description = "This ratio determines the number of days each x-axis bucket represents on the chart. A value of 10 means that for every 10 days in the date range, 1 message is added to the bucket size.",
         IsRequired = false,
         DefaultValue = "10",
         Order = 1 )]
 
     [IntegerField( "SMS Bucket Ratio",
         Key = AttributeKey.SmsBucketRatio,
-        Description = "This ratio determines the number of days each x-axis bucket represents on the chart. A value of 10 means that for every 10 days in the date range, 1 day is added to the bucket size.",
+        Description = "This ratio determines the number of days each x-axis bucket represents on the chart. A value of 10 means that for every 10 days in the date range, 1 message is added to the bucket size.",
         IsRequired = false,
         DefaultValue = "20",
         Order = 2 )]
 
     [IntegerField( "Push Notifications Bucket Ratio",
         Key = AttributeKey.PushNotificationBucketRatio,
-        Description = "This ratio determines the number of days each x-axis bucket represents on the chart. A value of 10 means that for every 10 days in the date range, 1 day is added to the bucket size.",
+        Description = "This ratio determines the number of days each x-axis bucket represents on the chart. A value of 10 means that for every 10 days in the date range, 1 message is added to the bucket size.",
         IsRequired = false,
         DefaultValue = "20",
         Order = 3 )]
