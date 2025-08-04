@@ -38,6 +38,7 @@
                 :filterValue="getPersonNameFilterValue"
                 :quickFilterValue="getPersonNameFilterValue"
                 :exportValue="getPersonNameExportValue"
+                sortValue="{{ row.firstName }} {{  row.lastName }}"
                 visiblePriority="xs">
             <template #format="{ row }">
                 <div class="flex-grow-1">
@@ -85,6 +86,7 @@
         <TextColumn name="resultSummary"
                     title="Result Summary"
                     field="resultSummary"
+                    disableSort
                     :filter="textValueFilter"
                     width="25%"
                     visiblePriority="md" />
@@ -384,7 +386,7 @@
         for (const row of rows) {
             for (const result of row.resultSpecifics as BenevolenceResultBag[]) {
                 if (result.result && !isNullOrUndefined(result.amount)) {
-                    if (result.result in resultTotals) {
+                    if (result.result in resultTotals.value) {
                         resultTotals.value[result.result] += result.amount ?? 0;
                     }
                     else {
