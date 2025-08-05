@@ -1826,6 +1826,7 @@
     <Compile Include="Plugin\HotFixes\254_UpdateGoogleMapShortcode.cs" />
     <Compile Include="Plugin\HotFixes\258_MigrationRollupsForV17_3_0.cs" />
     <Compile Include="Plugin\HotFixes\257_UpdateContentChannelInteractionComponentEntityTypeId.cs" />
+    <Compile Include="Plugin\HotFixes\260_MigrationRollupsForV17_3_1.cs" />
     <Compile Include="Plugin\HotFixes\259_MigrateTransactionBlocksFor17_3.cs" />
     <Compile Include="Plugin\HotFixes\HotFixMigrationResource.Designer.cs">
       <AutoGen>True</AutoGen>
