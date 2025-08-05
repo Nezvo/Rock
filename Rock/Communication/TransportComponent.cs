@@ -19,6 +19,7 @@ using System.Linq;
 
 using Rock.Extension;
 using Rock.Model;
+using Rock.Web.Cache;
 
 namespace Rock.Communication
 {
@@ -72,10 +73,18 @@ namespace Rock.Communication
             var person = recipient?.PersonAlias?.Person;
             if ( person != null )
             {
+                var inactiveValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.PERSON_RECORD_STATUS_INACTIVE )?.Id;
+
                 if ( person.IsDeceased )
                 {
                     recipient.Status = CommunicationRecipientStatus.Failed;
                     recipient.StatusNote = "Person is deceased";
+                    valid = false;
+                }
+                else if ( inactiveValueId.HasValue && person.RecordStatusValueId == inactiveValueId )
+                {
+                    recipient.Status = CommunicationRecipientStatus.Failed;
+                    recipient.StatusNote = "Person is inactive";
                     valid = false;
                 }
                 else if ( recipient.Communication.ListGroupId.HasValue )
