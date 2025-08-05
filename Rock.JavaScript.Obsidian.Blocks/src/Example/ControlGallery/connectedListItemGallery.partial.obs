@@ -27,7 +27,7 @@
         <template #settings>
             <div class="row">
                 <TextBox v-model="badgeText" formGroupClasses="col-md-4" label="Badge Text" />
-                <TextBox v-model="iconCssClass" formGroupClasses="col-md-4" label="Icon CSS Class" />
+                <IconPicker v-model="iconCssClass" formGroupClasses="col-md-4" label="Icon CSS Class" />
                 <DropDownList v-model="iconLabelType" :items="labelTypes" :showBlankItem="false" formGroupClasses="col-md-4" label="Icon Label Type" />
                 <TextBox v-if="iconLabelType === 'custom'" v-model="iconLabelCssClass" formGroupClasses="col-md-4 col-md-offset-8" label="Icon Label Custom Class" />
             </div>
@@ -54,6 +54,7 @@
     import ConnectedListItem from "@Obsidian/Controls/connectedListItem.obs";
     import DropDownList from "@Obsidian/Controls/dropDownList.obs";
     import TextBox from "@Obsidian/Controls/textBox.obs";
+    import IconPicker from "@Obsidian/Controls/iconPicker.obs";
     import { MenuAction } from "@Obsidian/Types/Controls/dropDownMenu";
     import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 
