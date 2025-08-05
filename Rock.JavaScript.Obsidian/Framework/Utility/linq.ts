@@ -84,6 +84,7 @@ function valueComparer<T>(keySelector: ValueSelector<T>, descending: boolean): V
 
 /**
  * Provides LINQ style access to an array of elements.
+ * @deprecated since version 18.0
  */
 export class List<T> {
     /** The elements being tracked by this list. */
@@ -598,6 +599,44 @@ export class Enumerable<T> {
     }
 
     /**
+     * Casts the elements of the sequence to the specified type.
+     * Performs a runtime type check for each element and throws an
+     * error if any element cannot be cast to the target type.
+     *
+     * @template U The target type to cast the elements to (must extend `T`).
+     * @param typeCheck A runtime type check function that verifies if the element is of type `U`.
+     * @returns A new Enumerable containing the elements cast to type `U`.
+     * @throws Error if any element cannot be cast to the specified type.
+     *
+     * @example
+     * const numbers = Enumerable.from([1, 2, 3])
+     *     // .select(...) //some projection that results in unknown type
+     *     .cast<number>(x => typeof x === "number"); // cast back to number.
+     * console.log(numbers.toArray()); // [1, 2, 3]
+     *
+     * @example
+     * const badCast = Enumerable.from([1, "hello"])
+     *     .cast<number>((x): x is number => typeof x === "number");
+     * // Throws: Invalid cast: Value 'hello' cannot be cast to the specified type.
+     */
+    cast<U extends T>(typeCheck: (item: T) => item is U): Enumerable<U> {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+
+        // Checked cast: throw when the type check fails.
+        return new Enumerable(function* () {
+            for (const item of self) {
+                if (!typeCheck(item)) {
+                    throw new Error(
+                        `Invalid cast: Value '${item}' cannot be cast to the specified type.`
+                    );
+                }
+                yield item;
+            }
+        });
+    }
+
+    /**
      * Concatenates the current sequence with another sequence.
      * @param second - The second sequence to concatenate.
      * @returns A new Enumerable containing the concatenated elements.
@@ -724,9 +763,8 @@ export class Enumerable<T> {
     }
 
     /**
-     * Returns the first element of the sequence or a default value if the sequence is empty.
-     * @param defaultValue - The default value to return if the sequence is empty.
-     * @returns The first element of the sequence or the default value.
+     * Returns the first element of the sequence or `undefined` if the sequence is empty.
+     * @returns The first element of the sequence or `undefined`.
      */
     firstOrDefault(): T | undefined;
 
@@ -737,11 +775,6 @@ export class Enumerable<T> {
      */
     firstOrDefault(defaultValue: T): T;
 
-    /**
-     * Returns the first element of the sequence or a default value if the sequence is empty.
-     * @param defaultValue - The default value to return if the sequence is empty.
-     * @returns The first element of the sequence or the default value.
-     */
     firstOrDefault(defaultValue?: T): T | undefined {
         for (const item of this) {
             return item;
@@ -828,6 +861,20 @@ export class Enumerable<T> {
     }
 
     /**
+     * Returns the last element of the sequence, or `undefined` if the sequence is empty.
+     * @returns The last element of the sequence, or `undefined`.
+     *
+     * @example
+     * const numbers = Enumerable.from([1, 2, 3]);
+     * console.log(numbers.lastOrDefault()); // Outputs: 3
+     *
+     * @example
+     * const empty = Enumerable.from<number>([]);
+     * console.log(empty.lastOrDefault()); // Outputs: undefined
+     */
+    lastOrDefault(): T | undefined;
+
+    /**
      * Returns the last element of the sequence, or a default value if the sequence is empty.
      * @param defaultValue - The default value to return if the sequence is empty.
      * @returns The last element of the sequence, or the provided default value.
@@ -840,6 +887,8 @@ export class Enumerable<T> {
      * const empty = Enumerable.from<number>([]);
      * console.log(empty.lastOrDefault(0)); // Outputs: 0
      */
+    lastOrDefault(defaultValue: T): T;
+
     lastOrDefault(defaultValue?: T): T | undefined {
         let last: T | undefined = defaultValue;
 
@@ -882,52 +931,22 @@ export class Enumerable<T> {
     }
 
     /**
-     * Filters the sequence and asserts that all elements are of the specified type.
-     *
-     * Use with caution as this method does not perform a runtime type check and could cause errors.
-     *
-     * @template U The target assertion type.
-     * @returns A new Enumerable containing elements of type `U`.
-     *
-     * @example
-     * const source = ["hello", null, undefined];
-     * const enumerable = Enumerable
-     *     .from(source)
-     *     .where(item => !isNullish(item))
-     *     .ofType<string>() // assert without a type check
-     *     .select(item => `${item} world!`);
-     *
-     * console.log(enumerable.toArray()); // Outputs: ["hello world!"]
-     */
-    ofType<U extends T>(): Enumerable<U>;
-
-    /**
      * Filters the sequence and returns only elements of the specified type.
      * @template U The target type to filter by.
      * @param typeCheck - A runtime check function to validate the type of each element.
      * @returns A new Enumerable containing elements of type `U`.
      *
      * @example
-     * const mixed: Enumerable<unknown> = Enumerable.from([1, "hello", true, 42]);
+     * const mixed = Enumerable.from([1, "hello", true, 42]);
      * const numbers = mixed.ofType<number>(item => typeof item === "number");
      * console.log(numbers.toArray()); // Outputs: [1, 42]
-     *
-     * @example
-     * class Animal {}
-     * class Dog extends Animal {}
-     * const animals: Enumerable<Animal> = Enumerable.from([new Animal(), new Dog()]);
-     * const dogs = animals.ofType<Dog>(item => item instanceof Dog);
-     * console.log(dogs.toArray()); // Outputs: [Dog instance]
      */
-    ofType<U extends T>(typeCheck: (item: T) => item is U): Enumerable<U>;
-
-    ofType<U extends T>(typeCheck?: (item: T) => item is U): Enumerable<U> {
+    ofType<U extends T>(typeCheck: (item: T) => item is U): Enumerable<U> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
-        const check = typeCheck || assertType<U>;
         return new Enumerable(function* () {
             for (const item of self) {
-                if (check(item)) {
+                if (typeCheck(item)) {
                     yield item;
                 }
             }
@@ -1260,11 +1279,4 @@ export class GroupedEnumerable<TKey, TElement> extends Enumerable<TElement> {
     ) {
         super(() => elements);
     }
-}
-
-/**
- * Blindly asserts that the value is of type T.
- */
-function assertType<T>(value: unknown): value is T {
-    return true;
 }
