@@ -27,22 +27,49 @@ namespace Rock.ViewModels.Blocks.Communication.CommunicationFlowDetail
     /// </summary>
     public class CommunicationFlowCommunicationBag
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public Guid Guid { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int DaysToWait { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public TimeSpan TimeToSend { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public CommunicationType CommunicationType { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public CommunicationFlowDetailCommunicationTemplateBag CommunicationTemplate { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int Order { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string TestEmailAddress { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string TestSmsPhoneNumber { get; set; }
     }
 }
