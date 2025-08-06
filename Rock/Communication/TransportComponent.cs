@@ -24,10 +24,16 @@ using Rock.Web.Cache;
 namespace Rock.Communication
 {
     /// <summary>
-    /// Base class for components that perform actions for a workflow
+    /// Base class for components that perform actions for a communication transport.
     /// </summary>
     public abstract class TransportComponent : Component
     {
+        /// <summary>
+        /// The friendly error message that will be returned if we can detect that an SMS recipient has previously
+        /// unsubscribed from messages at the transport level.
+        /// </summary>
+        internal static string UnsubscribedSmsRecipientMessage = "This number previously replied STOP to our messages.";
+
         /// <summary>
         /// Gets a value indicating whether transport has ability to track recipients opening the communication.
         /// </summary>
