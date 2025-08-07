@@ -13,7 +13,7 @@
                              v-model:futureSendDateTime="futureSendDateTime"
                              v-model:individualRecipientPersonAliasGuids="individualRecipientPersonAliasGuids"
                              v-model:isBulkCommunication="isBulkCommunication"
-                             v-model:personalizationSegmentIds="personalizationSegmentIds"
+                             v-model:personalizationSegments="personalizationSegments"
                              v-model:recipients="recipients"
                              v-model:segmentCriteria="segmentCriteria"
                              :allowedMediums="allowedMediums"
@@ -30,7 +30,7 @@
                              :isIncompatibleCommunicationTemplateNotificationShown="isIncompatibleCommunicationTemplateNotificationShown"
                              :isUseSimpleEditorButtonShown="isUseSimpleEditorButtonShown"
                              :nextStepTitle="nextStep"
-                             :personalizationSegments="config.personalizationSegments ?? []"
+                             :personalizationSegmentItems="personalizationSegmentItems"
                              :personalPreferenceRecipientCount="personalPreferenceRecipients.length"
                              :pushNotificationRecipientCount="pushNotificationRecipients.length"
                              :recipientCount="selectedMediumRecipients.length"
@@ -249,6 +249,7 @@
     import { TaskActivityProgressUpdateBag } from "@Obsidian/ViewModels/Utility/taskActivityProgressUpdateBag";
     import { AlertType } from "@Obsidian/Enums/Controls/alertType";
     import { CancellationTokenNone, CancellationTokenSource, ICancellationToken } from "@Obsidian/Utility/cancellation";
+    import { Enumerable } from "@Obsidian/Utility/linq";
 
     const config = useConfigurationValues<CommunicationEntryWizardInitializationBox>();
     const securityGrant = getSecurityGrant(config.securityGrantToken);
@@ -381,7 +382,7 @@
     const individualRecipientPersonAliasGuids = ref<Guid[] | null | undefined>(config.communication?.individualRecipientPersonAliasGuids);
     const isBulkCommunication = ref<boolean>(config.communication?.isBulkCommunication ?? false);
     const message = ref<string>(config.communication?.message ?? "");
-    const personalizationSegmentIds = ref<number[]>(config.communication?.personalizationSegmentIds ?? []);
+    const personalizationSegments = ref<ListItemBag[] | null | undefined>(config.communication?.personalizationSegments);
     const pushData = ref<CommunicationEntryWizardPushNotificationOptionsBag | null | undefined>(config.communication?.pushData);
     const pushImageBinaryFileGuid = ref<Guid | null | undefined>(config.communication?.pushImageBinaryFileGuid);
     const pushMessage = ref<string>(config.communication?.pushMessage ?? "");
@@ -509,24 +510,29 @@
         }
     });
 
+    const personalizationSegmentItems = computed<ListItemBag[]>(() => {
+        // Join the authorized list of personalization segments with
+        // any that are already configured on the communication.
+        const authorizedPersonalizationSegments = config.personalizationSegments ?? [];
+        const communicationPersonalizationSegments = personalizationSegments.value ?? [];
+
+        return Enumerable
+            .from(authorizedPersonalizationSegments)
+            .concat(communicationPersonalizationSegments)
+            .distinctBy(c => c.value)
+            .toArray();
+    });
+
     const personalizationSegmentNames = computed<string[] | null | undefined>(() => {
-        if (personalizationSegmentIds.value.length) {
-            const names: string[] = [];
-
-            const personalizationSegments = config.personalizationSegments ?? [];
-            for (const personalizationSegmentId of personalizationSegmentIds.value) {
-                const personalizationSegment = personalizationSegments.find(c => c.value === `${personalizationSegmentId}`);
-
-                if (personalizationSegment?.text) {
-                    names.push(personalizationSegment.text);
-                }
-            }
-
-            return names.length ? names : null;
+        if (!personalizationSegments.value) {
+            return personalizationSegments.value;
         }
-        else {
-            return null;
-        }
+
+        return Enumerable
+            .from(personalizationSegments.value)
+            .select(c => c.text)
+            .ofType<string>((t): t is string => !isNullOrWhiteSpace(t))
+            .toArray();
     });
 
     const emailAttachmentNames = computed<string[] | null | undefined>(() => {
@@ -709,7 +715,7 @@
             futureSendDateTime: futureSendDateTime.value,
             individualRecipientPersonAliasGuids: individualRecipientPersonAliasGuids.value,
             isBulkCommunication: isBulkCommunication.value,
-            personalizationSegmentIds: personalizationSegmentIds.value,
+            personalizationSegments: personalizationSegments.value,
             segmentCriteria: segmentCriteria.value,
             status: status.value,
 
@@ -755,7 +761,7 @@
         futureSendDateTime.value = bag.futureSendDateTime;
         individualRecipientPersonAliasGuids.value = bag.individualRecipientPersonAliasGuids;
         isBulkCommunication.value = bag.isBulkCommunication ?? false;
-        personalizationSegmentIds.value = personalizationSegmentIds.value ?? [];
+        personalizationSegments.value = bag.personalizationSegments ?? [];
         segmentCriteria.value = bag.segmentCriteria ?? SegmentCriteria.All;
         status.value = bag.status ?? CommunicationStatus.Transient;
 

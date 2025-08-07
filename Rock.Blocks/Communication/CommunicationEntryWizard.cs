@@ -395,7 +395,7 @@ namespace Rock.Blocks.Communication
                 box.MergeFields = GetCommunicationMergeFields( communication );
                 box.MinimumShortLinkTokenLength = this.MinimumShortLinkTokenLength;
                 box.NavigationUrls = GetBoxNavigationUrls();
-                box.PersonalizationSegments = GetPersonalizationSegments( this.RockContext );
+                box.PersonalizationSegments = GetPersonalizationSegments( this.RockContext, currentPerson );
                 box.PushApplications = GetPushApplications( this.RockContext, mediumBags );
                 box.Recipients = GetRecipientBags( this.RockContext, communicationBag );
                 box.SecurityGrantToken = GetSecurityGrantToken();
@@ -941,21 +941,51 @@ namespace Rock.Blocks.Communication
         #region Methods
 
         /// <summary>
-        /// Gets the personalization segments for the segments dropdown.
+        /// Gets the personalization segments for the segments dropdown authorized for the current person.
         /// </summary>
-        private List<ListItemBag> GetPersonalizationSegments( RockContext rockContext )
+        private List<ListItemBag> GetPersonalizationSegments( RockContext rockContext, Person authorizedPerson )
         {
             var personalizationSegmentCategory = this.PersonalizationSegmentCategoryGuid;
 
             return new PersonalizationSegmentService( rockContext )
                         .Queryable().AsNoTracking()
                         .Where( p => p.Categories.Any( c => c.Guid == personalizationSegmentCategory ) )
+                        .ToList()
+                        .Where( p => p.IsAuthorized( Authorization.VIEW, authorizedPerson ) )
                         .Select( p => new ListItemBag
                         {
+                            // We need integer IDs to store in the Communication.PersonalizationSegmentIds column.
                             Value = p.Id.ToString(),
                             Text = p.Name
                         } )
                         .ToList();
+        }
+
+        private List<int> GetPersonalizationSegmentIds( List<ListItemBag> personalizationSegmentListItemBags )
+        {
+            return personalizationSegmentListItemBags?
+                .Select( p => p.Value.AsIntegerOrNull() )
+                .Where( id => id.HasValue )
+                .Select( id => id.Value )
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets the personalization segments.
+        /// </summary>
+        private List<ListItemBag> GetPersonalizationSegments( RockContext rockContext, List<int> personalizationSegmentIds )
+        {
+            var personalizationSegmentCategory = this.PersonalizationSegmentCategoryGuid;
+
+            return new PersonalizationSegmentService( rockContext )
+                .GetByIds( personalizationSegmentIds )
+                .Select( p => new ListItemBag
+                {
+                    // We need integer IDs to store in the Communication.PersonalizationSegmentIds column.
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                } )
+                .ToList();
         }
 
         /// <summary>
@@ -1450,7 +1480,12 @@ namespace Rock.Blocks.Communication
                 PushTitle = communication.PushTitle,
                 ReplyToEmail = communication.ReplyToEmail,
                 SegmentCriteria = communication.SegmentCriteria,
-                PersonalizationSegmentIds = communication.PersonalizationSegments.SplitDelimitedValues().AsIntegerList(),
+                // Get all the personalization segments used by the communication.
+                // These may contain personalization segments that aren't available
+                // to the current person via entity security, but they will still be shown
+                // so the person can see what segments are being used. This allows a second
+                // person to view/edit a communication without losing the segments that were previously selected.
+                PersonalizationSegments = GetPersonalizationSegments( rockContext, communication.PersonalizationSegments.SplitDelimitedValues().AsIntegerList() ),
                 SmsAttachmentBinaryFiles = communication.GetAttachments( CommunicationType.SMS ).ToListItemBagList(),
                 SmsFromSystemPhoneNumberGuid = GetSmsFromSystemPhoneNumberGuid( communication ),
                 SmsMessage = communication.SMSMessage,
@@ -1711,7 +1746,7 @@ namespace Rock.Blocks.Communication
                         rockContext,
                         communicationListGroupId.Value,
                         bag.SegmentCriteria,
-                        bag.PersonalizationSegmentIds );
+                        GetPersonalizationSegmentIds( bag.PersonalizationSegments ) );
 
                     return ConvertRecipientInfoListToBagList( recipients );
                 }
@@ -2872,7 +2907,7 @@ namespace Rock.Blocks.Communication
             if ( bag.IndividualRecipientPersonAliasGuids?.Any() != true && bag.CommunicationListGroupGuid.HasValue )
             {
                 communicationInfo.CommunicationListGroupGuid = bag.CommunicationListGroupGuid.Value;
-                communicationInfo.PersonalizationSegmentIds = bag.PersonalizationSegmentIds;
+                communicationInfo.PersonalizationSegmentIds = GetPersonalizationSegmentIds( bag.PersonalizationSegments );
                 communicationInfo.CommunicationGroupSegmentCriteria = bag.SegmentCriteria;
             }
 
@@ -3027,7 +3062,7 @@ namespace Rock.Blocks.Communication
 
                 if ( listId.HasValue )
                 {
-                    var recipients = GetCommunicationRecipientDetailsForList( rockContext, listId.Value, bag.SegmentCriteria, bag.PersonalizationSegmentIds );
+                    var recipients = GetCommunicationRecipientDetailsForList( rockContext, listId.Value, bag.SegmentCriteria, GetPersonalizationSegmentIds( bag.PersonalizationSegments ) );
                     var groupMemberMap = recipients.ToDictionary( r => r.PrimaryAliasId, r => r.GroupMemberCommunicationPreference );
 
                     var personAliases = new PersonAliasService( rockContext )
