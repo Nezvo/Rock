@@ -1,12 +1,11 @@
 <template>
     <div class="content-section-container"
-         :class="additionalSectionWrapperClasses">
+         :class="additionalSectionContainerClasses">
         <div class="content-section-list">
             <slot />
         </div>
 
         <ContentSectionNav v-if="showSidebar"
-                           v-model:autoCollapse="autoCollapse"
                            :sections="sections" />
     </div>
 </template>
@@ -57,10 +56,8 @@
 
 <script setup lang="ts">
     import ContentSectionNav from "@Obsidian/Controls/Internal/contentSectionNav.obs";
-    import { IContentSectionHolder, IContentSectionWrapperHolder, provideSectionWrapper } from "@Obsidian/Core/Controls/contentSection";
-    import { usePersonPreferences } from "@Obsidian/Utility/block";
-    import { asBooleanOrNull } from "@Obsidian/Utility/booleanUtils";
-    import { computed, PropType, ref, shallowRef, watch } from "vue";
+    import { IContentSectionHolder, IContentSectionContainerHolder, provideSectionContainer } from "@Obsidian/Core/Controls/contentSection";
+    import { computed, PropType, shallowRef } from "vue";
 
     const props = defineProps({
         /**
@@ -78,19 +75,16 @@
          */
         sidebarPosition: {
             type: String as PropType<"left" | "right">,
-            default: "left"
+            default: "right"
         },
     });
-
-    const preferences = usePersonPreferences().blockPreferences;
 
     // #region Values
 
     let nextSectionId = 1;
     const sections = shallowRef<IContentSectionHolder[]>([]);
-    const autoCollapse = ref(asBooleanOrNull(preferences.getValue("content-section-auto-collapse")) ?? true);
 
-    const wrapper: IContentSectionWrapperHolder = {
+    const container: IContentSectionContainerHolder = {
         addSection(section) {
             section.anchor.value = `section-${nextSectionId++}`;
 
@@ -111,10 +105,10 @@
     });
 
     /**
-     * Returns additional classes to apply to the section wrapper based on the
+     * Returns additional classes to apply to the section container based on the
      * configured settings of the component.
      */
-    const additionalSectionWrapperClasses = computed((): string[] => {
+    const additionalSectionContainerClasses = computed((): string[] => {
         return [
             props.sidebarPosition === "right" ? "content-section-nav-right" : "content-section-nav-left"
         ];
@@ -122,10 +116,5 @@
 
     // #endregion
 
-    watch(autoCollapse, () => {
-        preferences.setValue("content-section-auto-collapse", autoCollapse.value ? "true" : "false");
-        preferences.save();
-    });
-
-    provideSectionWrapper(wrapper);
+    provideSectionContainer(container);
 </script>
