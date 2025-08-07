@@ -1,19 +1,18 @@
 <template>
-    <div class="content-section-nav-wrapper"
+    <div class="content-section-container"
          :class="additionalSectionWrapperClasses">
-        <div v-if="showSidebar" class="sidebar">
-            <ContentSectionNav v-model:autoCollapse="autoCollapse"
-                               :sections="sections" />
-        </div>
-
-        <div class="content-section-stack">
+        <div class="content-section-list">
             <slot />
         </div>
+
+        <ContentSectionNav v-if="showSidebar"
+                           v-model:autoCollapse="autoCollapse"
+                           :sections="sections" />
     </div>
 </template>
 
 <style>
-.content-section-nav-wrapper {
+.content-section-container {
     display: flex;
     flex-direction: row;
     gap: var(--spacing-large);
@@ -22,31 +21,37 @@
     align-items: flex-start;
 }
 
-.content-section-nav-wrapper > .sidebar {
+.content-section-container > .content-section-nav {
     height: 100%;
     flex: 0 0 20%;
     position: sticky;
     top: 0;
 }
 
-.content-section-nav-wrapper .content-section-stack {
+.content-section-list {
     display: flex;
     flex-direction: column;
     flex: 1 1 80%;
     gap: var(--spacing-xlarge);
+    height: auto;
     overflow-y: auto;
     scroll-behavior: smooth;
 }
 
-.content-section-stack {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xlarge);
+.content-section-container.content-section-nav-left {
+    flex-direction: row-reverse;
 }
 
-.content-section-nav-wrapper.sidebar-right {
-    flex-direction: row-reverse;
+@media (max-width: 767px) {
+    .content-section-container .content-section-nav {
+        display: none;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .content-section-container > .content-section-nav {
+        top: 16px;
+    }
 }
 </style>
 
@@ -111,7 +116,7 @@
      */
     const additionalSectionWrapperClasses = computed((): string[] => {
         return [
-            props.sidebarPosition === "right" ? "sidebar-right" : "sidebar-left"
+            props.sidebarPosition === "right" ? "content-section-nav-right" : "content-section-nav-left"
         ];
     });
 

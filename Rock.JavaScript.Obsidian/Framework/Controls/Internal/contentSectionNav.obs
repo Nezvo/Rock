@@ -1,7 +1,7 @@
 <template>
     <div class="list-group content-section-nav">
         <div class="content-section-nav-header">
-            <h5 class="content-section-nav-title">Sections</h5>
+            <h5 class="content-section-nav-header-title">Sections</h5>
 
             <span style="position: relative;">
                 <button type="button" class="btn btn-action"
@@ -28,7 +28,7 @@
 
         <a v-for="section in sections"
            :href="`#${section.anchor.value}`"
-           class="list-group-item nav-link"
+           class="list-group-item content-section-nav-link"
            :class="{ active: section.anchor.value === activeSectionId }"
            @click.prevent.stop="onOpenSectionClick(section)">
             <i v-if="section.icon.value" :class="section.icon.value"></i>
@@ -60,13 +60,13 @@
     margin-bottom: var(--spacing-tiny);
 }
 
-.content-section-nav > .nav-title {
+.content-section-nav > .content-section-nav-header-title {
     color: var(--color-interface-medium);
     font-size: var(--font-size-small);
     padding-left: var(--spacing-small);
 }
 
-.content-section-nav > .nav-link {
+.content-section-nav > .content-section-nav-link {
     border: none;
     border-radius: var(--rounded-small);
     background-color: transparent;

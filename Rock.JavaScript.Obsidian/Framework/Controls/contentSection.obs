@@ -5,7 +5,7 @@
         <div v-if="title"
              class="content-section-header"
              @click="onSectionHeaderClick">
-            <h5 class="content-section-title">
+            <h5 class="content-section-header-title">
                 <i v-if="icon" :class="icon"></i>
                 {{ title }}
             </h5>
@@ -139,7 +139,7 @@
     pointer-events: auto;
 }
 
-.content-section-title {
+.content-section-header-title {
     display: flex;
     align-items: center;
     gap: var(--spacing-tiny);
@@ -164,7 +164,7 @@ content-section-body-overflow {
     padding: var(--spacing-large);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xlarge);
+    gap: var(--spacing-large);
 }
 
 .content-section-header + div > .content-section-body {
@@ -173,7 +173,7 @@ content-section-body-overflow {
 
 .content-section .content-stack + .content-stack {
     border-top: 1px var(--color-interface-soft) solid;
-    padding-top: var(--spacing-xlarge);
+    padding-top: var(--spacing-large);
 }
 
 /* OVERFLOW BODY */
