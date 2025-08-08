@@ -128,7 +128,8 @@ namespace Rock.Migrations.RockStartup
             SystemGuid.ServiceJob.DATA_MIGRATIONS_133_ADD_INTERACTION_SESSION_INTERACTION_SESSION_LOCATION_ID_INDEX.AsGuid(),
             SystemGuid.ServiceJob.POST_170_UPDATE_HISTORY_ENTITYTYPEID_INDEX.AsGuid(),
             SystemGuid.ServiceJob.DATA_MIGRATIONS_173_UPDATE_NAMELESS_SCHEDULES.AsGuid(),
-            SystemGuid.ServiceJob.DATA_MIGRATIONS_180_UPDATE_NAMELESS_LOCATIONS.AsGuid()
+            SystemGuid.ServiceJob.DATA_MIGRATIONS_180_UPDATE_NAMELESS_LOCATIONS.AsGuid(),
+            SystemGuid.ServiceJob.DATA_MIGRATIONS_180_MIGRATE_ERA_DATA_TO_STEPS.AsGuid()
         };
 
         /// <summary>
