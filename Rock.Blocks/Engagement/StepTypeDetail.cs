@@ -1391,7 +1391,7 @@ namespace Rock.Blocks.Engagement
         [BlockAction]
         public BlockActionResult TransferStepType( StepTypeTransferBag transferBag )
         {
-            if ( !TryGetEntityForEditAction( transferBag.StepTypeIdKey, RockContext, out var stepType, out var actionError ) )
+            if ( !TryGetEntityForEditAction( transferBag.StepTypeIdKey, out var stepType, out var actionError ) )
             {
                 return actionError;
             }
