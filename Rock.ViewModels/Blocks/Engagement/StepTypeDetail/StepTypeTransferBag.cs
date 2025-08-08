@@ -16,37 +16,39 @@
 //
 
 using Rock.ViewModels.Utility;
+
+using System;
 using System.Collections.Generic;
 
 namespace Rock.ViewModels.Blocks.Engagement.StepTypeDetail
 {
     /// <summary>
-    /// 
+    /// The Bag used to transfer step types
     /// </summary>
-    public class StepTypeDetailOptionsBag
+    public class StepTypeTransferBag
     {
         /// <summary>
-        /// Gets or sets the trigger types.
+        /// Gets or sets the IdKey for the Step Type that is being transferred.
         /// </summary>
         /// <value>
-        /// The trigger types.
+        /// The Step Type IdKey.
         /// </value>
-        public List<ListItemBag> TriggerTypes { get; set; }
+        public string StepTypeIdKey { get; set; }
 
         /// <summary>
-        /// Gets or sets the step statuses.
+        /// Gets or sets a Step Program.
         /// </summary>
         /// <value>
-        /// The step statuses.
+        /// The step program.
         /// </value>
-        public List<ListItemBag> StepStatuses { get; set; }
+        public Guid? TargetStepProgramGuid { get; set; }
 
         /// <summary>
-        /// Gets or sets the step programs.
+        /// Gets or sets the step status mappings for the transfer.
         /// </summary>
         /// <value>
-        /// The step programs.
+        /// The step status mappings.
         /// </value>
-        public List<StepProgramBag> StepPrograms { get; set; }
+        public Dictionary<string, string> StepStatusMappings { get; set; }
     }
 }

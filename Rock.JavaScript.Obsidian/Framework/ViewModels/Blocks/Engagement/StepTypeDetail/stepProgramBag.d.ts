@@ -21,16 +21,12 @@
 // </copyright>
 //
 
-import { StepProgramBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepTypeDetail/stepProgramBag";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 
-export type StepTypeDetailOptionsBag = {
-    /** Gets or sets the step programs. */
-    stepPrograms?: StepProgramBag[] | null;
+export type StepProgramBag = {
+    /** Gets or sets a Step Program. */
+    stepProgram?: ListItemBag | null;
 
     /** Gets or sets the step statuses. */
     stepStatuses?: ListItemBag[] | null;
-
-    /** Gets or sets the trigger types. */
-    triggerTypes?: ListItemBag[] | null;
 };

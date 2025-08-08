@@ -14,39 +14,23 @@
 // limitations under the License.
 // </copyright>
 //
+using System;
 
-using Rock.ViewModels.Utility;
-using System.Collections.Generic;
-
-namespace Rock.ViewModels.Blocks.Engagement.StepTypeDetail
+namespace Rock.SystemGuid
 {
     /// <summary>
-    /// 
+    /// Guids for Step Statuses.
     /// </summary>
-    public class StepTypeDetailOptionsBag
+    public static class StepStatus
     {
         /// <summary>
-        /// Gets or sets the trigger types.
+        /// In Progress Step Status
         /// </summary>
-        /// <value>
-        /// The trigger types.
-        /// </value>
-        public List<ListItemBag> TriggerTypes { get; set; }
+        public const string IN_PROGRESS = "8013C752-31AA-46C6-9B55-BCFBE57C0577";
 
         /// <summary>
-        /// Gets or sets the step statuses.
+        /// Complete Step Status
         /// </summary>
-        /// <value>
-        /// The step statuses.
-        /// </value>
-        public List<ListItemBag> StepStatuses { get; set; }
-
-        /// <summary>
-        /// Gets or sets the step programs.
-        /// </summary>
-        /// <value>
-        /// The step programs.
-        /// </value>
-        public List<StepProgramBag> StepPrograms { get; set; }
+        public const string COMPLETE = "359D3CE0-E144-491E-8C3B-2A2BCE55C04B";
     }
 }

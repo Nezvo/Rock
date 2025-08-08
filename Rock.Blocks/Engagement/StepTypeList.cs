@@ -275,6 +275,7 @@ namespace Rock.Blocks.Engagement
                 .AddField( "startedCount", a => a.StartedCount )
                 .AddField( "completedCount", a => a.CompletedCount )
                 .AddField( "isSecurityDisabled", _ => !BlockCache.IsAuthorized( Authorization.ADMINISTRATE, RequestContext.CurrentPerson ) )
+                .AddField( "isSystem", a => a.StepType.IsSystem )
                 .AddAttributeFieldsFrom( a => a.StepType, _gridAttributes.Value );
         }
 

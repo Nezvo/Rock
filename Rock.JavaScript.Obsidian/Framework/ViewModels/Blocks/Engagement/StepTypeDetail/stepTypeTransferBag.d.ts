@@ -21,16 +21,15 @@
 // </copyright>
 //
 
-import { StepProgramBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepTypeDetail/stepProgramBag";
-import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+import { Guid } from "@Obsidian/Types";
 
-export type StepTypeDetailOptionsBag = {
-    /** Gets or sets the step programs. */
-    stepPrograms?: StepProgramBag[] | null;
+export type StepTypeTransferBag = {
+    /** Gets or sets the step status mappings for the transfer. */
+    stepStatusMappings?: Record<string, string> | null;
 
-    /** Gets or sets the step statuses. */
-    stepStatuses?: ListItemBag[] | null;
+    /** Gets or sets the IdKey for the Step Type that is being transferred. */
+    stepTypeIdKey?: string | null;
 
-    /** Gets or sets the trigger types. */
-    triggerTypes?: ListItemBag[] | null;
+    /** Gets or sets a Step Program. */
+    targetStepProgramGuid?: Guid | null;
 };
