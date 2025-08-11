@@ -114,6 +114,7 @@ namespace Rock.Blocks.Core
 
             return qry;
         }
+
         /// <inheritdoc/>
         protected override IQueryable<RestController> GetOrderedListQueryable( IQueryable<RestController> queryable, RockContext rockContext )
         {
