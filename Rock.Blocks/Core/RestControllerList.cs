@@ -114,6 +114,15 @@ namespace Rock.Blocks.Core
 
             return qry;
         }
+        /// <inheritdoc/>
+        protected override IQueryable<RestController> GetOrderedListQueryable( IQueryable<RestController> queryable, RockContext rockContext )
+        {
+            return queryable.AsNoTracking()
+                .ToList()
+                .OrderBy( c => c.Name )
+                .ThenBy( c => c.GetMetadata()?.Version ?? 1 )
+                .AsQueryable();
+        }
 
         /// <inheritdoc/>
         protected override GridBuilder<RestController> GetGridBuilder()
