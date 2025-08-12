@@ -38,7 +38,7 @@ namespace Rock.Blocks.CheckIn
     /// </summary>
     [DisplayName( "Attendance History" )]
     [Category( "Check-in" )]
-    [Description( "Block for displaying the attendance history of a person or a group." )]
+    [Description( "Block for displaying the attendance history of a person or a person and group." )]
     [IconCssClass( "fa fa-list" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
 
@@ -254,6 +254,10 @@ namespace Rock.Blocks.CheckIn
                 if ( FilterPerson.HasValue )
                 {
                     queryable = queryable.Where( a => a.PersonAlias.Person.Guid == FilterPerson.Value );
+                }
+                else
+                {
+                    throw new Exception( "Unable to load attendance. This block is intended to be on a page with a Person context." );
                 }
             }
 
