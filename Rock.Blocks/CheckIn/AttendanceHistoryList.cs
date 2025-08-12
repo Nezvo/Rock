@@ -221,7 +221,16 @@ namespace Rock.Blocks.CheckIn
         protected override IQueryable<Attendance> GetListQueryable( RockContext rockContext )
         {
             var attendanceService = new AttendanceService( rockContext );
-            var queryable = attendanceService.Queryable();
+            var queryable = attendanceService
+            .AsNoFilter()
+            .AsNoTracking()
+            .Include( a => a.Occurrence )
+            .Include( a => a.Occurrence.Group )
+            .Include( a => a.Occurrence.Schedule )
+            .Include( a => a.Occurrence.Location )
+            .Include( a => a.PersonAlias.Person )
+            .Include( a => a.Campus );
+
             InitializeContextEntities();
 
             if ( _person != null )
@@ -290,23 +299,47 @@ namespace Rock.Blocks.CheckIn
         {
             var listItems = base.GetListItems( queryable, rockContext );
 
-            // Filter out attendance records where the current user does not have View permission for the Group.
-            var securedAttendanceItems = listItems
-                .AsEnumerable()
-                .Where( a => ( a.Occurrence.Group?.IsAuthorized( Authorization.VIEW, GetCurrentPerson() ) == true ) || a.Occurrence.Group == null )
-                .ToList();
+            // Filter out attendance records where the current person does not have View permission for the Group.
+            var person = GetCurrentPerson();
+            if ( person != null )
+            {
+                var authCache = new Dictionary<int, bool>();
+
+                // Cache by Group.Id so IsAuthorized() runs once per group.
+                listItems = listItems
+                    .AsEnumerable()
+                    .Where( a =>
+                    {
+                        var group = a?.Occurrence?.Group;
+                        if ( group == null )
+                        {
+                            return true;
+                        }
+                        if ( authCache.TryGetValue( group.Id, out var ok ) )
+                        {
+                            return ok;
+                        }
+                        ok = group.IsAuthorized( Authorization.VIEW, person );
+                        authCache[group.Id] = ok;
+                        return ok;
+                    } )
+                    .ToList();
+            }
 
             // build a lookup for _checkInAreaPaths
             _checkInAreaPaths = new GroupTypeService( rockContext ).GetAllCheckinAreaPaths().ToList();
 
             // build a lookup for _locationPaths
-            var locationIdList = securedAttendanceItems.Select( a => a.Occurrence.LocationId )
+            var locationIdList = listItems.Select( a => a.Occurrence.LocationId )
                 .Distinct()
                 .ToList();
 
             _locationPaths = new Dictionary<int, string>();
             var qryLocations = new LocationService( rockContext )
                 .Queryable()
+                .AsNoTracking()
+                .Include( l => l.ParentLocation )
+                .Include( l => l.ParentLocation.ParentLocation )
                 .Where( l => locationIdList.Contains( l.Id ) );
 
             foreach ( var location in qryLocations )
