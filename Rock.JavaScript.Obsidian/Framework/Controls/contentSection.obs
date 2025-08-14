@@ -11,6 +11,7 @@
             </h5>
 
             <div class="content-section-header-actions">
+
                 <div v-if="$slots.headerSecondaryActions"
                      class="content-section-header-reveal-actions">
                     <slot name="headerSecondaryActions" />
@@ -178,12 +179,21 @@ content-section-body-overflow {
 
 /* OVERFLOW BODY */
 
+.content-section-body-overflow-toggle {
+    margin-bottom: var(--spacing-small);
+}
+
 .content-section-body-overflow-toggle .btn {
     font-size: var(--font-size-small);
     color: var(--color-primary);
     display: flex;
     align-items: center;
     gap: var(--spacing-tiny);
+}
+
+.content-section-body-overflow-toggle .btn:hover > span,
+.content-section-body-overflow-collapsed .btn:hover > span {
+    text-decoration: underline;
 }
 
 .content-section-body-overflow-toggle .btn .ti-chevron-up {
@@ -193,6 +203,13 @@ content-section-body-overflow {
 
 .content-section-body-overflow-collapsed .btn .ti-chevron-up {
     transform: rotate(180deg);
+}
+
+.content-section-body-overflow-toggle .btn.btn-link:hover,
+.content-section-body-overflow-collapsed .btn.btn-link:hover,
+.content-section-body-overflow-toggle .btn.btn-link:focus,
+.content-section-body-overflow-collapsed .btn.btn-link:focus {
+    text-decoration: none;
 }
 
 .content-section-body-overflow-content {
