@@ -14,35 +14,6 @@
     </div>
 </template>
 
-<style scoped>
-.displaycard-connector {
-    width: 2px;
-    height: var(--spacing-medium);
-    background-color: var(--color-interface-soft);
-    margin: 0 auto;
-    position: relative;
-}
-
-.displaycard-connector-tip::after {
-    content: "";
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%) rotate(45deg);
-    width: 8px;
-    height: 8px;
-    border-bottom: 2px solid var(--color-interface-soft);
-    border-right: 2px solid var(--color-interface-soft);
-    background: transparent;
-}
-
-.displaycard-connector-transparent,
-.displaycard-connector-transparent::after {
-    border-color: transparent;
-    background-color: transparent;
-}
-</style>
-
 <script setup lang="ts">
     import { computed, PropType, useSlots, VNode, VNodeTypes } from "vue";
     import DisplayCard from "./displayCard.obs";
