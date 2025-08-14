@@ -4518,6 +4518,19 @@ a .list-group-item-danger.active, a .list-group-item-danger.active:hover, a .lis
   line-height: var(--line-height-normal);
 }
 
+li.list-group-item > a {
+  display: block;
+  padding: var(--spacing-small) var(--spacing-medium);
+}
+
+li.list-group-item:has(> a) {
+  padding: 0;
+}
+
+li.list-group-item:hover:has(> a) {
+  background-color: var(--color-interface-softer) !important;
+}
+
 body.modal-open,
 .modal-open .navbar-fixed-top,
 .modal-open .navbar-fixed-bottom {
