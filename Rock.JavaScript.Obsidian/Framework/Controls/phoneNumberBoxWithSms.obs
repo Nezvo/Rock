@@ -14,7 +14,7 @@
                     <InputGroupDropDown v-else :items="availableCountryCodeOptions" v-model="countryCode" inputGroupClasses="input-group-addon" />
                     <input v-model="number" :id="uniqueId" type="text" class="form-control" v-bind="field" />
                 </div>
-                <div v-if="(showSmsOptIn && !props.hideSms)">
+                <div v-if="(!props.hideSms)">
                     <CheckBox
                               v-model="isMessagingEnabled"
                               label=""
@@ -32,7 +32,7 @@
     import { PhoneNumberBoxWithSmsControlBag } from "@Obsidian/ViewModels/Controls/phoneNumberBoxWithSmsControlBag";
     import { standardRockFormFieldProps, useStandardRockFormFieldProps } from "@Obsidian/Utility/component";
     import { normalizeRules } from "@Obsidian/ValidationRules";
-    import { getPhoneNumberAndSmsConfiguration, formatPhoneNumber, stripPhoneNumber } from "@Obsidian/Utility/phone";
+    import { getPhoneNumberConfiguration, getPhoneNumberAndSmsConfiguration, formatPhoneNumber, stripPhoneNumber } from "@Obsidian/Utility/phone";
     import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
     import RockFormField from "./rockFormField.obs";
     import InputGroupDropDown from "./inputGroupDropDown.obs";
@@ -50,7 +50,7 @@
             default: ""
         },
 
-        /** When this is enabled, the SMS option will be hidden regardless of server settings. */
+        /** When this is enabled, the SMS option will be hidden. */
         hideSms: {
             type: Boolean as PropType<boolean>,
             default: false
@@ -105,10 +105,6 @@
         return configuration.value?.smsOptInText ?? "";
     });
 
-    const showSmsOptIn = computed((): boolean => {
-        return smsOptInText.value.length > 0;
-    });
-
     // #endregion
 
     // #region Functions
@@ -141,7 +137,9 @@
     /** Retrieve the country code data, validation data, and formatting data from the server */
     async function loadConfiguration(): Promise<void> {
         try {
-            const result = await getPhoneNumberAndSmsConfiguration();
+            const result = props.hideSms
+                ? await getPhoneNumberConfiguration()
+                : await getPhoneNumberAndSmsConfiguration();
 
             if (result) {
                 configuration.value = result;
