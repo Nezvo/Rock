@@ -76,8 +76,15 @@
 }
 
 @media (max-width: 767px) {
+
+    .content-stack {
+        flex-direction: column;
+        gap: var(--spacing-tiny);
+    }
+
     .content-stack.content-stack-right {
         flex-direction: column-reverse;
+        gap: var(--spacing-tiny);
     }
 }
 </style>
