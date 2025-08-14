@@ -1,19 +1,19 @@
 <template>
     <div :id="section.anchor.value"
-         class="content-section"
+         class="contentsection"
          :class="additionalSectionClasses">
         <div v-if="title"
-             class="content-section-header"
+             class="contentsection-header"
              @click="onSectionHeaderClick">
-            <h5 class="content-section-header-title">
+            <h5 class="contentsection-header-title">
                 <i v-if="icon" :class="icon"></i>
                 {{ title }}
             </h5>
 
-            <div class="content-section-header-actions">
+            <div class="contentsection-header-actions">
 
                 <div v-if="$slots.headerSecondaryActions"
-                     class="content-section-header-reveal-actions">
+                     class="contentsection-header-reveal-actions">
                     <slot name="headerSecondaryActions" />
                 </div>
 
@@ -30,14 +30,14 @@
 
         <TransitionVerticalCollapse>
             <div v-show="disableCollapse || !section.isCollapsed.value">
-                <div class="content-section-body">
+                <div class="contentsection-body">
                     <slot />
                 </div>
 
                 <div v-if="$slots.overflow"
-                     class="content-section-body-overflow"
+                     class="contentsection-body-overflow"
                      :class="additionalSectionBodyOverflowClasses">
-                    <div class="content-section-body-overflow-toggle">
+                    <div class="contentsection-body-overflow-toggle">
                         <button type="button"
                                 class="btn btn-link"
                                 @click="isOverflowCollapsed = !isOverflowCollapsed">
@@ -47,18 +47,18 @@
                     </div>
 
                     <TransitionVerticalCollapse>
-                        <div v-show="!isOverflowCollapsed" class="content-section-body-overflow-content">
+                        <div v-show="!isOverflowCollapsed" class="contentsection-body-overflow-content">
                             <slot name="overflow" />
                         </div>
                     </TransitionVerticalCollapse>
                 </div>
 
-                <div v-if="$slots.footerActions || $slots.footerSecondaryActions" class="content-section-footer">
-                    <div class="content-section-footer-actions">
+                <div v-if="$slots.footerActions || $slots.footerSecondaryActions" class="contentsection-footer">
+                    <div class="contentsection-footer-actions">
                         <slot name="footerActions" />
                     </div>
 
-                    <div class="content-section-footer-secondary-actions">
+                    <div class="contentsection-footer-secondary-actions">
                         <slot name="footerSecondaryActions" />
                     </div>
 
@@ -71,7 +71,7 @@
 <style>
 /* DEFAULT SECTION */
 
-.content-section {
+.contentsection {
     border-radius: var(--rounded-large);
     height: auto;
     width: 100%;
@@ -83,20 +83,20 @@
 
 /* LIGHT SECTION */
 
-.content-section-light {
+.contentsection-light {
     background-color: var(--color-interface-softest);
     border: 1px var(--color-interface-soft) solid;
 }
 
-.content-section-light > .content-section-header {
+.contentsection-light > .contentsection-header {
     border-bottom: 0;
 }
 
-.content-section-light > .content-section-footer {
+.contentsection-light > .contentsection-footer {
     border-top: 0;
 }
 
-.content-section-light > .content-section-body {
+.contentsection-light > .contentsection-body {
     padding: 0;
     padding-top: 0;
     padding-right: var(--spacing-large);
@@ -104,20 +104,29 @@
     padding-left: var(--spacing-large);
 }
 
+.contentsection-light > .contentsection-header,
+.contentsection-light > .contentsection-footer {
+    display: none;
+}
+
+.contentsection-light > .contentsection-header + div > .contentsection-body {
+    border-top: none;
+}
+
 /* HEADER */
 
-.content-section-header {
+.contentsection-header {
     min-height: 58px;
     padding: var(--spacing-small) var(--spacing-large);
     display: flex;
     justify-content: space-between;
 }
 
-.content-section-collapsible > .content-section-header {
+.contentsection-collapsible > .contentsection-header {
     cursor: pointer;
 }
 
-.content-section-header-actions {
+.contentsection-header-actions {
     display: flex;
     gap: var(--spacing-tiny);
     align-items: center;
@@ -126,7 +135,7 @@
     cursor: initial;
 }
 
-.content-section-header-reveal-actions {
+.contentsection-header-reveal-actions {
     display: flex;
     gap: var(--spacing-tiny);
     align-items: center;
@@ -135,12 +144,12 @@
     pointer-events: none;
 }
 
-.content-section-header:hover .content-section-header-reveal-actions {
+.contentsection-header:hover .contentsection-header-reveal-actions {
     opacity: 100%;
     pointer-events: auto;
 }
 
-.content-section-header-title {
+.contentsection-header-title {
     display: flex;
     align-items: center;
     gap: var(--spacing-tiny);
@@ -148,19 +157,19 @@
     margin: 0;
 }
 
-.content-section .content-section-header-actions .ti-chevron-up {
+.contentsection .contentsection-header-actions .ti-chevron-up {
     /* 0.35 to match the transition speed in the collapse component */
     transition: transform 0.35s ease-in-out;
 }
 
-.content-section.content-section-collapsed .content-section-header-actions .ti-chevron-up {
+.contentsection.contentsection-collapsed .contentsection-header-actions .ti-chevron-up {
     transform: rotate(180deg);
 }
 
 /* SECTION BODY */
 
-.content-section-body,
-content-section-body-overflow {
+.contentsection-body,
+contentsection-body-overflow {
     height: auto;
     padding: var(--spacing-large);
     display: flex;
@@ -168,22 +177,22 @@ content-section-body-overflow {
     gap: var(--spacing-large);
 }
 
-.content-section-header + div > .content-section-body {
+.contentsection-header + div > .contentsection-body {
     border-top: 1px var(--color-interface-soft) solid;
 }
 
-.content-section .content-stack + .content-stack {
+.contentsection .content-stack + .content-stack {
     border-top: 1px var(--color-interface-soft) solid;
     padding-top: var(--spacing-large);
 }
 
 /* OVERFLOW BODY */
 
-.content-section-body-overflow-toggle {
+.contentsection-body-overflow-toggle {
     margin-bottom: var(--spacing-small);
 }
 
-.content-section-body-overflow-toggle .btn {
+.contentsection-body-overflow-toggle .btn {
     font-size: var(--font-size-small);
     color: var(--color-primary);
     display: flex;
@@ -191,35 +200,35 @@ content-section-body-overflow {
     gap: var(--spacing-tiny);
 }
 
-.content-section-body-overflow-toggle .btn:hover > span,
-.content-section-body-overflow-collapsed .btn:hover > span {
+.contentsection-body-overflow-toggle .btn:hover > span,
+.contentsection-body-overflow-collapsed .btn:hover > span {
     text-decoration: underline;
 }
 
-.content-section-body-overflow-toggle .btn .ti-chevron-up {
+.contentsection-body-overflow-toggle .btn .ti-chevron-up {
     /* 0.35 to match the transition speed in the collapse component */
     transition: transform 0.35s ease-in-out;
 }
 
-.content-section-body-overflow-collapsed .btn .ti-chevron-up {
+.contentsection-body-overflow-collapsed .btn .ti-chevron-up {
     transform: rotate(180deg);
 }
 
-.content-section-body-overflow-toggle .btn.btn-link:hover,
-.content-section-body-overflow-collapsed .btn.btn-link:hover,
-.content-section-body-overflow-toggle .btn.btn-link:focus,
-.content-section-body-overflow-collapsed .btn.btn-link:focus {
+.contentsection-body-overflow-toggle .btn.btn-link:hover,
+.contentsection-body-overflow-collapsed .btn.btn-link:hover,
+.contentsection-body-overflow-toggle .btn.btn-link:focus,
+.contentsection-body-overflow-collapsed .btn.btn-link:focus {
     text-decoration: none;
 }
 
-.content-section-body-overflow-content {
+.contentsection-body-overflow-content {
     border-top: 1px var(--color-interface-soft) solid;
     padding: var(--spacing-large);
 }
 
 /* SECTION FOOTER */
 
-.content-section-footer {
+.contentsection-footer {
     padding: var(--spacing-medium);
     display: flex;
     justify-content: space-between;
@@ -227,8 +236,8 @@ content-section-body-overflow {
     align-items: center;
 }
 
-.content-section-footer-actions,
-.content-section-footer-secondary-actions {
+.contentsection-footer-actions,
+.contentsection-footer-secondary-actions {
     display: flex;
     gap: var(--spacing-tiny);
     align-items: center;
@@ -236,20 +245,20 @@ content-section-body-overflow {
     transition: opacity 0.3s ease-in-out;
 }
 
-.content-section-footer-secondary-actions {
+.contentsection-footer-secondary-actions {
     margin-left: var(--spacing-large);
 }
 
-.content-section-footer-secondary-actions > .btn.btn-default {
+.contentsection-footer-secondary-actions > .btn.btn-default {
     margin-left: var(--spacing-xsmall);
 }
 
 /* ACTION BUTTONS */
 
-.content-section-header-actions .btn-action,
-.content-section-footer-actions .btn-action,
-.content-section-footer-secondary-actions .btn-action,
-.content-section-nav-header .btn-action {
+.contentsection-header-actions .btn-action,
+.contentsection-footer-actions .btn-action,
+.contentsection-footer-secondary-actions .btn-action,
+.contentsection-nav-header .btn-action {
     border-radius: var(--rounded-small);
     padding: var(--spacing-tiny);
     display: flex;
@@ -261,34 +270,34 @@ content-section-body-overflow {
     box-shadow: none;
 }
 
-.content-section-header-actions .btn-action:hover,
-.content-section-footer-actions .btn-action:hover,
-.content-section-footer-secondary-actions .btn-action:hover,
-.content-section-nav-header .btn-action:hover {
+.contentsection-header-actions .btn-action:hover,
+.contentsection-footer-actions .btn-action:hover,
+.contentsection-footer-secondary-actions .btn-action:hover,
+.contentsection-nav-header .btn-action:hover {
     background-color: var(--color-interface-softest);
     color: var(--color-interface-strong);
 }
 
-.content-section-header-actions .btn-action:focus,
-.content-section-footer-actions .btn-action:focus,
-.content-section-footer-secondary-actions .btn-action:focus,
-.content-section-nav-header .btn-action:focus {
+.contentsection-header-actions .btn-action:focus,
+.contentsection-footer-actions .btn-action:focus,
+.contentsection-footer-secondary-actions .btn-action:focus,
+.contentsection-nav-header .btn-action:focus {
     background-color: transparent;
     box-shadow: none;
 }
 
-.content-section-header-actions .btn-action:active,
-.content-section-footer-actions .btn-action:active,
-.content-section-footer-secondary-actions .btn-action:active,
-.content-section-nav-header .btn-action:active {
+.contentsection-header-actions .btn-action:active,
+.contentsection-footer-actions .btn-action:active,
+.contentsection-footer-secondary-actions .btn-action:active,
+.contentsection-nav-header .btn-action:active {
     background-color: transparent;
     box-shadow: none;
 }
 
-.content-section-header-actions .btn-action > i,
-.content-section-footer-actions .btn-action > i,
-.content-section-footer-secondary-actions .btn-action > i,
-.content-section-nav-header .btn-action > i {
+.contentsection-header-actions .btn-action > i,
+.contentsection-footer-actions .btn-action > i,
+.contentsection-footer-secondary-actions .btn-action > i,
+.contentsection-nav-header .btn-action > i {
     color: var(--color-interface-strong);
     align-self: center;
     font-size: var(--font-size-h5);
@@ -367,15 +376,15 @@ content-section-body-overflow {
         const classes: string[] = [];
 
         if (!props.disableCollapse) {
-            classes.push("content-section-collapsible");
+            classes.push("contentsection-collapsible");
         }
 
         if (section.isCollapsed.value) {
-            classes.push("content-section-collapsed");
+            classes.push("contentsection-collapsed");
         }
 
         if (props.light) {
-            classes.push("content-section-light");
+            classes.push("contentsection-light");
         }
 
         return classes;
@@ -389,7 +398,7 @@ content-section-body-overflow {
         const classes: string[] = [];
 
         if (isOverflowCollapsed.value) {
-            classes.push("content-section-body-overflow-collapsed");
+            classes.push("contentsection-body-overflow-collapsed");
         }
 
         return classes;
@@ -406,7 +415,7 @@ content-section-body-overflow {
      * @param ev The mouse event that triggered the click.
      */
     function onSectionHeaderClick(ev: MouseEvent): void {
-        if (ev.target && ev.target instanceof HTMLElement && ev.target.closest(".content-section-header-actions")) {
+        if (ev.target && ev.target instanceof HTMLElement && ev.target.closest(".contentsection-header-actions")) {
             // If the click was on the actions, don't toggle collapse.
             return;
         }

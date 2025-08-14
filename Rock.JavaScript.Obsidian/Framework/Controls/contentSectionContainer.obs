@@ -1,7 +1,7 @@
 <template>
-    <div class="content-section-container"
+    <div class="contentsection-container"
          :class="additionalSectionContainerClasses">
-        <div class="content-section-list">
+        <div class="contentsection-list">
             <slot />
         </div>
 
@@ -11,7 +11,7 @@
 </template>
 
 <style>
-.content-section-container {
+.contentsection-container {
     display: flex;
     flex-direction: row;
     gap: var(--spacing-large);
@@ -20,14 +20,14 @@
     align-items: flex-start;
 }
 
-.content-section-container > .content-section-nav {
+.contentsection-container > .contentsection-nav {
     height: 100%;
     flex: 0 0 20%;
     position: sticky;
     top: 0;
 }
 
-.content-section-list {
+.contentsection-list {
     display: flex;
     flex-direction: column;
     flex: 1 1 80%;
@@ -37,18 +37,18 @@
     scroll-behavior: smooth;
 }
 
-.content-section-container.content-section-nav-left {
+.contentsection-container.contentsection-nav-left {
     flex-direction: row-reverse;
 }
 
 @media (max-width: 767px) {
-    .content-section-container .content-section-nav {
+    .contentsection-container .contentsection-nav {
         display: none;
     }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
-    .content-section-container > .content-section-nav {
+    .contentsection-container > .contentsection-nav {
         top: 16px;
     }
 }
@@ -110,7 +110,7 @@
      */
     const additionalSectionContainerClasses = computed((): string[] => {
         return [
-            props.sidebarPosition === "right" ? "content-section-nav-right" : "content-section-nav-left"
+            props.sidebarPosition === "right" ? "contentsection-nav-right" : "contentsection-nav-left"
         ];
     });
 
