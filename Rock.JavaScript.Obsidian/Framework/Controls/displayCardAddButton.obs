@@ -1,24 +1,24 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <div class="display-card-add-button">
-        <DropDownMenu v-if="actions?.length" anchorButtonCssClass="display-card-add-button-trigger"
+    <div class="displaycard-add-button">
+        <DropDownMenu v-if="actions?.length" anchorButtonCssClass="displaycard-add-button-trigger"
                       :items="actions ?? []"
                       @click.stop><i class="ti ti-circle-plus"></i> {{ addText }}</DropDownMenu>
 
         <RockButton v-else
-                    class="display-card-add-button-trigger">
+                    class="displaycard-add-button-trigger">
             <i class="ti ti-circle-plus"></i> {{ addText }}
         </RockButton>
     </div>
 </template>
 
 <style scoped>
-.display-card-add-button {
+.displaycard-add-button {
     white-space: nowrap;
 }
 
-.display-card-add-button-trigger,
-:deep(.display-card-add-button-trigger) {
+.displaycard-add-button-trigger,
+:deep(.displaycard-add-button-trigger) {
     height: 90px;
     display: flex;
     flex-direction: row;
@@ -26,7 +26,7 @@
     width: 100%;
     padding: var(--spacing-large) var(--spacing-large);
     background-color: var(--color-interface-softest);
-    border-radius: var(--border-radius-base);
+    border-radius: var(--rounded-xsmall);
     border: 1px dotted var(--color-info-strong);
     cursor: pointer;
     align-items: center;
@@ -36,8 +36,8 @@
     white-space: nowrap;
 }
 
-:deep(.display-card-add-button-trigger:hover),
-.dropdown.open :deep(.display-card-add-button-trigger) {
+:deep(.displaycard-add-button-trigger:hover),
+.dropdown.open :deep(.displaycard-add-button-trigger) {
     background-color: var(--color-info-soft);
 }
 
