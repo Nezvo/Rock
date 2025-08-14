@@ -12680,6 +12680,11 @@ ul.list-group-panel .list-group-item:first-child,
 .panel-collapse .list-group-item:first-child {
   border: 0;
 }
+ul.list-group-panel .list-group-item:last-child,
+.panel-collapse .list-group-item:last-child {
+  border-bottom-left-radius: var(--rounded-medium);
+  border-bottom-right-radius: var(--rounded-medium);
+}
 
 .directory-letters li {
   width: 3.8455%;
