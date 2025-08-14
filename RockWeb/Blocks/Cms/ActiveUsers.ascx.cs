@@ -323,7 +323,7 @@ namespace RockWeb.Blocks.Cms
 
                 if ( sbUsers.Length > 0 )
                 {
-                    lUsers.Text = string.Format( @"<ul class='activeusers fa-ul'>{0}</ul>", sbUsers.ToString() );
+                    lUsers.Text = string.Format( @"<ul class='activeusers'>{0}</ul>", sbUsers.ToString() );
                     lUsers.Text += string.Format( @"<p class='margin-l-sm js-current-guests'>{0}</p>", guestVisitorsStr );
                 }
                 else
