@@ -241,6 +241,8 @@ th {
   --base-warning: #E58600;
   --base-link: #006DCC;
   --base-secondary: #83758F;
+  --base-gender-male: #1A8AE5;
+  --base-gender-female: #DE69C3;
   --color-interface-strongest: var(--base-interface-strongest);
   --color-interface-stronger: var(--base-interface-stronger);
   --color-interface-strong: var(--base-interface-strong);
@@ -309,10 +311,6 @@ th {
   --color-sequential-9: #AFEECB;
   --color-sequential-10: #C9F4DC;
   --color-sequential-11: #E4F9ED;
-  --color-gender-male-bg: #E8F3FC;
-  --color-gender-female-bg: #FCE8FA;
-  --color-gender-male-text: #1A8AE5;
-  --color-gender-female-text: #DE69C3;
   --font-size-xsmall: 12px;
   --font-size-small: 14px;
   --font-size-regular: 16px;
@@ -398,6 +396,12 @@ th {
     --color-link-shade: color-mix(in srgb, var(--base-link) 100%, #000 var(--shade-black-percentage));
     --color-secondary-tint: color-mix(in srgb, var(--base-secondary) 50%, transparent var(--tint-white-percentage));
     --color-secondary-shade: color-mix(in srgb, var(--base-secondary) 100%, #000 var(--shade-black-percentage));
+    --color-gender-male-tint: color-mix(in srgb, var(--base-gender-male) 50%, transparent var(--tint-white-percentage));
+    --color-gender-male-soft: color-mix(in srgb, var(--base-gender-male) 7%, transparent var(--tint-white-percentage));
+    --color-gender-male-shade: color-mix(in srgb, var(--base-gender-male) 100%, #000 var(--shade-black-percentage));
+    --color-gender-female-tint: color-mix(in srgb, var(--base-gender-female) 50%, transparent var(--tint-white-percentage));
+    --color-gender-female-soft: color-mix(in srgb, var(--base-gender-female) 7%, transparent var(--tint-white-percentage));
+    --color-gender-female-shade: color-mix(in srgb, var(--base-gender-female) 100%, #000 var(--shade-black-percentage));
   }
 }
 @media (prefers-color-scheme: dark) {
