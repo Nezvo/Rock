@@ -5419,12 +5419,12 @@ textarea.form-control {
 }
 
 .form-group.required > .control-label::before {
-  margin-right: 0;
+  margin-right: 2px;
   font-family: "tabler-icons";
-  font-size: 10px;
+  font-size: var(--font-size-small);
   font-weight: var(--font-weight-black);
   color: var(--color-danger-strong);
-  vertical-align: middle;
+  vertical-align: baseline;
   content: "\f698";
 }
 
@@ -5566,9 +5566,13 @@ select.form-control:focus::-ms-value {
 }
 
 a.help {
-  margin-left: 0;
+  margin-left: var(--spacing-tiny);
   color: var(--color-interface-medium);
   outline: 0;
+}
+
+a.help i {
+  font-size: 15px;
 }
 
 a.warning {
