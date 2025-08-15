@@ -321,16 +321,14 @@ output {
 }
 
 // Moved from _checkin-core.less
-.form-group.required {
-  .control-label::before {
-    margin-right:    0;
-    font-family:    'tabler-icons';
-    font-size:      10px;
-    font-weight:    var(--font-weight-black);
-    color:          var(--color-danger-strong);
-    vertical-align: middle;
-    content:        '\f698';
-  }
+.form-group.required > .control-label::before {
+  margin-right:    0;
+  font-family:    'tabler-icons';
+  font-size:      10px;
+  font-weight:    var(--font-weight-black);
+  color:          var(--color-danger-strong);
+  vertical-align: middle;
+  content:        '\f698';
 }
 // ===============
 // ===================== END FORM CONTROL =====================

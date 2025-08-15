@@ -5418,7 +5418,7 @@ textarea.form-control {
   padding-top: 0;
 }
 
-.form-group.required .control-label::before {
+.form-group.required > .control-label::before {
   margin-right: 0;
   font-family: "tabler-icons";
   font-size: 10px;
