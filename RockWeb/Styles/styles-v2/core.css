@@ -12793,7 +12793,7 @@ ul.list-group-panel .list-group-item:last-child,
 }
 .datepicker table tr td.day:hover, .datepicker table tr td.focused {
   cursor: pointer;
-  background: var(--color-interface-softer);
+  background: var(--color-interface-soft);
 }
 .datepicker table tr td.disabled, .datepicker table tr td.disabled:hover {
   color: var(--color-interface-medium);
