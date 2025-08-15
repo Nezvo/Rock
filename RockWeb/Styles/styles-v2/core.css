@@ -15964,14 +15964,22 @@ textarea:focus,
   width: 240px;
 }
 
+.grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter.active > .grid-quick-filter-search > form {
+  width: 100%;
+}
+
 .grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter.active > .btn-grid-action {
   background-color: var(--color-interface-soft);
   color: var(--color-interface-stronger);
 }
 
-.grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter > .grid-quick-filter-search > .control-wrapper {
+.grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter > .grid-quick-filter-search > .control-wrapper,
+.grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter > .grid-quick-filter-search > form > .control-wrapper,
+.grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter > .grid-quick-filter-search > form > .control-wrapper > div,
+.grid-obsidian > .grid-heading > .grid-title-heading > .grid-quick-filter > .grid-quick-filter-search > form > .control-wrapper > div > .form-control {
   width: 100%;
   height: 100%;
+  border-radius: 0;
 }
 
 .grid-quick-filter-search > .control-wrapper > div {
