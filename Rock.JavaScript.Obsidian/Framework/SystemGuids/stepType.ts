@@ -21,16 +21,14 @@
 // </copyright>
 //
 
-import { Guid } from "@Obsidian/Types";
-
-/** The Bag used to transfer step types */
-export type StepTypeTransferBag = {
-    /** Gets or sets the step status mappings for the transfer. */
-    stepStatusMappings?: Record<string, string> | null;
-
-    /** Gets or sets the IdKey for the Step Type that is being transferred. */
-    stepTypeIdKey?: string | null;
-
-    /** Gets or sets a Step Program. */
-    targetStepProgramGuid?: Guid | null;
+/** Guids for Step Types. */
+export const StepType = {
+    /** Baptism Step Type */
+    Baptism: "801cc43c-0641-4271-939e-75e428f31d06",
+    /** eRA Step Type */
+    Era: "E57468BE-15BF-48B6-AAB2-F8E2B02720F3",
+    /** Serve Step Type */
+    Serve: "71E66730-8F7D-4EEF-9C53-524C4BDE5E59",
+    /** Small Group Step Type */
+    SmallGroup: "EFA15A4F-5666-4153-B92F-AF3ECD73C504",
 };

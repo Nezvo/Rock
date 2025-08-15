@@ -21,16 +21,12 @@
 // </copyright>
 //
 
-import { Guid } from "@Obsidian/Types";
+import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 
-/** The Bag used to transfer step types */
-export type StepTypeTransferBag = {
-    /** Gets or sets the step status mappings for the transfer. */
-    stepStatusMappings?: Record<string, string> | null;
+export type StepStatusBag = {
+    /** Gets or sets a value indicating whether this step status is a completion status. */
+    isCompletionStatus: boolean;
 
-    /** Gets or sets the IdKey for the Step Type that is being transferred. */
-    stepTypeIdKey?: string | null;
-
-    /** Gets or sets a Step Program. */
-    targetStepProgramGuid?: Guid | null;
+    /** Gets or sets the List Item Bag that represents the step status. */
+    stepStatus?: ListItemBag | null;
 };

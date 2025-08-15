@@ -14,33 +14,24 @@
 // limitations under the License.
 // </copyright>
 //
-using System;
 
-namespace Rock.SystemGuid
+using Rock.ViewModels.Utility;
+
+namespace Rock.ViewModels.Blocks.Engagement.StepTypeDetail
 {
     /// <summary>
-    /// Guids for Step Types.
+    /// 
     /// </summary>
-    public static class StepType
+    public class StepStatusBag
     {
         /// <summary>
-        /// eRA Step Type
+        /// Gets or sets the List Item Bag that represents the step status.
         /// </summary>
-        public const string ERA = "E57468BE-15BF-48B6-AAB2-F8E2B02720F3";
+        public ListItemBag StepStatus { get; set; }
 
         /// <summary>
-        /// Baptism Step Type
+        /// Gets or sets a value indicating whether this step status is a completion status.
         /// </summary>
-        public const string BAPTISM = "801cc43c-0641-4271-939e-75e428f31d06";
-
-        /// <summary>
-        /// Small Group Step Type
-        /// </summary>
-        public const string SMALL_GROUP = "EFA15A4F-5666-4153-B92F-AF3ECD73C504";
-
-        /// <summary>
-        /// Serve Step Type
-        /// </summary>
-        public const string SERVE = "71E66730-8F7D-4EEF-9C53-524C4BDE5E59";
-   }
+        public bool IsCompletionStatus { get; set; }
+    }
 }
