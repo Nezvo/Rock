@@ -5414,14 +5414,14 @@ textarea.form-control {
   padding-top: 0;
 }
 
-.form-group.required .control-label::after {
-  margin-left: var(--spacing-tiny);
-  font-family: "FontAwesome";
-  font-size: 6px;
+.form-group.required .control-label::before {
+  margin-right: 0;
+  font-family: "tabler-icons";
+  font-size: 10px;
   font-weight: var(--font-weight-black);
   color: var(--color-danger-strong);
-  vertical-align: super;
-  content: "\f111";
+  vertical-align: middle;
+  content: "\f698";
 }
 
 select.form-control {
@@ -5562,8 +5562,8 @@ select.form-control:focus::-ms-value {
 }
 
 a.help {
-  margin-left: 6px;
-  color: var(--color-info-strong);
+  margin-left: 0;
+  color: var(--color-interface-medium);
   outline: 0;
 }
 
