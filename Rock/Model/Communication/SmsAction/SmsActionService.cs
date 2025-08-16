@@ -104,7 +104,7 @@ namespace Rock.Model
         /// </summary>
         /// <param name="message">The incoming message that should be processed.</param>
         /// <returns>
-        /// <c>null</c> or a list of outcomes that might contain a response to send back to the incoming message sender.
+        /// A list of outcomes that might contain a response to send back to the incoming message sender.
         /// </returns>
         public static List<SmsActionOutcome> ProcessIncomingMessage( SmsMessage message )
         {
@@ -119,7 +119,7 @@ namespace Rock.Model
         /// The <see cref="SmsPipeline"/> identifier. If <c>null</c>, the active pipeline with the lowest ID will be used.
         /// </param>
         /// <returns>
-        /// <c>null</c> or a list of outcomes that might contain a response to send back to the incoming message sender.
+        /// A list of outcomes that might contain a response to send back to the incoming message sender.
         /// </returns>
         public static List<SmsActionOutcome> ProcessIncomingMessage( SmsMessage message, int? smsPipelineId )
         {
@@ -134,7 +134,9 @@ namespace Rock.Model
                 if ( minSmsPipelineId == null )
                 {
                     var errorMessage = "No default SMS Pipeline could be found.";
-                    return LogExceptionAndCreateErrorOutcome( errorMessage );
+                    return new List<SmsActionOutcome> {
+                        LogExceptionAndCreateErrorOutcome( errorMessage )
+                    };
                 }
 
                 smsPipelineId = minSmsPipelineId;
@@ -149,98 +151,114 @@ namespace Rock.Model
         /// <param name="message">The incoming message that should be processed.</param>
         /// <param name="smsPipelineId">The <see cref="SmsPipeline"/> identifier.</param>
         /// <returns>
-        /// <c>null</c> or a list of outcomes that might contain a response to send back to the incoming message sender.
+        /// A list of outcomes that might contain a response to send back to the incoming message sender.
         /// </returns>
         public static List<SmsActionOutcome> ProcessIncomingMessage( SmsMessage message, int smsPipelineId )
         {
+            // Opt-in/opt-out tracking should be processed before anything else, to ensure we respect the sender's
+            // preferences and also to ensure we remain compliant with messaging regulations.
             TryUpdateOptInOutTrackingForSender( message );
 
-            var outcomes = new List<SmsActionOutcome>();
+            SmsPipeline smsPipeline;
 
-            var optInOutOutcome = TryGetOptInOutOutcome( message );
-            if ( optInOutOutcome != null )
+            using ( var rockContext = new RockContext() )
             {
-                // If this message opted the sender into or out of messaging and we have a response, return early.
-                outcomes.Add( optInOutOutcome );
-                return outcomes;
+                smsPipeline = new SmsPipelineService( rockContext ).GetNoTracking( smsPipelineId );
             }
 
+            var outcomes = new List<SmsActionOutcome>();
             var errorMessage = string.Empty;
-            var smsPipelineService = new SmsPipelineService( new RockContext() );
-            var smsPipeline = smsPipelineService.Get( smsPipelineId );
 
             if ( smsPipeline == null )
             {
-                errorMessage = $"The SMS Pipeline for SMS Pipeline ID {smsPipelineId} was null.";
-                return LogExceptionAndCreateErrorOutcome( errorMessage );
+                errorMessage = $"SMS Pipeline with ID {smsPipelineId} could not be found.";
+                outcomes.Add( LogExceptionAndCreateErrorOutcome( errorMessage ) );
             }
-
-            if ( !smsPipeline.IsActive )
+            else if ( !smsPipeline.IsActive )
             {
-                errorMessage = $"The SMS Pipeline for SMS Pipeline ID {smsPipelineId} was inactive.";
-                return LogExceptionAndCreateErrorOutcome( errorMessage );
+                errorMessage = $"SMS Pipeline with ID {smsPipelineId} is inactive.";
+                outcomes.Add( LogExceptionAndCreateErrorOutcome( errorMessage ) );
             }
-
-            var smsActions = SmsActionCache.All()
-                .Where( a => a.IsActive )
-                .Where( a => a.SmsPipelineId == smsPipelineId )
-                .OrderBy( a => a.Order )
-                .ThenBy( a => a.Id );
-
-            foreach ( var smsAction in smsActions )
+            else
             {
-                if ( smsAction.SmsActionComponent == null )
-                {
-                    LogIfError( "The SmsActionComponent for '{smsAction.Name}' was null." );
-                    continue;
-                }
+                var smsActions = SmsActionCache.All()
+                    .Where( a => a.IsActive )
+                    .Where( a => a.SmsPipelineId == smsPipelineId )
+                    .OrderBy( a => a.Order )
+                    .ThenBy( a => a.Id );
 
-                var outcome = new SmsActionOutcome
+                foreach ( var smsAction in smsActions )
                 {
-                    ActionName = smsAction.Name
-                };
-                outcomes.Add( outcome );
-
-                try
-                {
-                    // Check if the action wants to process this message.
-                    outcome.ShouldProcess = smsAction.SmsActionComponent.ShouldProcessMessage( smsAction, message, out errorMessage );
-                    outcome.ErrorMessage = errorMessage;
-                    LogIfError( errorMessage );
-
-                    if ( !outcome.ShouldProcess )
+                    if ( smsAction.SmsActionComponent == null )
                     {
+                        LogIfError( $"The '{smsAction.Name}' SMS Action could not be found." );
                         continue;
                     }
 
-                    // Process the message and use either the response returned by the action
-                    // or the previous response we already had.
-                    outcome.Response = smsAction.SmsActionComponent.ProcessMessage( smsAction, message, out errorMessage );
-                    outcome.ErrorMessage = errorMessage;
-                    LogIfError( errorMessage );
-
-                    if ( outcome.Response != null )
+                    var outcome = new SmsActionOutcome
                     {
+                        ActionName = smsAction.Name
+                    };
+
+                    outcomes.Add( outcome );
+
+                    try
+                    {
+                        // Check if the action wants to process this message.
+                        outcome.ShouldProcess = smsAction.SmsActionComponent.ShouldProcessMessage( smsAction, message, out errorMessage );
+                        outcome.ErrorMessage = errorMessage;
                         LogIfError( errorMessage );
-                    }
 
-                    // Log an interaction if this action completed successfully.
-                    if ( smsAction.IsInteractionLoggedAfterProcessing && errorMessage.IsNullOrWhiteSpace() )
+                        if ( !outcome.ShouldProcess )
+                        {
+                            continue;
+                        }
+
+                        // Process the message and use either the response returned by the action
+                        // or the previous response we already had.
+                        outcome.Response = smsAction.SmsActionComponent.ProcessMessage( smsAction, message, out errorMessage );
+                        outcome.ErrorMessage = errorMessage;
+                        LogIfError( errorMessage );
+
+                        if ( outcome.Response != null )
+                        {
+                            LogIfError( errorMessage );
+                        }
+
+                        // Log an interaction if this action completed successfully.
+                        if ( smsAction.IsInteractionLoggedAfterProcessing && errorMessage.IsNullOrWhiteSpace() )
+                        {
+                            WriteInteraction( smsAction, message, smsPipeline );
+                            outcome.IsInteractionLogged = true;
+                        }
+                    }
+                    catch ( Exception exception )
                     {
-                        WriteInteraction( smsAction, message, smsPipeline );
-                        outcome.IsInteractionLogged = true;
+                        outcome.Exception = exception;
+                        LogIfError( exception );
+                    }
+
+                    // If the action is set to not continue after processing then stop.
+                    if ( outcome.ShouldProcess && !smsAction.ContinueAfterProcessing )
+                    {
+                        break;
                     }
                 }
-                catch ( Exception exception )
-                {
-                    outcome.Exception = exception;
-                    LogIfError( exception );
-                }
+            }
 
-                // If the action is set to not continue after processing then stop.
-                if ( outcome.ShouldProcess && !smsAction.ContinueAfterProcessing )
+            // If the sender is opting into or out of messaging, ensure this response is the last outcome added, so it
+            // will be the response sent back.
+            var optInOutOutcome = TryGetOptInOutOutcome( message );
+            if ( optInOutOutcome != null )
+            {
+                if ( !message.WasOptInOutTrackingProcessed )
                 {
-                    break;
+                    errorMessage = $"System Phone Number {message.ToNumber} is misconfigured: unable to send opt-in/opt-out auto-replies unless Rock also manages opt-out tracking.";
+                    outcomes.Add( LogExceptionAndCreateErrorOutcome( errorMessage ) );
+                }
+                else
+                {
+                    outcomes.Add( optInOutOutcome );
                 }
             }
 
@@ -306,16 +324,13 @@ namespace Rock.Model
         /// Logs an exception and creates the error outcome.
         /// </summary>
         /// <param name="errorMessage">The error message.</param>
-        /// <returns>A list of one <see cref="SmsActionOutcome"/> containing the error message.</returns>
-        private static List<SmsActionOutcome> LogExceptionAndCreateErrorOutcome( string errorMessage )
+        /// <returns>An <see cref="SmsActionOutcome"/> containing the error message.</returns>
+        private static SmsActionOutcome LogExceptionAndCreateErrorOutcome( string errorMessage )
         {
             LogIfError( errorMessage );
-            return new List<SmsActionOutcome>
+            return new SmsActionOutcome
             {
-                new SmsActionOutcome
-                {
-                    ErrorMessage = errorMessage
-                }
+                ErrorMessage = errorMessage
             };
         }
 
@@ -349,7 +364,7 @@ namespace Rock.Model
             }
 
             var context = HttpContext.Current;
-            var wrappedException = new Exception( "An exception occurred in the SmsAction pipeline. See the inner exception.", exception );
+            var wrappedException = new Exception( "An error occurred in the SMS Pipeline. See the inner exception.", exception );
             ExceptionLogService.LogException( wrappedException, context );
         }
 
@@ -365,7 +380,7 @@ namespace Rock.Model
             }
 
             var context = HttpContext.Current;
-            var exception = new Exception( $"An error occurred in the SmsAction pipeline: {errorMessage}" );
+            var exception = new Exception( $"An error occurred in the SMS Pipeline: {errorMessage}" );
             ExceptionLogService.LogException( exception, context );
         }
 

@@ -73,7 +73,8 @@
                         <div class="form-field">
                             <InlineCheckBox v-model="suppressSmsOptInOutAutoReplies"
                                             label="Suppress Opt-In/Opt-Out Auto-Replies"
-                                            help="Prevents Rock from sending automatic replies to opt-in or opt-out messages. Use this when your messaging provider handles these responses. Otherwise, you'll need to manage them manually (not recommended)." />
+                                            help="Prevents Rock from sending automatic replies to opt-in or opt-out messages. Use this when your messaging provider handles these responses. Otherwise, you'll need to manage them manually (not recommended)."
+                                            :disabled="isSuppressSmsOptInOutAutoRepliesDisabled" />
                         </div>
 
                         <div class="form-field">
@@ -89,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-    import { PropType, ref, watch } from "vue";
+    import { computed, PropType, ref, watch } from "vue";
     import AttributeValuesContainer from "@Obsidian/Controls/attributeValuesContainer.obs";
     import CheckBox from "@Obsidian/Controls/checkBox.obs";
     import ConditionalWell from "@Obsidian/Controls/conditionalWell.obs";
@@ -148,6 +149,10 @@
 
     // #region Computed Values
 
+    const isSuppressSmsOptInOutAutoRepliesDisabled = computed((): boolean => {
+        return disableSmsOptInOutTracking.value && suppressSmsOptInOutAutoReplies.value;
+    });
+
     // #endregion
 
     // #region Functions
@@ -179,6 +184,10 @@
     // Determines which values we want to track changes on (defined in the
     // array) and then emit a new object defined as newValue.
     watch([attributeValues, ...propRefs], () => {
+        if (disableSmsOptInOutTracking.value) {
+            suppressSmsOptInOutAutoReplies.value = true;
+        }
+
         const newValue: SystemPhoneNumberBag = {
             ...props.modelValue,
             attributeValues: attributeValues.value,

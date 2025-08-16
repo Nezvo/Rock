@@ -116,6 +116,8 @@ class TwilioSmsResponseAsync : TwilioDefaultResponseAsync
 
         if ( message.ToNumber.IsNotNullOrWhiteSpace() && message.FromNumber.IsNotNullOrWhiteSpace() )
         {
+            // Opt-in/opt-out tracking should be processed before anything else, to ensure we respect the sender's
+            // preferences and also to ensure we remain compliant with messaging regulations.
             SmsActionService.TryUpdateOptInOutTrackingForSender( message );
 
             using ( var rockContext = new RockContext() )
