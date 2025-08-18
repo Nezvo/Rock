@@ -5419,14 +5419,15 @@ textarea.form-control {
 }
 
 .form-group.required > .control-label::before {
-  margin-right: 2px;
-  vertical-align: middle;
+  margin-right: var(--spacing-tiny);
   background-color: var(--color-danger-strong);
   width: 6px;
   height: 6px;
   display: inline-block;
   border-radius: 50%;
   content: "";
+  position: relative;
+  transform: translateY(-30%);
 }
 
 select.form-control {
