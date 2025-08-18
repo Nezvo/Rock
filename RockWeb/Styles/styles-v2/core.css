@@ -17355,6 +17355,7 @@ iframe.file-browser {
   margin-bottom: 0;
   background: transparent;
   border: 0 !important;
+  overflow: visible;
 }
 
 .card-badge-top {
