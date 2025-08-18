@@ -290,6 +290,24 @@
                        @linkToPerson="linkToPerson" />
 </template>
 
+<style scoped>
+:deep(.system-phone-selection) {
+    width: 210px;
+}
+
+:deep(.panel-body) {
+    padding: 0;
+}
+
+:deep(.panel-action-fullscreen) {
+    display: block !important;
+}
+
+:deep(.panel.panel-flex>.panel-heading>.panel-title) {
+    padding-right: 5px;
+}
+</style>
+
 <script setup lang="ts">
     import { getSecurityGrant, onConfigurationValuesChanged, provideSecurityGrant, setPropertiesBoxValue, useConfigurationValues, useInvokeBlockAction, usePersonPreferences, useReloadBlock } from "@Obsidian/Utility/block";
     import { SmsConversationsInitializationBox } from "@Obsidian/ViewModels/Blocks/Communication/SmsConversations/smsConversationsInitializationBox";
