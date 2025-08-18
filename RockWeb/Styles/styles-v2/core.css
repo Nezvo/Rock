@@ -5420,12 +5420,13 @@ textarea.form-control {
 
 .form-group.required > .control-label::before {
   margin-right: 2px;
-  font-family: "tabler-icons";
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-black);
-  color: var(--color-danger-strong);
-  vertical-align: baseline;
-  content: "\f698";
+  vertical-align: middle;
+  background-color: var(--color-danger-strong);
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+  border-radius: 50%;
+  content: "";
 }
 
 select.form-control {
