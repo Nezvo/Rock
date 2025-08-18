@@ -8096,6 +8096,10 @@ ul.activeusers {
   border-bottom-color: var(--color-interface-soft);
 }
 
+.panel-default:has(.dropdown-menu) {
+  overflow: visible;
+}
+
 .panel-primary {
   border-color: var(--color-primary);
 }
