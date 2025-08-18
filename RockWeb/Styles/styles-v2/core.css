@@ -16297,6 +16297,13 @@ textarea:focus,
   justify-content: right;
 }
 
+.grid-obsidian .grid-row:has(.table-empty) {
+  border-bottom: 1px solid var(--color-interface-soft);
+}
+.grid-obsidian .grid-row:has(.table-empty) .grid-cell {
+  border-bottom: none;
+}
+
 @media (max-width: 767px) {
   .grid-obsidian > .grid-footing > .grid-paging-footer > .grid-page-picker > .page-num {
     display: none;
