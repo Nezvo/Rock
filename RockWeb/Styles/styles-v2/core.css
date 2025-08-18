@@ -31256,7 +31256,8 @@ tbody .collapse.in {
   font-size: 10em !important;
 }
 
-.fa-stack {
+.fa-stack,
+.ti-stacked {
   display: inline-block;
   height: 2em;
   line-height: 2em;
@@ -31265,19 +31266,25 @@ tbody .collapse.in {
   width: 2em;
 }
 
-.fa-stack-1x {
+.fa-stack-1x,
+.ti-stacked-1x {
   line-height: inherit;
 }
 
-.fa-stack-2x {
+.fa-stack-2x,
+.ti-stacked-2x {
   font-size: 2em;
 }
 
-.fa-inverse {
+.fa-inverse,
+.ti-inverse {
   color: var(--color-interface-softest);
 }
 
-.fa-stack-1x, .fa-stack-2x {
+.fa-stack-1x,
+.fa-stack-2x,
+.ti-stacked-1x,
+.ti-stacked-2x {
   left: 0;
   position: absolute;
   text-align: center;
