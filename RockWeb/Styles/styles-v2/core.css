@@ -7267,10 +7267,6 @@ td.grid-actions {
 .chosen-container-single a:not([href]):not([tabindex]).chosen-single:not(.chosen-default) {
   color: var(--color-interface-stronger) !important;
 }
-.chosen-container-single .chosen-search-input {
-  display: none;
-  border: none;
-}
 .chosen-container-single .chosen-search {
   padding: var(--spacing-xsmall) var(--spacing-xsmall) 0;
   white-space: nowrap;
