@@ -30,6 +30,7 @@ body.navbar-side-open {
 }
 
 .full-work-surface {
+  height: 100%;
   padding: var(--spacing-medium);
 }
 
@@ -179,6 +180,10 @@ body.navbar-side-open {
   @media (min-width: $screen-small) {
       margin-left: 88px;
   }
+}
+
+#content-wrapper:has(.full-work-surface) {
+    height: 100%;
 }
 
 @media (max-width: ($screen-small - 1)) {

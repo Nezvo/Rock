@@ -440,6 +440,12 @@
     font-weight: 600;
 }
 
+.grid-obsidian .grid-cell-boolean,
+.grid-obsidian .grid-column-header-boolean {
+    text-align: center;
+    justify-content: center;
+}
+
 .grid-obsidian .grid-cell-number,
 .grid-obsidian .grid-cell-currency,
 .grid-obsidian .grid-column-header-number,
