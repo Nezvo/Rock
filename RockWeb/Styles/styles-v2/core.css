@@ -22612,6 +22612,10 @@ tr.inactive td {
   width: 100%;
 }
 
+.connection-request-board .modal-open .modal-body .nav-tabs {
+  margin-top: var(--spacing-medium);
+}
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   margin: 0;
