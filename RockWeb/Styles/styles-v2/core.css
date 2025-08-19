@@ -3324,9 +3324,9 @@ input[type=button].btn-block {
 }
 
 .btn-group-xs > .btn {
-  padding: 1px var(--spacing-tiny);
+  padding: var(--spacing-tiny) var(--spacing-xsmall);
   font-size: var(--font-size-xsmall);
-  line-height: var(--line-height-tight);
+  line-height: var(--line-height-normal);
   border-radius: var(--rounded-tiny);
 }
 
