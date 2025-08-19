@@ -11,7 +11,6 @@
 // ======================== BASE STYLE ========================
 
 .displaycard {
-    height: 90px;
     display: flex;
     flex-direction: row;
     gap: var(--spacing-large);
@@ -180,15 +179,14 @@
 }
 
 .displaycard-add-button-trigger {
-    height: 90px;
     display: flex;
     flex-direction: row;
     justify-content: center;
     width: 100%;
-    padding: var(--spacing-large) var(--spacing-large);
+    padding: var(--spacing-large);
     background-color: var(--color-interface-softest);
     border-radius: var(--rounded-xsmall);
-    border: 1px dotted var(--color-info-strong);
+    border: 1px dashed var(--color-info-strong);
     cursor: pointer;
     align-items: center;
     gap: var(--spacing-xsmall);
@@ -198,8 +196,10 @@
 }
 
 .displaycard-add-button-trigger:hover,
+.displaycard-add-button-trigger.btn-default:focus,
 .dropdown.open .displaycard-add-button-trigger {
     background-color: var(--color-info-soft);
+    color: var(--color-info-strong);
 }
 
 .displaycard-add-button .dropdown-menu {

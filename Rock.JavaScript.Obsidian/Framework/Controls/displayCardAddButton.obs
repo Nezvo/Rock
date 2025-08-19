@@ -7,7 +7,7 @@
 
         <RockButton v-else
                     class="displaycard-add-button-trigger">
-            <i class="ti ti-circle-plus"></i> {{ addText }}
+            <i class="ti ti-circle-plus-filled"></i> {{ addText }}
         </RockButton>
     </div>
 </template>
