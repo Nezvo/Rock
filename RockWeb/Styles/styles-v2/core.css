@@ -2964,6 +2964,7 @@ fieldset[disabled] .btn-danger-solid.focus {
   width: 34px;
   height: 34px;
   padding: 6px 0;
+  align-content: center;
 }
 .btn-square i.fa {
   width: auto;
