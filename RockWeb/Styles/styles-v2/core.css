@@ -18517,6 +18517,10 @@ iframe.file-browser {
   gap: var(--spacing-tiny);
 }
 
+.displaycard-secondary-actions .btn-link.btn-overflow {
+  color: var(--color-interface-medium);
+}
+
 @media (max-width: 767px) {
   /*Allow display card to stack content on smaller screens*/
   .displaycard {
