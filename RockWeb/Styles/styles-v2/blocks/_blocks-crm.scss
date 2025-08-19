@@ -4,7 +4,7 @@
 
 
 // =============================================================
-// Table of Content           
+// Table of Content
 //  + Header
 //  + Badge Bar
 //  + Edit Group Page
@@ -17,6 +17,7 @@
 //  + Photo Request
 //  + Duplicate Pages
 //  + DISC & Assessments
+//  + Connection Request
 // =============================================================
 
 
@@ -909,3 +910,10 @@ tr.inactive {
 }
 // ====================== END EDIT PERSON ======================
 
+// ======================== CONNECTION REQUEST ========================
+
+.connection-request-board .modal-open .modal-body .panel-body .photo > img {
+  width: 100%;
+}
+
+// ======================== END CONNECTION REQUEST ========================
