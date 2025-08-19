@@ -49,7 +49,7 @@ namespace Rock.Migrations
             AddColumn( "dbo.StepProgram", "IsSystem", c => c.Boolean( nullable: false ) );
 
             Sql( @"
-DECLARE @Now DATETIME = dbo.RockGetDate()
+DECLARE @Now DATETIME = GETDATE();
 
 INSERT INTO [StepProgram] (
     [Name],
