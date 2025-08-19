@@ -329,7 +329,7 @@ ul.activeusers {
 }
 }
 
-.panel-default:has(.dropdown-menu) { // Allows dropdown menus to overflow outside of Content Collection panel
+.panel-default:has(.dropdown.open) { // Allows dropdown menus to overflow outside of Content Collection panel
       overflow: visible;
 }
 
