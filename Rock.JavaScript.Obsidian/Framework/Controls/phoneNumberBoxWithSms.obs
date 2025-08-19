@@ -14,7 +14,7 @@
                     <InputGroupDropDown v-else :items="availableCountryCodeOptions" v-model="countryCode" inputGroupClasses="input-group-addon" />
                     <input v-model="number" :id="uniqueId" type="text" class="form-control" v-bind="field" />
                 </div>
-                <div v-if="(!props.hideSms)">
+                <div v-if="(showSmsOptIn && !props.hideSms)">
                     <CheckBox
                               v-model="isMessagingEnabled"
                               label=""
@@ -105,6 +105,10 @@
         return configuration.value?.smsOptInText ?? "";
     });
 
+    const showSmsOptIn = computed((): boolean => {
+        return smsOptInText.value.length > 0;
+    });
+
     // #endregion
 
     // #region Functions
@@ -137,9 +141,9 @@
     /** Retrieve the country code data, validation data, and formatting data from the server */
     async function loadConfiguration(): Promise<void> {
         try {
-            const result = props.hideSms
-                ? await getPhoneNumberConfiguration()
-                : await getPhoneNumberAndSmsConfiguration();
+            const result = (showSmsOptIn && !props.hideSms)
+                ? await getPhoneNumberAndSmsConfiguration()
+                : await getPhoneNumberConfiguration();
 
             if (result) {
                 configuration.value = result;
