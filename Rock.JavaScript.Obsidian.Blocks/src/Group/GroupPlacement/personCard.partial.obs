@@ -192,9 +192,9 @@
         if (props.isGenderHighlighting) {
             switch (gender) {
                 case Gender.Male:
-                    return "#1A8AE5";
+                    return "var(--base-gender-male)";
                 case Gender.Female:
-                    return "#DE69CE";
+                    return "var(--base-gender-female)";
                 case Gender.Unknown:
                 default:
                     return "var(--color-interface-medium)";
