@@ -163,11 +163,6 @@ namespace Rock.Jobs
                 return;
             }
 
-            // If there are Task.Runs that don't handle their exceptions, this will catch those so that we can log them.
-            // Note that this event won't fire until the Task is disposed. In most cases, that'll be when GC is collected.
-            // So it won't happen immediately.
-            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-
             var syncTask = Task.Run( async () =>
             {
                 using ( var rockContext = new RockContext() )
@@ -1456,16 +1451,6 @@ namespace Rock.Jobs
             }
 
             return formattedResultSb.ToString();
-        }
-
-        /// <summary>
-        /// If there are Task.Runs that don't handle their exceptions, this will catch those so that we can log them.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="UnobservedTaskExceptionEventArgs"/> instance containing the event data.</param>
-        private void TaskScheduler_UnobservedTaskException( object sender, UnobservedTaskExceptionEventArgs e )
-        {
-            ExceptionLogService.LogException( new RockJobWarningException( $"Unobserved Task Exception in {nameof( ChatSync )} Job.", e.Exception ) );
         }
 
         #endregion Task Result Reporting
