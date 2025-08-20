@@ -4,8 +4,8 @@
                       demoMode>
         <ContextSlicer title="Context Slicer"
                        :showCampus="showCampus"
-                       :campusTypeFilter="campusTypeFilter?.value"
-                       :campusStatusFilter="campusStatusFilter?.value">
+                       :campusTypeFilter="campusTypeFilter?.value ?? undefined"
+                       :campusStatusFilter="campusStatusFilter?.value ?? undefined">
             <InlineCheckBox v-if="showCustomControls"
                             label="Show Hidden"
                             :modelValue="false" />
