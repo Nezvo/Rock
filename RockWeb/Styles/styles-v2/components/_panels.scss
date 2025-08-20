@@ -1017,7 +1017,7 @@ ul.activeusers {
   .panel-heading {
 
     .panel-header-actions {
-      margin-right: 1rem !important;
+      margin-right: var(--spacing-xsmall) !important;
     }
 
     .panel-title {
