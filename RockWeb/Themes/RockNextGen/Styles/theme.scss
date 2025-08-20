@@ -1356,13 +1356,13 @@ a.rock-bookmark {
     min-height: 500px;
 
     @media (max-width: $screen-medium) {
-      margin-top: 10vh;
+      margin: 2vh 0;
       grid-template-columns: 1fr;
       grid-template-rows: 4fr 10fr;
       gap: 0;
       
       min-width: 380px;
-      width: 80vw;
+      width: 90vw;
     }
   }
 
@@ -1433,6 +1433,9 @@ a.rock-bookmark {
   .checkbox {
     // Override the normal check box margin.
     margin-bottom: var(--spacing-medium);
+  }
+  @media screen and (max-width: $screen-medium) {
+    height: 100%;
   }
 }
 
