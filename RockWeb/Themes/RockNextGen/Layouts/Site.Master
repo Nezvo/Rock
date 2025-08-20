@@ -71,7 +71,6 @@ through Christ, we find forgiveness, salvation, and the assurance of eternal lif
     <script src="<%# ResolveRockUrl("~~/Assets/Scripts/theme.js", true) %>"></script>
 
   <script>
-
             let attributeName = "theme"
             var htmlElement = document.documentElement;
 
@@ -120,9 +119,6 @@ through Christ, we find forgiveness, salvation, and the assurance of eternal lif
 
                 <div id="fixed-header" class="header-content" role="navigation">
                     <div class="navbar-zone-login"><Rock:Zone Name="Login" runat="server" /></div>
-                    <div>
-                        <button id="themeSwitchButton" class="theme-toggle" type="button"><i id="theme-icon" class="ti theme-mode-icon"></i></button>
-                    </div>
                     <div class="navbar-zone-header"><Rock:Zone Name="Header" runat="server" /></div>
 
                     <!-- Page Title -->
