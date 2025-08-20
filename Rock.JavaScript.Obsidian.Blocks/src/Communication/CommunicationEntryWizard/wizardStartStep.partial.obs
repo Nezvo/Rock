@@ -5,7 +5,7 @@
             <template #headerActions>
                 <div>
                     <HighlightLabel labelType="info">
-                        <template v-if="isFetchingRecipients"><i class="ti ti-rotate-2 ti-pulse"></i> Recipients</template>
+                        <template v-if="isFetchingRecipients"><i class="ti ti-rotate-clockwise-2 ti-pulse"></i> Recipients</template>
                         <template v-else>{{ recipientsLabel }}</template>
                     </HighlightLabel>
                 </div>
@@ -84,7 +84,7 @@
                                                     <RockButton btnSize="sm"
                                                                 :disabled="isFetchingRecipients"
                                                                 @click="isRecipientModalShown = true">
-                                                        <i v-if="isFetchingRecipients" class="ti ti-rotate-2 ti-pulse"></i>
+                                                        <i v-if="isFetchingRecipients" class="ti ti-rotate-clockwise-2 ti-pulse"></i>
                                                         <i v-else class="ti ti-eye"></i> View List
                                                     </RockButton>
                                                 </div>
@@ -145,7 +145,7 @@
                                                         <h3>Email</h3>
                                                         <small>Send an email to everyone in your targeted segment.</small>
                                                         <HighlightLabel labelType="info">
-                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-2 ti-pulse"></i></template>
+                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-clockwise-2 ti-pulse"></i></template>
                                                             <template v-else>Reachable Audience: {{ emailRecipientCount }}</template>
                                                         </HighlightLabel>
                                                         <i :class="internalCommunicationType === CommunicationType.Email ? 'ti ti-circle-dot' : 'ti ti-circle'"></i>
@@ -161,7 +161,7 @@
                                                         <h3>SMS</h3>
                                                         <small>Send a text message to your targeted segment.</small>
                                                         <HighlightLabel labelType="info">
-                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-2 ti-pulse"></i></template>
+                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-clockwise-2 ti-pulse"></i></template>
                                                             <template v-else>Reachable Audience: {{ smsRecipientCount }}</template>
                                                         </HighlightLabel>
                                                         <i :class="internalCommunicationType === CommunicationType.SMS ? 'ti ti-circle-dot' : 'ti ti-circle'"></i>
@@ -177,7 +177,7 @@
                                                         <h3>Push Notifications</h3>
                                                         <small>Notify targeted segment via the church app.</small>
                                                         <HighlightLabel labelType="info">
-                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-2 ti-pulse"></i></template>
+                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-clockwise-2 ti-pulse"></i></template>
                                                             <template v-else>Reachable Audience: {{ pushNotificationRecipientCount }}</template>
                                                         </HighlightLabel>
                                                         <i :class="internalCommunicationType === CommunicationType.PushNotification ? 'ti ti-circle-dot' : 'ti ti-circle'"></i>
@@ -193,7 +193,7 @@
                                                         <h3>Personal Preference</h3>
                                                         <small>Notify targeted segment via person's preferred channel.</small>
                                                         <HighlightLabel labelType="info">
-                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-2 ti-pulse"></i></template>
+                                                            <template v-if="isFetchingRecipients">Reachable Audience: <i class="ti ti-rotate-clockwise-2 ti-pulse"></i></template>
                                                             <template v-else>Reachable Audience: {{ personalPreferenceRecipientCount }}</template>
                                                         </HighlightLabel>
                                                         <i :class="internalCommunicationType === CommunicationType.RecipientPreference ? 'ti ti-circle-dot' : 'ti ti-circle'"></i>
