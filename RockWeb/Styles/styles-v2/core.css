@@ -8322,6 +8322,9 @@ ul.activeusers {
 .panel-widget .panel-heading small {
   color: var(--color-interface-strong);
 }
+.panel-widget .panel-heading .btn-link {
+  color: var(--color-interface-medium);
+}
 .panel-widget > .panel-body {
   border-top: 1px solid var(--color-interface-soft);
 }

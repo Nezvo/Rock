@@ -585,6 +585,10 @@ ul.activeusers {
     small {
       color:          var(--color-interface-strong);
     }
+
+    .btn-link {
+      color: var(--color-interface-medium);
+    }
   }
 
   > .panel-body {
