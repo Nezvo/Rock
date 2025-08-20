@@ -22,14 +22,13 @@ import { Component, computed, defineComponent, nextTick, onErrorCaptured, onMoun
 import { useStore } from "@Obsidian/PageState";
 import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
 import { HttpBodyData, HttpMethod, HttpResult, HttpUrlParams } from "@Obsidian/Types/Utility/http";
-import { createInvokeBlockAction, provideBlockBrowserBus, provideBlockGuid, provideBlockTypeGuid, provideConfigurationValuesChanged, providePersonPreferences, provideReloadBlock, provideStaticContent } from "@Obsidian/Utility/block";
+import { createInvokeBlockAction, provideBlockGuid, provideBlockTypeGuid, provideConfigurationValuesChanged, providePersonPreferences, provideReloadBlock, provideStaticContent } from "@Obsidian/Utility/block";
 import { areEqual, emptyGuid, toGuidOrNull } from "@Obsidian/Utility/guid";
 import { PanelAction } from "@Obsidian/Types/Controls/panelAction";
 import { ObsidianBlockConfigBag } from "@Obsidian/ViewModels/Cms/obsidianBlockConfigBag";
 import { IBlockPersonPreferencesProvider, IPersonPreferenceCollection } from "@Obsidian/Types/Core/personPreferences";
 import { PersonPreferenceValueBag } from "@Obsidian/ViewModels/Core/personPreferenceValueBag";
 import { BlockReloadMode } from "@Obsidian/Enums/Cms/blockReloadMode";
-import { BrowserBus } from "@Obsidian/Utility/browserBus";
 import { ICancellationToken } from "@Obsidian/Utility/cancellation";
 
 const store = useStore();
@@ -423,10 +422,6 @@ export default defineComponent({
 
         provideBlockGuid(props.config.blockGuid);
         provideBlockTypeGuid(props.config.blockTypeGuid);
-        provideBlockBrowserBus(new BrowserBus({
-            block: props.config.blockGuid,
-            blockType: props.config.blockTypeGuid
-        }));
 
         // If we have a block guid, then add an event listener for configuration
         // changes to the block.

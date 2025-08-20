@@ -33,7 +33,6 @@ import { ICancellationToken } from "./cancellation";
 const blockReloadSymbol = Symbol();
 const configurationValuesChangedSymbol = Symbol();
 const staticContentSymbol = Symbol("static-content");
-const blockBrowserBusSymbol = Symbol("block-browser-bus");
 
 // TODO: Change these to use symbols
 
@@ -206,16 +205,6 @@ export function useStaticContent(): Node[] {
 }
 
 /**
- * Provides the browser bus configured to publish messages for the current
- * block.
- *
- * @param bus The browser bus.
- */
-export function provideBlockBrowserBus(bus: BrowserBus): void {
-    provide(blockBrowserBusSymbol, bus);
-}
-
-/**
  * Gets the browser bus configured for use by the current block. If available
  * this will be properly configured to publish messages with the correct block
  * and block type. If this is called outside the context of a block then a
@@ -224,7 +213,13 @@ export function provideBlockBrowserBus(bus: BrowserBus): void {
  * @returns An instance of {@link BrowserBus}.
  */
 export function useBlockBrowserBus(): BrowserBus {
-    return inject<BrowserBus>(blockBrowserBusSymbol, () => useBrowserBus(), true);
+    const blockTypeGuid = useBlockTypeGuid();
+    const blockGuid = useBlockGuid();
+
+    return useBrowserBus({
+        blockType: blockTypeGuid,
+        block: blockGuid
+    });
 }
 
 
