@@ -13,7 +13,7 @@
                     <asp:Repeater ID="rptProperties" runat="server" >
                         <ItemTemplate >
                             <li class='<%# GetTabClass(Container.DataItem) %>'>
-                                <asp:LinkButton ID="lbProperty" runat="server" Text='<%# Container.DataItem %>' OnClick="lbProperty_Click" CausesValidation="false">
+                                <asp:LinkButton ID="lbProperty" runat="server" Text='<%# GetTabName(Container.DataItem) %>' CommandArgument="<%# Container.DataItem %>" OnClick="lbProperty_Click" ValidationGroup="<%# BlockValidationGroup %>" CausesValidation="true">
                                 </asp:LinkButton> 
                             </li>
                         </ItemTemplate>
@@ -33,6 +33,8 @@
                     <asp:Panel ID="pnlMobileSettings" runat="server" Visible="false">
                         <Rock:AttributeValuesContainer ID="avcMobileAttributes" runat="server" ShowCategoryLabel="false" />
                     </asp:Panel>
+
+                    <asp:Placeholder ID="phTabAttributes" runat="server"></asp:Placeholder>
 
                     <asp:Panel ID="pnlAdvancedSettings" runat="server" Visible="false" >
                         <Rock:RockTextBox ID="tbCssClass" runat="server" Label="CSS Class" Help="An optional CSS class to include with this block's containing div" />
