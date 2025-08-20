@@ -16032,6 +16032,13 @@ textarea:focus,
   flex-wrap: wrap;
 }
 
+.grid-cell > .label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
 .grid-select-field {
   min-width: 60px;
 }

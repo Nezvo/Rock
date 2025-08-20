@@ -326,6 +326,13 @@
     flex-wrap: wrap;
 }
 
+.grid-cell > .label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
 .grid-select-field {
     min-width: 60px;
 }
@@ -458,7 +465,7 @@
     .grid-row:has(.table-empty) {
     border-bottom: 1px solid var(--color-interface-soft);
     }
-    
+
     .grid-row:has(.table-empty) .grid-cell {
     border-bottom: none;
     }
