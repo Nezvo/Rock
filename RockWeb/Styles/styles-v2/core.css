@@ -21656,6 +21656,13 @@ iframe.email-body {
   border-bottom: none;
 }
 
+.actions.assetmanager-actions {
+  margin-bottom: var(--spacing-xsmall);
+}
+.actions.assetmanager-actions > .pull-left {
+  margin-right: var(--spacing-xsmall);
+}
+
 /*
     Used to manage styles for specific blocks.
 
