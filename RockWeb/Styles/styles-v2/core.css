@@ -223,6 +223,10 @@ th {
   padding: 0;
 }
 
+iframe {
+  border: 0;
+}
+
 /* ===================== VARIABLES =================== */
 :root {
   --logo-image: url("../../../Assets/Images/rock-logo-circle-white.svg");
