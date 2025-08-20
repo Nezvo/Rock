@@ -63,10 +63,10 @@ body.navbar-side-open {
       }
 
       > li + li::before {
-        font-family: FontAwesome;
+        font-family: 'tabler-icons';
         font-size: 80%;
         font-weight: 900;
-        content: "\f054";
+        content: "\ea61";
       }
     }
     .title {

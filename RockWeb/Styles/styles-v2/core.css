@@ -10344,8 +10344,8 @@ ul.activeusers {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .panel-follow-status::before {
-  font-family: "FontAwesome";
-  content: "\f005";
+  font-family: "tabler-icons";
+  content: "\f6a6";
 }
 .panel-follow-status.following {
   color: var(--color-interface-softest);
@@ -19181,10 +19181,10 @@ contentsection-body-overflow {
   opacity: 0.75;
 }
 .rock-fullscreen-toggle::before {
-  font-family: "FontAwesome";
+  font-family: "tabler-icons";
   font-weight: var(--font-weight-black);
   text-align: center;
-  content: "\f065";
+  content: "\eaea";
 }
 .is-fullscreen .rock-fullscreen-toggle {
   color: var(--color-interface-stronger);

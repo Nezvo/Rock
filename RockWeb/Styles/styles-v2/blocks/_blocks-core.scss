@@ -44,10 +44,10 @@
   }
 
   &::before {
-    font-family:    'FontAwesome';
+    font-family:    'tabler-icons';
     font-weight:    var(--font-weight-black);
     text-align:     center;
-    content:        "\f065";
+    content:        "\eaea";
   }
 
   .is-fullscreen & {
