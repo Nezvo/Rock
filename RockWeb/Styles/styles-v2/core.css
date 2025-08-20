@@ -20137,6 +20137,7 @@ contentsection-body-overflow {
 }
 .group-scheduler-v2 .card-sched {
   margin-bottom: var(--spacing-small);
+  overflow: visible;
 }
 .group-scheduler-v2 .card-sched .location {
   margin-bottom: var(--spacing-medium);
