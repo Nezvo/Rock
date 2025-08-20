@@ -3664,6 +3664,11 @@ input[type=button].btn-block {
   color: var(--color-interface-softest);
 }
 
+.badge-circle {
+  border-radius: 999px;
+  width: 24px;
+}
+
 .badge-icon {
   font-size: 45px;
   font-size: var(--badge-size, 45px);
