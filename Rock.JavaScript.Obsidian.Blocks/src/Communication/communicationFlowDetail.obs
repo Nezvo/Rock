@@ -182,7 +182,7 @@
     const idKey = ref<string | null | undefined>(config.entity?.idKey);
     // The individual will activate the communication flow after setup is complete.
     // Initialize to false for now to avoid sending communications prematurely.
-    const isActive = ref<boolean>(config.entity?.isActive ?? false);
+    const isActive = ref<boolean>(config.entity?.isActive ?? true);
     const name = ref<string | null | undefined>(config.entity?.name);
     const targetAudienceDataView = ref<ListItemBag | null | undefined>(config.entity?.targetAudienceDataView);
     const triggerType = ref(config.entity?.triggerType ?? CommunicationFlowTriggerType.Recurring);
