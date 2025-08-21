@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Threading;
 
 using Rock.Attribute;
+using Rock.Cms;
 using Rock.Data;
 using Rock.Enums.Cms;
 using Rock.Observability;
@@ -235,6 +236,12 @@ namespace Rock.Model
                             blockType.Category = Rock.Reflection.GetCategory( type ) ?? string.Empty;
                             blockType.Description = Rock.Reflection.GetDescription( type ) ?? string.Empty;
 
+                            var blockRoleAttribute = type.GetCustomAttribute<BlockRoleAttribute>();
+                            if ( blockRoleAttribute != null )
+                            {
+                                blockType.DefaultRole = blockRoleAttribute.Role;
+                            }
+
                             rockContext.SaveChanges();
 
                             // Update the attributes used by the block
@@ -368,6 +375,12 @@ namespace Rock.Model
                             if ( blockTypeGuidFromAttribute != null && blockType.Guid != blockTypeGuidFromAttribute.Value )
                             {
                                 blockType.Guid = blockTypeGuidFromAttribute.Value;
+                            }
+
+                            var blockRoleAttribute = blockCompiledType.GetCustomAttribute<BlockRoleAttribute>();
+                            if ( blockRoleAttribute != null )
+                            {
+                                blockType.DefaultRole = blockRoleAttribute.Role;
                             }
 
                             rockContext.SaveChanges();

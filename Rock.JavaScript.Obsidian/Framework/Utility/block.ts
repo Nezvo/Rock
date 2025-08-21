@@ -29,8 +29,10 @@ import { IEntity } from "@Obsidian/ViewModels/entity";
 import { debounce } from "./util";
 import { BrowserBus, useBrowserBus } from "./browserBus";
 import { ICancellationToken } from "./cancellation";
+import { BlockRole, BlockRoleDescription } from "@Obsidian/Enums/Cms/blockRole";
 
 const blockReloadSymbol = Symbol();
+const blockRoleActionsSymbol = Symbol("block-role-actions");
 const configurationValuesChangedSymbol = Symbol();
 const staticContentSymbol = Symbol("static-content");
 
@@ -733,6 +735,172 @@ export function providePersonPreferences(provider: IBlockPersonPreferencesProvid
 export function usePersonPreferences(): IBlockPersonPreferencesProvider {
     return inject<IBlockPersonPreferencesProvider>(blockPreferenceProviderSymbol)
         ?? emptyPreferenceProvider;
+}
+
+// #endregion
+
+// #region Block Registration and Actions
+
+/**
+ * The registration information for block actions.
+ */
+type BlockRegistration = {
+    /** The action handlers for the block. */
+    actions: IBlockActions;
+
+    /** The role of the block on the page. */
+    role: BlockRole;
+
+    /** The number of times the block has been hidden without being unhidden. */
+    hideCount: number;
+};
+
+/** The list of block registrations for the current page. */
+const registeredBlocks: BlockRegistration[] = [];
+
+/**
+ * The block actions that can be performed on a block.
+ */
+export interface IBlockActions {
+    /** Called when the block should hide itself. */
+    hideBlock?(): Promise<void>;
+
+    /** Called when the block should show itself. */
+    showBlock?(): Promise<void>;
+
+    /** Called when the block should reload itself. */
+    reloadBlock?(): Promise<void>;
+}
+
+/**
+ * Registers a block with the specified actions and role.
+ *
+ * **This is an internal function that should not be called by plugins.**
+ *
+ * @param actions The actions that can be performed on the block.
+ * @param role The role of the block on the page.
+ */
+export function registerBlock(actions: IBlockActions, role: BlockRole): void {
+    registeredBlocks.push({
+        actions,
+        role,
+        hideCount: 0
+    });
+}
+
+/**
+ * Unregisters a block with the specified actions and role.
+ *
+ * **This is an internal function that should not be called by plugins.**
+ *
+ * @param actions The actions that can be performed on the block.
+ * @param role The role of the block on the page.
+ */
+export function unregisterBlock(actions: IBlockActions, role: BlockRole): void {
+    const index = registeredBlocks.findIndex(
+        (entry) => entry.actions === actions && entry.role === role
+    );
+
+    if (index !== -1) {
+        registeredBlocks.splice(index, 1);
+    }
+}
+
+/**
+ * Provides the block actions that will be used by child components
+ * to access the actions associated with their block.
+ *
+ * **This is an internal function that should not be called by plugins.**
+ *
+ * @param actions The actions that can be performed on the block.
+ */
+export function provideBlockActions(actions: IBlockActions): void {
+    provide(blockRoleActionsSymbol, actions);
+}
+
+/**
+ * Gets the block actions that can be used by child components
+ * to access the actions associated with their block.
+ *
+ * @returns An object that implements {@link IBlockActions}.
+ */
+export function useBlockActions(): IBlockActions {
+    return inject<IBlockActions>(blockRoleActionsSymbol) ?? {};
+}
+
+/**
+ * Hides the blocks on the page that match the specified role.
+ *
+ * @param role The role to use when deciding which blocks to hide.
+ */
+export async function hideBlockRole(role: BlockRole): Promise<void> {
+    const roleName = BlockRoleDescription[role]?.toLowerCase();
+
+    // Support for static blocks and non-Obsidian blocks.
+    if (roleName) {
+        window.document.body.classList.add(`hide-block-role-${roleName}`);
+    }
+
+    const promises: Promise<void>[] = [];
+
+    for (const entry of registeredBlocks) {
+        if (entry.role === role) {
+            entry.hideCount++;
+
+            if (entry.hideCount === 1 && entry.actions.hideBlock) {
+                promises.push(entry.actions.hideBlock());
+            }
+        }
+    }
+
+    await Promise.all(promises);
+}
+
+/**
+ * Shows the blocks on the page that match the specified role.
+ *
+ * @param role The role to use when deciding which blocks to show.
+ */
+export async function showBlockRole(role: BlockRole): Promise<void> {
+    const roleName = BlockRoleDescription[role]?.toLowerCase();
+
+    // Support for static blocks and non-Obsidian blocks.
+    if (roleName) {
+        window.document.body.classList.remove(`hide-block-role-${roleName}`);
+    }
+
+    const promises: Promise<void>[] = [];
+
+    for (const entry of registeredBlocks) {
+        if (entry.role === role) {
+            if (entry.hideCount > 0) {
+                entry.hideCount--;
+            }
+
+            if (entry.hideCount === 0 && entry.actions.showBlock) {
+                promises.push(entry.actions.showBlock());
+            }
+        }
+    }
+
+    await Promise.all(promises);
+}
+
+/**
+ * Reloads the blocks on the page that match the specified role.
+ *
+ * @param role The role to use when deciding which blocks to reload.
+ */
+export async function reloadBlockRole(role: BlockRole): Promise<void> {
+    const promises: Promise<void>[] = [];
+
+    for (const entry of registeredBlocks) {
+        if (entry.role === role && entry.actions.reloadBlock) {
+            promises.push(entry.actions.reloadBlock());
+        }
+    }
+
+    await Promise.all(promises);
 }
 
 // #endregion

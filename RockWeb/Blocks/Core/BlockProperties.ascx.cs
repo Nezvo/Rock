@@ -432,6 +432,8 @@ namespace RockWeb.Blocks.Core
 
                 tbBlockName.Text = _block.Name;
                 tbCssClass.Text = _block.CssClass;
+                ddlBlockRole.Text = _block.Role?.ConvertToInt().ToString() ?? string.Empty;
+                ddlBlockRole.AppendText = _block.BlockType != null ? "Default: " + _block.BlockType?.DefaultRole.ToString() : null;
                 cePreHtml.Text = _block.PreHtml;
                 cePostHtml.Text = _block.PostHtml;
 
@@ -521,6 +523,7 @@ namespace RockWeb.Blocks.Core
 
                 block.Name = tbBlockName.Text;
                 block.CssClass = tbCssClass.Text;
+                block.Role = ddlBlockRole.Text.ConvertToEnumOrNull<BlockRole>();
                 block.PreHtml = cePreHtml.Text;
                 block.PostHtml = cePostHtml.Text;
                 block.OutputCacheDuration = 0; //Int32.Parse( tbCacheDuration.Text );
