@@ -341,10 +341,15 @@
             attributes: attributes.value,
             category: category.value,
             communications: communications.value,
-            conversionGoalSettings: conversionGoalSettings.value,
-            conversionGoalTargetPercent: conversionGoalTargetPercent.value,
-            conversionGoalTimeframeInDays: conversionGoalTimeframeInDays.value,
-            conversionGoalType: conversionGoalType.value,
+
+            // Wait until the final save to clear out the conversion goal information
+            // if goal tracking is not enabled. This allows the person to enable/disable
+            // while building the flow without losing conversion goal information.
+            conversionGoalSettings: isGoalTrackingEnabled.value ? conversionGoalSettings.value : null,
+            conversionGoalTargetPercent: isGoalTrackingEnabled.value ? conversionGoalTargetPercent.value : null,
+            conversionGoalTimeframeInDays: isGoalTrackingEnabled.value ? conversionGoalTimeframeInDays.value : null,
+            conversionGoalType: isGoalTrackingEnabled.value ? conversionGoalType.value : null,
+
             description: description.value,
             exitConditionType: exitConditionType.value,
             iCalendarContent: iCalendarContent.value,
