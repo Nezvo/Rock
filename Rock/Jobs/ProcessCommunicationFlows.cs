@@ -547,11 +547,11 @@ namespace Rock.Jobs
 
                 var existingKeys = instance.CommunicationFlowInstanceCommunications
                     .SelectMany( cfic => cfic.CommunicationFlowInstanceCommunicationConversions )
-                    .Select( h => new ConversionKey
+                    .Select( h => new
                     {
-                        CommunicationFlowInstanceCommunicationId = h.CommunicationFlowInstanceCommunicationId,
-                        CommunicationRecipientId = h.CommunicationRecipientId,
-                        PersonId = h.PersonAlias.PersonId
+                        h.CommunicationFlowInstanceCommunicationId,
+                        h.CommunicationRecipientId,
+                        h.PersonAlias.PersonId
                         // h.Date - add this in the future if we ever need to track ALL conversions for a person per instance.
                     } )
                     .ToHashSet();
@@ -560,11 +560,11 @@ namespace Rock.Jobs
                 using ( ObservabilityHelper.StartActivity( "Get New ConversionCandidates" ) )
                 {
                     newConversions = conversionCandidates
-                        .Where( h => !existingKeys.Contains( new ConversionKey
+                        .Where( h => !existingKeys.Contains( new
                         {
-                            CommunicationFlowInstanceCommunicationId = h.Conversion.CommunicationFlowInstanceCommunicationId,
-                            CommunicationRecipientId = h.Conversion.CommunicationRecipientId,
-                            PersonId = h.PersonId
+                            h.Conversion.CommunicationFlowInstanceCommunicationId,
+                            h.Conversion.CommunicationRecipientId,
+                            h.PersonId
                             // h.Date - add this in the future if we ever need to track ALL conversions for a person per instance.
                         } ) )
                         .ToList();
@@ -619,13 +619,6 @@ namespace Rock.Jobs
                                        && r.CommunicationSendDateTime.Value <= conversionDateTime ) ) )
                     .Select( r => ( r.CommunicationFlowInstanceCommunication, (int?)r.CommunicationRecipientId ) )
                     .FirstOrDefault();
-            }
-
-            private class ConversionKey
-            {
-                public int CommunicationFlowInstanceCommunicationId { get; set; }
-                public int CommunicationRecipientId { get; set; }
-                public int PersonId { get; set; }
             }
 
             private class PersonConversionInfo
