@@ -236,10 +236,10 @@ namespace Rock.Model
                             blockType.Category = Rock.Reflection.GetCategory( type ) ?? string.Empty;
                             blockType.Description = Rock.Reflection.GetDescription( type ) ?? string.Empty;
 
-                            var blockRoleAttribute = type.GetCustomAttribute<BlockRoleAttribute>();
+                            var blockRoleAttribute = type.GetCustomAttribute<DefaultBlockRoleAttribute>( inherit: true );
                             if ( blockRoleAttribute != null )
                             {
-                                blockType.DefaultRole = blockRoleAttribute.Role;
+                                blockType.DefaultRole = blockRoleAttribute.DefaultRole;
                             }
 
                             rockContext.SaveChanges();
@@ -377,10 +377,10 @@ namespace Rock.Model
                                 blockType.Guid = blockTypeGuidFromAttribute.Value;
                             }
 
-                            var blockRoleAttribute = blockCompiledType.GetCustomAttribute<BlockRoleAttribute>();
+                            var blockRoleAttribute = blockCompiledType.GetCustomAttribute<DefaultBlockRoleAttribute>( inherit: true );
                             if ( blockRoleAttribute != null )
                             {
-                                blockType.DefaultRole = blockRoleAttribute.Role;
+                                blockType.DefaultRole = blockRoleAttribute.DefaultRole;
                             }
 
                             rockContext.SaveChanges();

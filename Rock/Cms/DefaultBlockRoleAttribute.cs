@@ -26,8 +26,8 @@ namespace Rock.Cms
     /// added to a page. Individual Block instances can override this via the
     /// block's configuration UI.
     /// </summary>
-    [AttributeUsage( AttributeTargets.Class, AllowMultiple = false )]
-    public class BlockRoleAttribute : System.Attribute
+    [AttributeUsage( AttributeTargets.Class, AllowMultiple = false, Inherited = true )]
+    public class DefaultBlockRoleAttribute : System.Attribute
     {
         #region Properties
 
@@ -35,19 +35,19 @@ namespace Rock.Cms
         /// The default role for the block if not specified in the block's
         /// configuration.
         /// </summary>
-        public BlockRole Role { get; }
+        public BlockRole DefaultRole { get; }
 
         #endregion
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlockRoleAttribute"/> class.
+        /// Initializes a new instance of the <see cref="DefaultBlockRoleAttribute"/> class.
         /// </summary>
-        /// <param name="role">The default role for the block if not specified in the block's configuration.</param>
-        public BlockRoleAttribute( BlockRole role )
+        /// <param name="defaultRole">The default role for the block if not specified in the block's configuration.</param>
+        public DefaultBlockRoleAttribute( BlockRole defaultRole )
         {
-            Role = role;
+            DefaultRole = defaultRole;
         }
 
         #endregion
