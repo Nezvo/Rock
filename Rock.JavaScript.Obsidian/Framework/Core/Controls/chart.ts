@@ -462,7 +462,6 @@ export function alignDataPointsByDate(
         labels: allKeys,
         values: mappedSeries.map(map => {
             let lastValue: number | null | undefined;
-            console.log(`all keys`, allKeys);
             return Enumerable
                 .from(allKeys)
                 .select<number | null>(key => {

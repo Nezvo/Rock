@@ -576,7 +576,6 @@
         const bottom = ctx.chart.chartArea?.bottom ?? 0;
         const cacheKey = getFillColorCacheKey(color, top, bottom);
         if (fillColorCache.has(cacheKey)) {
-            console.log("retrieved fill color from cache");
             return fillColorCache.get(cacheKey)!;
         }
 
