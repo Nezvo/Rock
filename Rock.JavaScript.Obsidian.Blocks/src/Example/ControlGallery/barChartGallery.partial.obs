@@ -2,27 +2,28 @@
     <GalleryAndResult :value="{ series: series, labels: labels }" hasMultipleValues :importCode="importCode" :exampleCode="exampleCode">
 
         <div style="height: 300px;">
-            <LineChart :labels="labels"
-                       :series="series"
-                       :hideLegend="isLegendHidden"
-                       :labelDateFormat="labelDateFormat"
-                       :legendAlign="legendAlign"
-                       :legendPosition="legendPosition"
-                       :linear="isLinear"
-                       :lineStyle="lineStyle"
-                       :stack="isStacked"
-                       :title="title"
-                       :type="isPercent ? 'percent' : isPercent === false ? 'number' : undefined"
-                       :unfilled="isUnfilled"
-                       :xLabel="xLabel"
-                       :xMaxTickCount="xMaxTickCount"
-                       :xShowGridLines="xShowGridLines"
-                       :yHideGridLines="yHideGridLines"
-                       :yLabel="yLabel"
-                       :yMaxTickCount="yMaxTickCount"
-                       :ySuggestedMax="ySuggestedMax"
-                       :ySuggestedMin="ySuggestedMin"
-                       :yTickCount="yTickCount" />
+            <BarChart :labels="labels"
+                      :series="series"
+                      :barLabels="barLabels"
+                      :hideLegend="isLegendHidden"
+                      :labelDateFormat="labelDateFormat"
+                      :legendAlign="legendAlign"
+                      :legendPosition="legendPosition"
+                      :overlap="isOverlapped"
+                      :stack="isStacked"
+                      :title="title"
+                      :type="isPercent ? 'percent' : isPercent === false ? 'number' : undefined"
+                      :unfilled="isUnfilled"
+                      :xLabel="xLabel"
+                      :xMaxTickCount="xMaxTickCount"
+                      :xShowGridLines="xShowGridLines"
+                      :yHideGridLines="yHideGridLines"
+                      :yLabel="yLabel"
+                      :yMaxTickCount="yMaxTickCount"
+                      :ySuggestedMax="ySuggestedMax"
+                      :ySuggestedMin="ySuggestedMin"
+                      :yTickCount="yTickCount"
+                      @click="onBarChartClicked" />
         </div>
 
         <template #settings>
@@ -43,39 +44,50 @@
                                           :min="1"
                                           :max="8" />
 
-                            <div class="button-wrapper">
-                                <RockButton btnType="primary"
-                                            @click="onRandomizeDataClicked">Randomize Data</RockButton>
-                            </div>
-
                             <DropDownList :modelValue="labelDateFormat ?? ''"
                                           help="If specified, then the labels array must have ISO 8601-formatted dates. If not specified, the labels will be treated as simple strings."
                                           :items="labelDateFormatItems"
                                           label="Label Date Format"
                                           @update:modelValue="labelDateFormat = <LabelDateFormat>$event" />
 
-                            <DropDownList :modelValue="lineStyle ?? ''"
-                                          :items="lineStyleItems"
-                                          label="Line Style"
-                                          @update:modelValue="lineStyle = <LineStyle>$event" />
-
-                            <Switch :modelValue="isStacked ?? false"
-                                    label="Stacked"
-                                    @update:modelValue="isStacked = $event" />
-
-                            <Switch :modelValue="isUnfilled ?? false"
-                                    label="Unfilled"
-                                    @update:modelValue="isUnfilled = $event" />
-
-                            <Switch :modelValue="isLinear ?? false"
-                                    help="Connects data points with straight line segments instead of curves."
-                                    label="Linear"
-                                    @update:modelValue="isLinear = $event" />
-
                             <Switch :modelValue="isPercent ?? false"
                                     help="For 'percent', the data must be in decimal form (e.g., 0.1 for 10%)."
                                     label="Percent"
                                     @update:modelValue="isPercent = $event" />
+
+                            <Switch :modelValue="isStacked ?? false"
+                                    help="Stack bars from different series on top of each other instead of side-by-side or overlapping."
+                                    label="Stack"
+                                    @update:modelValue="isStacked = $event" />
+
+                            <Switch :modelValue="isOverlapped ?? false"
+                                    help="Show bars from different series over each other instead of side-by-side or stacked. The 'unfilled' option is recommended to ensure visibility of overlapping data points."
+                                    label="Overlap"
+                                    @update:modelValue="isOverlapped = $event" />
+
+                            <Switch :modelValue="isUnfilled ?? false"
+                                    help="Unfilled bars are not filled with color, which could be useful to ensure visibility of overlapping data points when using 'overlap'."
+                                    label="Unfilled"
+                                    @update:modelValue="isUnfilled = $event" />
+
+                            <Switch :modelValue="hasOutsideBarLabels ?? false"
+                                    help="If labels overlap, those with a higher data index will be hidden. The chart height will also increase to fit the highest label."
+                                    label="Outside Bar Labels"
+                                    @update:modelValue="hasOutsideBarLabels = $event" />
+
+                            <Switch :modelValue="hasInsideBarLabels ?? false"
+                                    label="Inside Bar Labels"
+                                    @update:modelValue="hasInsideBarLabels = $event" />
+
+                            <div class="button-wrapper">
+                                <RockButton btnType="primary"
+                                            @click="onRandomizeDataClicked">Randomize Data</RockButton>
+                            </div>
+
+                            <div class="button-wrapper">
+                                <RockButton btnType="primary"
+                                            @click="onRandomizeOpacityClicked">Randomize Opacity</RockButton>
+                            </div>
                         </div>
                     </ContentStack>
 
@@ -166,35 +178,17 @@
     import ContentSection from "@Obsidian/Controls/contentSection.obs";
     import ContentStack from "@Obsidian/Controls/contentStack.obs";
     import DropDownList from "@Obsidian/Controls/dropDownList.obs";
-    import LineChart from "@Obsidian/Controls/lineChart.obs";
+    import BarChart from "@Obsidian/Controls/barChart.obs";
     import NumberBox from "@Obsidian/Controls/numberBox.obs";
     import NumberUpDown from "@Obsidian/Controls/numberUpDown.obs";
     import RockButton from "@Obsidian/Controls/rockButton.obs";
     import Switch from "@Obsidian/Controls/switch.obs";
     import TextBox from "@Obsidian/Controls/textBox.obs";
-    import { LabelDateFormat, LegendAlign, LegendPosition, LineStyle, LineSeries, LineStyleDescription, LabelDateFormatDescription, LegendAlignDescription, LegendPositionDescription } from "@Obsidian/Core/Controls/chart";
+    import { BarSeries, LabelDateFormat, LegendAlign, LegendPosition, LabelDateFormatDescription, LegendAlignDescription, LegendPositionDescription, BarChartClickEvent, BarLabelContext, BarLabelsConfig } from "@Obsidian/Core/Controls/chart";
     import { Enumerable } from "@Obsidian/Utility/linq";
     import { isNullish } from "@Obsidian/Utility/util";
 
     const importCode = getSfcControlImportPath("chart");
-    const labels = [
-        "2024-01-01T00:00:00",
-        "2024-02-01T00:00:00",
-        "2024-03-01T00:00:00",
-        "2024-04-01T00:00:00",
-        "2024-05-01T00:00:00",
-        "2024-06-01T00:00:00",
-        "2024-07-01T00:00:00",
-        "2024-08-01T00:00:00",
-        "2024-09-01T00:00:00",
-        "2024-10-01T00:00:00",
-        "2024-11-01T00:00:00",
-        "2024-12-01T00:00:00",
-        "2025-01-01T00:00:00",
-        "2025-02-01T00:00:00",
-        "2025-03-01T00:00:00",
-        "2025-04-01T00:00:00"
-    ];
     const legendPositionItems = [
         { text: LegendPositionDescription[LegendPosition.Top], value: LegendPosition.Top },
         { text: LegendPositionDescription[LegendPosition.Bottom], value: LegendPosition.Bottom },
@@ -213,14 +207,24 @@
         { text: LabelDateFormatDescription[LabelDateFormat.Month], value: LabelDateFormat.Month },
         { text: LabelDateFormatDescription[LabelDateFormat.Year], value: LabelDateFormat.Year }
     ];
-    const lineStyleItems = [
-        { text: LineStyleDescription[LineStyle.Solid], value: LineStyle.Solid },
-        { text: LineStyleDescription[LineStyle.Dashed], value: LineStyle.Dashed },
-        { text: LineStyleDescription[LineStyle.Dotted], value: LineStyle.Dotted }
+    const labels = [
+        "2024-12-01T00:00:00",
+        "2025-01-01T00:00:00",
+        "2025-02-01T00:00:00"
     ];
 
     // #region Values
 
+    const series = ref<BarSeries[]>([
+        {
+            label: "Small Group",
+            data: [49, 73, 96],
+        },
+        {
+            label: "Baptism",
+            data: [11, 44, 47],
+        }
+    ]);
     const minValue = ref<number>(0);
     const maxValue = ref<number>(100);
     const xShowGridLines = ref<boolean | undefined>();
@@ -228,14 +232,13 @@
     const xMaxTickCount = ref<number | undefined>();
     const yMaxTickCount = ref<number | undefined>();
     const isUnfilled = ref<boolean | undefined>();
-    const isLinear = ref<boolean | undefined>();
+    const isOverlapped = ref<boolean | undefined>();
     const isStacked = ref<boolean | undefined>();
-    const seriesCount = ref<number>(4);
+    const seriesCount = ref<number>(series.value.length);
     const legendPosition = ref<LegendPosition | undefined>();
     const legendAlign = ref<LegendAlign | undefined>();
     const isLegendHidden = ref<boolean | undefined>();
     const labelDateFormat = ref<LabelDateFormat | undefined>(LabelDateFormat.Auto);
-    const lineStyle = ref<LineStyle | undefined>();
     const isPercent = ref<boolean | undefined>();
     const yTickCount = ref<number | undefined>();
     const xLabel = ref<string | undefined>("X Axis");
@@ -243,23 +246,9 @@
     const title = ref<string | undefined>("Chart Title");
     const ySuggestedMin = ref<number | undefined>();
     const ySuggestedMax = ref<number | undefined>();
-    const series = ref<LineSeries[]>([
-        {
-            label: "Small Group",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        },
-        {
-            label: "Baptism",
-            data: [0, 5, 7, 11, 13, 15, 16, 18, 19, 20, 20, 20, 22, 24, 27, 30],
-        },
-        {
-            label: "Starting Point Class",
-            data: [0, 2, 3, 4, 5, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10],
-        },
-        {
-            label: "Serve",
-            data: [0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6],
-        }]);
+    const opacity = ref<number | number[] | undefined>();
+    const hasOutsideBarLabels = ref<boolean | undefined>();
+    const hasInsideBarLabels = ref<boolean | undefined>();
 
     // #endregion Values
 
@@ -272,7 +261,7 @@
         ];
 
         if (!isNullish(isLegendHidden.value)) {
-            lineChartProps.push(`hideLegend="${isLegendHidden.value}"`);
+            lineChartProps.push(`:hideLegend="${isLegendHidden.value}"`);
         }
         if (!isNullish(labelDateFormat.value)) {
             lineChartProps.push(`labelDateFormat="${labelDateFormat.value}"`);
@@ -284,14 +273,11 @@
         if (!isNullish(legendPosition.value)) {
             lineChartProps.push(`legendPosition="${legendPosition.value}"`);
         }
-        if (!isNullish(isLinear.value)) {
-            lineChartProps.push(`linear="${isLinear.value}"`);
-        }
-        if (!isNullish(lineStyle.value)) {
-            lineChartProps.push(`lineStyle="${lineStyle.value}"`);
+        if (!isNullish(isOverlapped.value)) {
+            lineChartProps.push(`:overlap="${isOverlapped.value}"`);
         }
         if (!isNullish(isStacked.value)) {
-            lineChartProps.push(`stack="${isStacked.value}"`);
+            lineChartProps.push(`:stack="${isStacked.value}"`);
         }
         if (title.value) {
             lineChartProps.push(`title="${title.value}"`);
@@ -305,7 +291,7 @@
             }
         }
         if (!isNullish(isUnfilled.value)) {
-            lineChartProps.push(`unfilled="${isUnfilled.value}"`);
+            lineChartProps.push(`"unfilled="${isUnfilled.value}"`);
         }
         if (xLabel.value) {
             lineChartProps.push(`xLabel="${xLabel.value}"`);
@@ -325,17 +311,17 @@
         if (!isNullish(yMaxTickCount.value)) {
             lineChartProps.push(`:yMaxTickCount="${yMaxTickCount.value}"`);
         }
-        if (!isNullish(ySuggestedMin.value)) {
-            lineChartProps.push(`:ySuggestedMin="${ySuggestedMin.value}"`);
-        }
         if (!isNullish(ySuggestedMax.value)) {
             lineChartProps.push(`:ySuggestedMax="${ySuggestedMax.value}"`);
+        }
+        if (!isNullish(ySuggestedMin.value)) {
+            lineChartProps.push(`:ySuggestedMin="${ySuggestedMin.value}"`);
         }
         if (!isNullish(yTickCount.value)) {
             lineChartProps.push(`:yTickCount="${yTickCount.value}"`);
         }
 
-        const prefix = "<LineChart ";
+        const prefix = "<BarChart ";
         const spaces = " ".repeat(prefix.length);
         return `${prefix}${lineChartProps.join(`\n${spaces}`)} />`;
     });
@@ -344,109 +330,69 @@
 
     // #region Functions
 
-    function generateSeries(): LineSeries[] {
+    function generateSeries(): BarSeries[] {
         return Enumerable
             .from(Array(seriesCount.value).keys())
             .select(i => generateOneSeries(i))
             .toArray();
     }
 
-    function generateOneSeries(i: number): LineSeries {
+    function generateOneSeries(i: number): BarSeries {
         const min = Math.min(minValue.value, maxValue.value);
         const max = Math.max(minValue.value, maxValue.value);
-        let data = generateTrendingRandomData(labels.length, min, max, true);
+        let data = generateRandomBarData(labels.length, min, max, true);
+
         if (isPercent.value) {
             data = Enumerable.from(data).select(n => typeof n === "number" ? n / 100 : n).toArray();
         }
-        const s: LineSeries = {
+
+        const s: BarSeries = {
             label: `Series ${i + 1}`,
             data: data,
-            // isUnfilled: isUnfilled.value,
-            // isLinear: isLinear.value,
-            // lineStyle: lineStyle.value
+            opacity: opacity.value
         };
+
         return s;
     }
 
-    function generateTrendingRandomData(
+    const barLabels = computed<BarLabelsConfig | undefined>(() => {
+        if (hasInsideBarLabels.value || hasOutsideBarLabels.value) {
+            return {
+                outside: hasOutsideBarLabels.value ? {
+                    formatter: (ctx: BarLabelContext): string => {
+                        return ctx.seriesName;
+                    },
+                } : undefined,
+                inside: hasInsideBarLabels.value ? {
+                    formatter: (ctx: BarLabelContext): string => {
+                        return ctx.formattedValue || ctx.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+                    },
+                } : undefined
+            };
+        }
+    });
+
+    /**
+ * Generate independent random values between `min` and `max` for bar charts.
+ * - No trend or momentum; each value is i.i.d.
+ * - No accumulation across points.
+ *
+ * Note: `startAtMin` is ignored and kept only for backward compatibility.
+ */
+    function generateRandomBarData(
         count: number,
         min: number,
         max: number,
-        startAtMin: boolean = true
+        _startAtMin: boolean = true
     ): number[] {
-        if (count <= 0) {
-            return [];
-        }
+        if (count <= 0) return [];
+        if (min > max) [min, max] = [max, min];
 
-        // Ensure min is less than or equal to max
-        if (min > max) {
-            [min, max] = [max, min]; // Swap if min is greater than max
-        }
-
-        const data: number[] = [];
-        let currentValue: number;
-
-        // Set the initial value, potentially starting exactly at 'min'
-        currentValue = startAtMin ? min : min + (max - min) * 0.1;
-
-        // Randomly decide if this run should trend downwards (~25% of the time)
-        const isDownwardTrend = Math.random() < 0.25;
-
-        // Generate a random upward/downward bias for this function call
-        const randomTrendBias = 1.0 + Math.random() * 1.5; // Random number between 1.0 and 2.5
-
-        // Volatility factor - making it more dynamic
-        const baseVolatility = (max - min) * 0.15; // 15% of the range
-
-        // Randomly decide if this run should end at the maximum (or minimum for downward trend)
-        const shouldEndAtMax = Math.random() < 0.3; // Lower the chance of hitting max/min at the end
+        const range = max - min;
+        const data = new Array<number>(count);
 
         for (let i = 0; i < count; i++) {
-            const progressFactor = i / (count - 1); // 0 at start, 1 at end
-
-            // Dynamically adjust momentum based on trend direction and progress
-            let momentum = isDownwardTrend
-                ? Math.pow(1 - progressFactor, 0.5) * randomTrendBias * -1 // Downward momentum, stronger at start
-                : Math.pow(progressFactor, 0.5) * randomTrendBias; // Upward momentum, stronger at end
-
-            const randomDirectionChange = (Math.random() * 2 - 1); // Between -1 and 1
-
-            let trendComponent = (randomDirectionChange + momentum) * baseVolatility;
-
-            // Adjust trend behavior near boundaries (Allowing it to fall after hitting max)
-            const rangeFactor = (currentValue - min) / (max - min); // 0 when at min, 1 when at max
-
-            if (isDownwardTrend) {
-                // If trending downwards, reduce downward push as it approaches min
-                if (rangeFactor < 0.3) {
-                    trendComponent *= rangeFactor; // Reduce downward push, increase volatility's impact
-                }
-            }
-            else {
-                // If trending upwards, and close to or at max, introduce a downward bias
-                if (rangeFactor > 0.95) { // If within 5% of the max
-                    trendComponent -= baseVolatility * (0.5 + Math.random() * 0.5); // Add a stronger push downwards, random factor for variability
-                }
-                else if (rangeFactor > 0.7) { // If in the upper 30% of the range
-                    trendComponent *= (1 - rangeFactor); // Reduce upward push
-                }
-            }
-
-            currentValue += trendComponent;
-
-            // Apply volatility directly to currentValue to add more swing
-            const fluctuation = (Math.random() * 2 - 1) * baseVolatility * (1 + Math.random());
-            currentValue += fluctuation;
-
-            // Constrain the value within the specified min and max bounds
-            currentValue = Math.max(min, Math.min(max, currentValue));
-
-            data.push(currentValue);
-
-            // If it's the last element AND we decided this run should end at max (or min for downward), force it
-            if (i === count - 1 && shouldEndAtMax) {
-                data[i] = isDownwardTrend ? min : max;
-            }
+            data[i] = min + Math.random() * range; // uniform in [min, max)
         }
 
         return data;
@@ -460,33 +406,86 @@
         series.value = generateSeries();
     }
 
+    function onRandomizeOpacityClicked(): void {
+        opacity.value = Enumerable
+            .from(labels)
+            .withIndex()
+            .select(([_label, _index]) => (Math.random() > 0.5 ? 0.25 : 1))
+            .toArray();
+    }
+
+    function onBarChartClicked(event: BarChartClickEvent): void {
+        if (event.targets.length === 0) {
+            // If no targets, reset opacity to full.
+            opacity.value = 1;
+            return;
+        }
+
+        const clickedLabelIndexes = Enumerable
+            .from(event.targets)
+            .select(t => t.labelIndex)
+            .toArray();
+
+        const newOpacity = Enumerable
+            .from(labels)
+            .withIndex()
+            .select<number>(([_label, index]) => {
+                if (clickedLabelIndexes.includes(index)) {
+                    return 1;
+                }
+                return 0.25;
+            })
+            .toArray();
+
+        // If the new and old opacities are the same,
+        // then narrow down the opacity to the selected
+        // dataset.
+        if (Array.isArray(opacity.value) && Enumerable.from(newOpacity).sequenceEqual(opacity.value)) {
+            opacity.value = undefined;
+            series.value = Enumerable
+                .from(series.value)
+                .withIndex()
+                .select<BarSeries>(([s, seriesIndex]) => {
+                    const targetsWithThisSeries = Enumerable
+                        .from(event.targets)
+                        .where(t => t.seriesIndex === seriesIndex)
+                        .toArray();
+
+                    if (targetsWithThisSeries.length) {
+                        const opacities = Enumerable
+                            .from(labels)
+                            .withIndex()
+                            .select<number>(([_label, labelIndex]) => {
+                                if (Enumerable.from(targetsWithThisSeries).any(t => t.labelIndex === labelIndex)) {
+                                    return 1;
+                                }
+                                else {
+                                    return 0.25;
+                                }
+                            })
+                            .toArray();
+
+                        return {
+                            ...s,
+                            opacity: opacities
+                        };
+                    }
+                    return {
+                        ...s,
+                        opacity: 0.25 // This series was not selected.
+                    };
+                }).toArray();
+        }
+        else {
+            // When an index/series is clicked, let's set the opacity of everything but the selected value
+            // to semi-transparent.
+            opacity.value = newOpacity;
+        }
+    }
+
     // #endregion Event Handlers
 
     // #region Watchers
-
-    // watch([isUnfilled], () => {
-    //     series.value = Enumerable
-    //         .from(series.value)
-    //         .select<LineSeries>((s) => {
-    //             return {
-    //                 ...s,
-    //                 isUnfilled: isUnfilled.value
-    //             };
-    //         })
-    //         .toArray();
-    // });
-
-    // watch(isLinear, () => {
-    //     series.value = Enumerable
-    //         .from(series.value)
-    //         .select<LineSeries>(s => {
-    //             return {
-    //                 ...s,
-    //                 isLinear: isLinear.value
-    //             };
-    //         })
-    //         .toArray();
-    // });
 
     watch(seriesCount, (newCount, oldCount) => {
         const amountToRemove = oldCount - newCount;
@@ -514,23 +513,11 @@
             .select(s => {
                 return {
                     ...s,
-                    data: generateTrendingRandomData(labels.length, min, max, true)
+                    data: generateRandomBarData(labels.length, min, max, true)
                 };
             })
             .toArray();
     });
-
-    // watch(lineStyle, (newValue) => {
-    //     series.value = Enumerable
-    //         .from(series.value)
-    //         .select<LineSeries>(s => {
-    //             return {
-    //                 ...s,
-    //                 lineStyle: newValue
-    //             };
-    //         })
-    //         .toArray();
-    // });
 
     watch(isPercent, (newValue) => {
         if (newValue) {
@@ -551,6 +538,20 @@
                     return {
                         ...s,
                         data: Enumerable.from(s.data).select(n => typeof n === "number" ? n * 100 : n).toArray()
+                    };
+                })
+                .toArray();
+        }
+    });
+
+    watch(opacity, (opacity) => {
+        if (!isNullish(opacity)) {
+            series.value = Enumerable
+                .from(series.value)
+                .select(s => {
+                    return {
+                        ...s,
+                        opacity: opacity
                     };
                 })
                 .toArray();
