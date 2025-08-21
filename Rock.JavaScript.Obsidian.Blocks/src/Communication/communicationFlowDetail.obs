@@ -424,7 +424,10 @@
                     // or update the existing communication if it was already in the list.
                     const newCommunications = [...communications.value];
 
-                    const index = newCommunications.findIndex(c => c.guid === originalCommunication.guid);
+                    // Find the index of the original communication in the list
+                    // so it can be updated.
+                    const index = communications.value.findIndex(c => c === originalCommunication);
+
                     if (index === -1) {
                         // If the communication was not already in the list, add it.
                         newCommunications.push(updatedCommunication);
