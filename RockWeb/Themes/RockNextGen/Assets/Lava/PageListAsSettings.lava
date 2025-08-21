@@ -1,3 +1,32 @@
+<script>
+    let attributeName = "theme"
+    var htmlElement = document.documentElement;
+
+    const states = ["light", "dark", "system"];
+    let currentStateIndex;
+
+    const value = localStorage.getItem(attributeName);
+    if (value != null) {
+    htmlElement.setAttribute(attributeName, value);
+    currentStateIndex = states.indexOf(value);
+    } else {
+    currentStateIndex = 2;
+    };
+    document.addEventListener("DOMContentLoaded", function () {
+        const button = document.getElementById("themeSwitchButton");
+
+        button.addEventListener("click", () => {
+
+            currentStateIndex = (currentStateIndex + 1) % states.length;
+
+            localStorage.setItem(attributeName, states[currentStateIndex]);
+
+            const value = localStorage.getItem(attributeName);
+            htmlElement.setAttribute(attributeName, value);
+        });
+    });
+</script>
+
 <div class="panel panel-flex panel-default list-as-blocks clearfix">
         <div class="panel-heading" style="padding-top: var(--spacing-xsmall); padding-bottom: var(--spacing-xsmall);">
             <h1 class="panel-title">
