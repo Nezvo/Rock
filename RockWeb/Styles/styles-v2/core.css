@@ -3254,6 +3254,10 @@ input[type=button].btn-block {
   display: flex;
   align-items: center;
   gap: var(--spacing-xsmall);
+  justify-content: center;
+}
+.btn-group a:hover {
+  text-decoration: none;
 }
 .btn-group .btn + .btn,
 .btn-group .btn + .btn-group,
