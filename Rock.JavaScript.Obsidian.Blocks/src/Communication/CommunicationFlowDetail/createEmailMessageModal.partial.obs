@@ -41,8 +41,7 @@
                         <EmailBox v-model="emailReplyToAddress"
                                   :disabled="disabled"
                                   help="If your recipients reply to the email, this is the address where their responses will be sent."
-                                  label="Reply To Address"
-                                  rules="required" />
+                                  label="Reply To Address" />
 
                         <TextBox v-model="emailPreviewText"
                                  :disabled="disabled"
