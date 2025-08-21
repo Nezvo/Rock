@@ -10879,6 +10879,7 @@ ul.activeusers {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: inherit;
 }
 .panel-block > .panel-body {
   -ms-flex: 1 1 auto;
