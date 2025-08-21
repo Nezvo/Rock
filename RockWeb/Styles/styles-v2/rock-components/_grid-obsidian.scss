@@ -275,7 +275,7 @@
 .grid-filter-popup-container .grid-filter-popup > .actions {
     display: flex;
     border-top: 1px solid var(--color-interface-soft);
-    background-color: #fcfcfc;
+    background-color: var(--color-interface-softest);
     padding: 8px;
     gap: 8px;
 }
