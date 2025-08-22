@@ -1,4 +1,4 @@
-.main-content:has(.profile-content) {
+.main-content:has(.profile-content, .person-profile) {
   max-width: 100%;
   padding: 0 !important;
   margin: 0 !important;
