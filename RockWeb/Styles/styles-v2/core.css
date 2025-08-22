@@ -399,6 +399,7 @@ iframe {
     --color-link-tint: color-mix(in srgb, var(--base-link) 50%, transparent var(--tint-white-percentage));
     --color-link-shade: color-mix(in srgb, var(--base-link) 100%, #000 var(--shade-black-percentage));
     --color-secondary-tint: color-mix(in srgb, var(--base-secondary) 50%, transparent var(--tint-white-percentage));
+    --color-secondary-soft: color-mix(in srgb, var(--base-secondary) 7%, transparent var(--tint-white-percentage));
     --color-secondary-shade: color-mix(in srgb, var(--base-secondary) 100%, #000 var(--shade-black-percentage));
     --color-gender-male-tint: color-mix(in srgb, var(--base-gender-male) 50%, transparent var(--tint-white-percentage));
     --color-gender-male-soft: color-mix(in srgb, var(--base-gender-male) 7%, transparent var(--tint-white-percentage));
@@ -17229,7 +17230,7 @@ iframe.file-browser {
   min-height: 102px;
   background: var(--color-interface-softest);
   border: 1px solid var(--color-interface-soft);
-  border-radius: var(--rounded-normal);
+  border-radius: var(--rounded-small);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .zone-badgebar .card-badges {
