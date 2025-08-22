@@ -20056,6 +20056,10 @@ contentsection-body-overflow {
   align-items: center;
 }
 
+body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-role-action-aware) {
+  display: none;
+}
+
 .group-location-map {
   margin-bottom: var(--spacing-large);
 }
