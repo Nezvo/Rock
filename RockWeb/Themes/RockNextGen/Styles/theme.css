@@ -467,11 +467,6 @@ body.navbar-side-open {
   }
 }
 
-.nav-pills > li > a {
-  color: var(--color-interface-strong);
-  background-color: var(--color-interface-softer);
-}
-
 .navbar-static-side {
   --nav-childpages-bg: var(--navbarside-background-color);
   position: fixed;

@@ -8264,6 +8264,13 @@ ul.activeusers {
   margin-top: 6px;
   margin-bottom: 6px;
 }
+.panel-toolbar .nav-pills > li > a {
+  background-color: transparent;
+  color: var(--color-interface-strong);
+}
+.panel-toolbar .nav-pills > li > a:hover {
+  color: var(--color-primary);
+}
 .panel-toolbar .slidingdaterange-select,
 .panel-toolbar .slidingdaterange-number,
 .panel-toolbar .slidingdaterange-daterange .input-group {
@@ -9270,14 +9277,18 @@ ul.activeusers {
 }
 .nav-pills > li > a {
   border-radius: var(--rounded-small);
+  color: var(--color-interface-strong);
+}
+.nav-pills > li > a:hover {
+  color: var(--color-primary);
 }
 .nav-pills > li + li {
   margin-left: 2px;
 }
-.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-  color: var(--base-interface-softest);
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+.nav-pills > li.active > a, .nav-pills > li.active > a:focus {
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+  border-color: var(--color-primary-soft);
 }
 
 .nav-stacked > li {
@@ -17181,12 +17192,7 @@ iframe.file-browser {
 .profile-nav .nav-pills > li > a {
   padding: var(--spacing-xsmall) var(--spacing-small);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-interface-strong);
   white-space: nowrap;
-  background: var(--color-interface-softest);
-}
-.profile-nav .nav-pills > li > a:hover {
-  background: var(--color-interface-softer);
 }
 .profile-nav .nav-pills > li.active a,
 .profile-nav .nav-pills > li.active a:hover,

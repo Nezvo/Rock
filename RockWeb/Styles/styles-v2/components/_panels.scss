@@ -462,60 +462,69 @@ ul.activeusers {
 
 // ======================= PANEL TOOLBAR =======================
 .panel-toolbar {
-  padding:        var(--spacing-xsmall) var(--spacing-medium);
-  font-size:      var(--font-size-xsmall);
-  border-bottom:  1px solid var(--color-interface-soft);
-  display:        flex;
-  flex-wrap:      wrap;
-  align-items:    center;
-  justify-content: space-between;
+    padding: var(--spacing-xsmall) var(--spacing-medium);
+    font-size: var(--font-size-xsmall);
+    border-bottom: 1px solid var(--color-interface-soft);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
 
-  @media (min-width: $screen-small) {
-    flex-wrap:    nowrap;
-  }
-
-  .btn-tool,
-  .picker .picker-label {
-    padding:      1px var(--spacing-tiny);
-    color:        var(--color-interface-medium);
-    font-size:    var(--font-size-xsmall);
-    font-weight:  var(--font-weight-semibold);
-    line-height:  24px;
-    color:        var(--color-interface-medium);
-    background:   transparent;
-    border:       1px solid transparent;
-
-    &:focus,
-    &:hover,
-    &:active,
-    &.active {
-      background: var(--color-interface-soft);
+    @media (min-width: $screen-small) {
+        flex-wrap: nowrap;
     }
-  }
 
-  .picker-select-none {
-    margin:       1px 0 0 2px;
-  }
+    .btn-tool,
+    .picker .picker-label {
+        padding: 1px var(--spacing-tiny);
+        color: var(--color-interface-medium);
+        font-size: var(--font-size-xsmall);
+        font-weight: var(--font-weight-semibold);
+        line-height: 24px;
+        color: var(--color-interface-medium);
+        background: transparent;
+        border: 1px solid transparent;
 
-  .nav-pills {
-    margin:       6px var(--spacing-xsmall);
-
-    > li {
-      margin-top:     6px;
-      margin-bottom:  6px;
+        &:focus,
+        &:hover,
+        &:active,
+        &.active {
+            background: var(--color-interface-soft);
+        }
     }
-  }
 
-  .slidingdaterange-select,
-  .slidingdaterange-number,
-  .slidingdaterange-daterange .input-group {
-    margin-bottom:    0;
-  }
+    .picker-select-none {
+        margin: 1px 0 0 2px;
+    }
 
-  &.panel-toolbar-right {
-    justify-content:  flex-end;
-    gap:              var(--spacing-tiny) 30px;
-  }
+    .nav-pills {
+        margin: 6px var(--spacing-xsmall);
+
+        > li {
+            margin-top: 6px;
+            margin-bottom: 6px;
+
+            & > a {
+                background-color: transparent;
+                color: var(--color-interface-strong);
+            }
+
+            & > a:hover {
+                color: var(--color-primary);
+            }
+        }
+    }
+
+    .slidingdaterange-select,
+    .slidingdaterange-number,
+    .slidingdaterange-daterange .input-group {
+        margin-bottom: 0;
+    }
+
+    &.panel-toolbar-right {
+        justify-content: flex-end;
+        gap: var(--spacing-tiny) 30px;
+    }
 }
 
 .panel-toolbar-border {
