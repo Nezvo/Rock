@@ -330,14 +330,16 @@
         }
         else {
             const conversionGoalTargetFractionalPercent = (props.conversionGoalTargetPercent ?? 0) / 100;
-
             const goalNotMetInstances = Enumerable
                 .from(messagesGroupedByInstance.value)
                 .where(messagesByInstance => {
-                    const messageCount = messagesByInstance.count();
-                    const conversionCount = messagesByInstance.count(m => !!m.convertedDateTime);
+                    const uniquePeopleConvertedCount = Enumerable.from(messagesByInstance)
+                        .where(m => !!m.convertedDateTime)
+                        .select(m => m.personAliasIdKey)
+                        .distinct()
+                        .count();
 
-                    const conversionPercent = messageCount ? conversionCount / messageCount : 0;
+                    const conversionPercent = props.uniquePersonCount ? uniquePeopleConvertedCount / props.uniquePersonCount : 0;
 
                     return conversionPercent < conversionGoalTargetFractionalPercent;
                 })
