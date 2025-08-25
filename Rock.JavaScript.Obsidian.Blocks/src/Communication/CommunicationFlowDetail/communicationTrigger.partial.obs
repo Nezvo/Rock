@@ -1,6 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <div class="communication-trigger">
+    <div class="communication-trigger" :class="hasError ? 'has-error' : undefined">
         <DropDownContent class="communication-trigger-button"
                          :disabled="disabled"
                          preventOverflowClipping
@@ -80,6 +80,7 @@
     import { newGuid } from "@Obsidian/Utility/guid";
     import { useFormState } from "@Obsidian/Utility/form";
     import { isNullish } from "@Obsidian/Utility/util";
+    import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
 
     type CommTrigger = {
         daysToWait: number,
@@ -96,6 +97,16 @@
             type: Boolean as PropType<boolean>,
             required: true
         },
+
+        index: {
+            type: Number as PropType<number>,
+            required: true
+        },
+
+        communications: {
+            type: Array as PropType<CommunicationFlowCommunicationBag[]>,
+            required: true
+        }
     });
 
     const emit = defineEmits<{
@@ -170,13 +181,10 @@
     });
 
     const timeToSendAsString = computed<string>(() => {
-        const values = /^(\d+):(\d+)/.exec(internalCommunication.value.timeToSend ?? "");
+        const time = RockDateTime.parseISO(`1970-01-01T${internalCommunication.value.timeToSend}`);
 
-        if (values !== null) {
-            const hour = toNumber(values[1]);
-            const minute = toNumber(values[2]);
-            const time = new Date(0, 0, 0, hour, minute);
-            return time.toLocaleTimeString(undefined, { hour: "numeric", minute: "numeric" });
+        if (time !== null) {
+            return time.toLocaleString({ hour: "numeric", minute: "numeric" });
         }
         else {
             return "";
@@ -202,6 +210,7 @@
     function updateValidation(): void {
         let error = false;
 
+        // Validate Days to Wait.
         if (internalValue.value.daysToWait < 0) {
             error = true;
             formState?.setError(daysToWaitValidationId, "Days to Wait", "must be zero or positive");
@@ -211,15 +220,36 @@
             formState?.setError(daysToWaitValidationId, "Days to Wait", "");
         }
 
+        // Validate Time to Send.
         if (!internalValue.value.timeToSend) {
             error = true;
             formState?.setError(timeToSendValidationId, "Time to Send", "is required.");
+        }
+        else if (internalValue.value.daysToWait === 0
+            && compareTimesToSend(internalValue.value.timeToSend, getPreviousCommunicationTime()) < 0) {
+            error = true;
+            formState?.setError(timeToSendValidationId, "Time to Send", "must be on or after the previous communication's time to send");
         }
         else {
             formState?.setError(timeToSendValidationId, "Time to Send", "");
         }
 
         hasError.value = error;
+    }
+
+    function getPreviousCommunicationTime(): string | null | undefined {
+        return props.communications[props.index - 1]?.timeToSend;
+    }
+
+    function compareTimesToSend(time1: string | null | undefined, time2: string | null | undefined): number {
+        const date1 = RockDateTime.parseISO(`1970-01-01T${time1}`);
+        const date2 = RockDateTime.parseISO(`1970-01-01T${time2}`);
+
+        if (date1 && date2) {
+            return date1.toMilliseconds() - date2.toMilliseconds();
+        }
+
+        return 0;
     }
 
     // #endregion Functions
@@ -239,7 +269,7 @@
 
     // #region Watchers
 
-    watch(internalValue, () => {
+    watch([internalValue, () => props.communications], () => {
         updateValidation();
     }, {
         immediate: true
