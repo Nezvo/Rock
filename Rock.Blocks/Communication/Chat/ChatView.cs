@@ -561,7 +561,7 @@ namespace Rock.Blocks.Communication.Chat
         CornerRadius=""70""
         HeightRequest=""140""
         WidthRequest=""140"">
-        <Rock:Icon IconClass=""ti ti-shield-half"" 
+        <Rock:Icon IconClass=""fa fa-shield-alt"" 
             FontSize=""84""
             HorizontalOptions=""Center""
             VerticalOptions=""Center""
@@ -587,7 +587,7 @@ namespace Rock.Blocks.Communication.Chat
         CornerRadius=""999""
         HeightRequest=""140""
         WidthRequest=""140"">
-        <Rock:Icon IconClass=""ti ti-user-shield"" 
+        <Rock:Icon IconClass=""fa fa-user-lock"" 
             FontSize=""72""
             StyleClass=""text-warning-strong""
             HorizontalOptions=""Center""
