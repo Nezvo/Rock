@@ -561,7 +561,7 @@ namespace Rock.Blocks.Communication.Chat
         CornerRadius=""70""
         HeightRequest=""140""
         WidthRequest=""140"">
-        <Rock:Icon IconClass=""fa fa-shield-alt"" 
+        <Rock:Icon IconClass=""ti ti-shield-half"" 
             FontSize=""84""
             HorizontalOptions=""Center""
             VerticalOptions=""Center""
@@ -587,7 +587,7 @@ namespace Rock.Blocks.Communication.Chat
         CornerRadius=""999""
         HeightRequest=""140""
         WidthRequest=""140"">
-        <Rock:Icon IconClass=""fa fa-user-lock"" 
+        <Rock:Icon IconClass=""ti ti-user-shield"" 
             FontSize=""72""
             StyleClass=""text-warning-strong""
             HorizontalOptions=""Center""
@@ -610,7 +610,7 @@ namespace Rock.Blocks.Communication.Chat
 <div class=""age-verification-wrapper"" style=""text-align: center; padding: 1.5rem;"">
   <!-- Font Awesome shield icon -->
   <div class=""icon"" style=""margin-bottom: 1.5rem;"">
-    <i class=""fas fa-shield-alt"" style=""font-size: 4rem; color: var(--color-info-strong);""></i>
+    <i class=""ti ti-shield-half"" style=""font-size: 4rem; color: var(--color-info-strong);""></i>
   </div>
   
   <h2 style=""color: var(--color-interface-strongest)"">
@@ -629,7 +629,7 @@ namespace Rock.Blocks.Communication.Chat
 <div class=""age-verification-wrapper"" style=""text-align: center; padding: 1.5rem;"">
   <!-- Font Awesome shield icon -->
   <div class=""icon"" style=""margin-bottom: 1.5rem;"">
-    <i class=""fas fa-user-lock"" style=""font-size: 4rem; color: var(--color-warning-strong);""></i>
+    <i class=""ti ti-user-shield"" style=""font-size: 4rem; color: var(--color-warning-strong);""></i>
   </div>
   
   <h2 style=""color: var(--color-interface-strongest)"">

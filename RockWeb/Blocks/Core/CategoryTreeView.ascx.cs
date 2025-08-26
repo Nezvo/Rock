@@ -65,7 +65,7 @@ namespace RockWeb.Blocks.Core
     [TextField( "Default Icon CSS Class",
         Description = "The icon CSS class to use when the treeview displays items that do not have an IconCSSClass property",
         IsRequired = false,
-        DefaultValue = "fa fa-list-ol",
+        DefaultValue = "ti ti-list-numbers",
         Key = AttributeKey.DefaultIconCSSClass )]
 
     [CategoryField( "Root Category",

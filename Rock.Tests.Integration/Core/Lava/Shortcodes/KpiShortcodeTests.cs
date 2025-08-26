@@ -82,11 +82,11 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[kpis title:'Chess Pieces' subtitle:'A selection of chess pieces' showtitleseparator:'true' columncount:'1' columnmin:'12' size:'lg' tooltipdelay:'2000']}
-  [[ kpi icon:'fa-chess-king' value:'100' description:'king' ]][[ endkpi ]]
-  [[ kpi icon:'fa-chess-queen' value:'101' description:'queen' ]][[ endkpi ]]
-  [[ kpi icon:'fa-chess-rook' value:'102' description:'rook' ]][[ endkpi ]]
-  [[ kpi icon:'fa-chess-knight' value:'103' description:'knight' ]][[ endkpi ]]
-  [[ kpi icon:'fa-chess-bishop' value:'104' description:'bishop' ]][[ endkpi ]]
+  [[ kpi icon:'ti-chess-king' value:'100' description:'king' ]][[ endkpi ]]
+  [[ kpi icon:'ti-chess-queen' value:'101' description:'queen' ]][[ endkpi ]]
+  [[ kpi icon:'ti-chess-rook' value:'102' description:'rook' ]][[ endkpi ]]
+  [[ kpi icon:'ti-chess-knight' value:'103' description:'knight' ]][[ endkpi ]]
+  [[ kpi icon:'ti-chess-bishop' value:'104' description:'bishop' ]][[ endkpi ]]
 {[endkpis]}
 ";
 
@@ -95,7 +95,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-lg kpi-card has-icon-bg ""  data-toggle=""tooltip"" title=""king"" data-delay='2000'>
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-chess-king""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-chess-king""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">100</span>
@@ -107,7 +107,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-lg kpi-card has-icon-bg ""  data-toggle=""tooltip"" title=""queen"" data-delay='2000'>
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-chess-queen""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-chess-queen""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">101</span>
@@ -119,7 +119,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-lg kpi-card has-icon-bg ""  data-toggle=""tooltip"" title=""rook"" data-delay='2000'>
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-chess-rook""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-chess-rook""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">102</span>
@@ -131,7 +131,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-lg kpi-card has-icon-bg ""  data-toggle=""tooltip"" title=""knight"" data-delay='2000'>
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-chess-knight""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-chess-knight""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">103</span>
@@ -143,7 +143,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-lg kpi-card has-icon-bg ""  data-toggle=""tooltip"" title=""bishop"" data-delay='2000'>
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-chess-bishop""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-chess-bishop""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">104</span>
@@ -169,16 +169,16 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[kpis title:'Small' size:'sm']}
-  [[ kpi icon:'fa-user' value:'1' color:'red' ]][[ endkpi ]]
+  [[ kpi icon:'ti-user' value:'1' color:'red' ]][[ endkpi ]]
 {[endkpis]}
 {[kpis title:'Default' iconbackground:'false']}
-  [[ kpi icon:'fa-user' value:'10' color:'yellow' ]][[ endkpi ]]
+  [[ kpi icon:'ti-user' value:'10' color:'yellow' ]][[ endkpi ]]
 {[endkpis]}
 {[kpis title:'Large' size:'lg']}
-  [[ kpi icon:'fa-user' value:'100' color:'green' ]][[ endkpi ]]
+  [[ kpi icon:'ti-user' value:'100' color:'green' ]][[ endkpi ]]
 {[endkpis]}
 {[kpis title:'Extra-Large' size:'xl' iconbackground:'false']}
-  [[ kpi icon:'fa-user' value:'1000' color:'blue' ]][[ endkpi ]]
+  [[ kpi icon:'ti-user' value:'1000' color:'blue' ]][[ endkpi ]]
 {[endkpis]}
 ";
 
@@ -187,7 +187,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-sm kpi-card has-icon-bg "" style=""color:red;border-color:rgba(255, 0, 0, 0.5)"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-user""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-user""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">1</span>
@@ -202,7 +202,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card  "" style=""color:yellow;border-color:rgba(255, 255, 0, 0.5)"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-user""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-user""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">10</span>
@@ -217,7 +217,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-lg kpi-card has-icon-bg "" style=""color:green;border-color:rgba(0, 128, 0, 0.5)"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-user""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-user""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">100</span>
@@ -232,7 +232,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi kpi-xl kpi-card  "" style=""color:blue;border-color:rgba(0, 0, 255, 0.5)"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-user""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-user""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">1000</span>
@@ -259,7 +259,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[ kpis ]}
-[[ kpi icon:'fa-users' value:'30' label:'Groups' textalign:'right' labellocation:'top' description:'Tooltip: highlighters' color:'yellow-700' url:'/people/groups']][[ endkpi ]]
+[[ kpi icon:'ti-users' value:'30' label:'Groups' textalign:'right' labellocation:'top' description:'Tooltip: highlighters' color:'yellow-700' url:'/people/groups']][[ endkpi ]]
 {[ endkpis ]}
 ";
 
@@ -268,7 +268,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg text-yellow-700 border-yellow-500""  data-toggle=""tooltip"" title=""Tooltip: highlighters"" >
             <a href=""/people/groups"" class=""stretched-link""></a><div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-users""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-users""></i></div>
             </div><div class=""kpi-stat text-right"">
                 <span class=""kpi-label"">Groups</span>
             
@@ -294,9 +294,9 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[ kpis columncount:'1' columnmin:'12' ]}
-[[ kpi icon:'fa-users' value:'200px' label:'Tall' height:'200px']][[ endkpi ]]
-[[ kpi icon:'fa-users' value:'100px' label:'Medium' height:'100px']][[ endkpi ]]
-[[ kpi icon:'fa-users' value:'50px' label:'Short' height:'50px']][[ endkpi ]]
+[[ kpi icon:'ti-users' value:'200px' label:'Tall' height:'200px']][[ endkpi ]]
+[[ kpi icon:'ti-users' value:'100px' label:'Medium' height:'100px']][[ endkpi ]]
+[[ kpi icon:'ti-users' value:'50px' label:'Short' height:'50px']][[ endkpi ]]
 {[ endkpis ]}
 ";
 
@@ -305,7 +305,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg "" style=""min-height: 200px;"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-users""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-users""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">200px</span>
@@ -317,7 +317,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg "" style=""min-height: 100px;"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-users""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-users""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">100px</span>
@@ -329,7 +329,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg "" style=""min-height: 50px;"" >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-users""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-users""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">50px</span>
@@ -391,9 +391,9 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[kpis]}
-  [[ kpi icon:'fa-highlighter' value:'4' label:'Highlighters' color:'yellow-700']][[ endkpi ]]
-  [[ kpi icon:'fa-pen-fancy' value:'8' label:'Pens' color:'indigo-700']][[ endkpi ]]
-  [[ kpi icon:'fa-pencil-alt' value:'15' label:'Pencils' color:'green-600']][[ endkpi ]]
+  [[ kpi icon:'ti-highlight' value:'4' label:'Highlighters' color:'yellow-700']][[ endkpi ]]
+  [[ kpi icon:'ti-ballpen' value:'8' label:'Pens' color:'indigo-700']][[ endkpi ]]
+  [[ kpi icon:'ti-pencil' value:'15' label:'Pencils' color:'green-600']][[ endkpi ]]
 {[endkpis]}
 ";
 
@@ -402,7 +402,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg text-yellow-700 border-yellow-500""  >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-highlighter""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-highlight""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">4</span>
@@ -414,7 +414,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg text-indigo-700 border-indigo-500""  >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-pen-fancy""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-ballpen""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">8</span>
@@ -426,7 +426,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg text-green-600 border-green-400""  >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-pencil-alt""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-pencil""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">15</span>
@@ -452,10 +452,10 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[kpis title:'Card Style' style:'card' ]}
-  [[ kpi icon:'fa-check-square' value:'42' label:'Steps Completed' color:'indigo-700']][[ endkpi ]]
+  [[ kpi icon:'ti-checkbox' value:'42' label:'Steps Completed' color:'indigo-700']][[ endkpi ]]
 {[endkpis]}
 {[kpis title:'Edgeless Style' style:'edgeless' ]}
-  [[ kpi icon:'fa-check-square' value:'42' label:'Steps Completed' color:'indigo-700']][[ endkpi ]]
+  [[ kpi icon:'ti-checkbox' value:'42' label:'Steps Completed' color:'indigo-700']][[ endkpi ]]
 {[endkpis]}
 ";
 
@@ -464,7 +464,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg text-indigo-700 border-indigo-500""  >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-check-square""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-checkbox""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">42</span>
@@ -479,7 +479,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi   has-icon-bg text-indigo-700 border-indigo-500""  >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-check-square""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-checkbox""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">42</span>
@@ -505,7 +505,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
 
             testCase.InputTemplate = @"
 {[kpis title:'With Parameters' subtitle: 'subvalue, secondarylabel' ]}
-  [[ kpi icon:'fa-user' value:'92' label:'Individuals Completing Program' secondarylabel:'Secondary Label' subvalue:'+49 YTD' color:'indigo-700' ]][[ endkpi ]]
+  [[ kpi icon:'ti-user' value:'92' label:'Individuals Completing Program' secondarylabel:'Secondary Label' subvalue:'+49 YTD' color:'indigo-700' ]][[ endkpi ]]
 {[endkpis]}
 ";
 
@@ -514,7 +514,7 @@ namespace Rock.Tests.Integration.Core.Lava.Shortcodes
     <div class=""kpi  kpi-card has-icon-bg text-indigo-700 border-indigo-500""  >
             <div class=""kpi-icon"">
                 <img class=""svg-placeholder"" src=""data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'&gt;&lt;/svg&gt;"">
-                <div class=""kpi-content""><i class=""fa fa-fw fa-user""></i></div>
+                <div class=""kpi-content""><i class=""ti ti-fw ti-user""></i></div>
             </div><div class=""kpi-stat "">
                 
                 <span class=""kpi-value text-color"">92<span class=""kpi-subvalue "">+49 YTD</span></span>

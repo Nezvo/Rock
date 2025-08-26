@@ -41,7 +41,7 @@ namespace Rock.Blocks.Communication
     [DisplayName( "Communication Flow Performance" )]
     [Category( "Communication" )]
     [Description( "Displays the performance of a particular communication flow." )]
-    [IconCssClass( "fa fa-line-chart" )]
+    [IconCssClass( "ti ti-chart-line" )]
     // [SupportedSiteTypes( Model.SiteType.Web )]
 
     #region Block Attributes

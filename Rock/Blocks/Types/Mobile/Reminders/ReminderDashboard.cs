@@ -206,7 +206,7 @@ namespace Rock.Blocks.Types.Mobile.Reminders
                 {
                     Name = "Due",
                     CssClass = "reminders-due",
-                    IconClass = "fa fa-bell",
+                    IconClass = "ti ti-bell",
                     TotalReminderCount = GetTotalRemindersForFilteredType( "due", reminders ),
                     Parameters = new Dictionary<string, string>
                     {
@@ -223,7 +223,7 @@ namespace Rock.Blocks.Types.Mobile.Reminders
                 {
                     Name = "Future",
                     CssClass = "reminders-future",
-                    IconClass = "fa fa-calendar",
+                    IconClass = "ti ti-calendar",
                     TotalReminderCount = GetTotalRemindersForFilteredType( "future", reminders ),
                     Parameters = new Dictionary<string, string>
                     {
@@ -240,7 +240,7 @@ namespace Rock.Blocks.Types.Mobile.Reminders
                 {
                     Name = "All",
                     CssClass = "reminders-all",
-                    IconClass = "fa fa-inbox",
+                    IconClass = "ti ti-inbox",
                     TotalReminderCount = GetTotalRemindersForFilteredType( "all", reminders ),
                     Parameters = new Dictionary<string, string>
                     {
@@ -258,7 +258,7 @@ namespace Rock.Blocks.Types.Mobile.Reminders
                 {
                     Name = "Completed",
                     CssClass = "reminders-completed",
-                    IconClass = "fa fa-check",
+                    IconClass = "ti ti-check",
                     TotalReminderCount = GetTotalRemindersForFilteredType( "completed", reminders ),
                     Parameters = new Dictionary<string, string>
                     {

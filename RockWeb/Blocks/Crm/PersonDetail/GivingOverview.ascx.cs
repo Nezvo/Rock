@@ -447,13 +447,13 @@ $@"<span title=""{growthPercentText}"" class=""small text-{growthPercentClass}""
 
             // Gives as family / individual KPI
             var givesAs = Person.GivingGroupId.HasValue ? "Family" : "Individual";
-            var givesAsIcon = Person.GivingGroupId.HasValue ? "fa-fw fa-users" : "fa-fw fa-user";
+            var givesAsIcon = Person.GivingGroupId.HasValue ? "ti-fw ti-users" : "ti-fw ti-user";
             var kpiGivesAs = GetKpiShortCode( "Gives As", givesAs, icon: givesAsIcon );
 
             // Giving Journey
             var journeyStage = ( GivingJourneyStage ) Person.GetAttributeValue( Rock.SystemGuid.Attribute.PERSON_GIVING_CURRENT_GIVING_JOURNEY_STAGE.AsGuid() ).AsInteger();
             var journeyStageName = journeyStage.GetDescription() ?? journeyStage.ConvertToString();
-            var kpiGivingJourney = GetKpiShortCode( "Giving Journey", journeyStageName, icon: "fa fa-fw fa-hiking" );
+            var kpiGivingJourney = GetKpiShortCode( "Giving Journey", journeyStageName, icon: "ti ti-trekking" );
 
             // Combined KPIs
             var kpi = kpiLast12Months + kpiLast90Days + kpiGivesAs + kpiGivingJourney;
@@ -559,7 +559,7 @@ $@"<span title=""{growthPercentText}"" class=""small text-{growthPercentClass}""
                 "Typical Gift",
                 $"<span class=\"currency-span\">{FormatAsCurrency( giftAmountMedian )}</span>",
                 $"{giftAmountIqr}",
-                "fa-fw fa-money-bill",
+                "ti-fw ti-cash",
                 "left",
                 $"A typical gift amount has a median value of ${giftAmountMedian} with a variability of ${giftAmountIqr}." );
 
@@ -575,20 +575,20 @@ $@"<span title=""{growthPercentText}"" class=""small text-{growthPercentClass}""
                 "Typical Frequency",
                 giftFrequencyDaysMean + "d",
                 $"{PlusOrMinus}{giftFrequencyDaysStdDev}d",
-                "fa-fw fa-clock",
+                "ti-fw ti-clock",
                 description: $"A typical gift frequency has a mean value of {giftFrequencyDaysMean} {giftFrequencyDaysMeanUnits} with a variability of {giftFrequencyDaysStdDev} {giftFrequencyDaysStdDevUnits}." );
 
             stringBuilder.Append( typicalFrequencyKpi );
 
             // Percent of gifts that are scheduled KPI
-            stringBuilder.Append( GetKpiShortCode( "Percent Scheduled", Person.GetAttributeValue( "PercentofGiftsScheduled" ).AsInteger() + "%", icon: "fa-fw fa-percent" ) );
+            stringBuilder.Append( GetKpiShortCode( "Percent Scheduled", Person.GetAttributeValue( "PercentofGiftsScheduled" ).AsInteger() + "%", icon: "ti-fw ti-percentage" ) );
 
             // Frequency label KPI
             var frequencyLabelAttribute = AttributeCache.Get( Rock.SystemGuid.Attribute.PERSON_GIVING_FREQUENCY_LABEL );
             if ( frequencyLabelAttribute != null )
             {
                 var frequencyLabel = frequencyLabelAttribute.FieldType.Field.FormatValue( null, Person.GetAttributeValue( "FrequencyLabel" ), frequencyLabelAttribute.QualifierValues, false );
-                stringBuilder.Append( GetKpiShortCode( "Frequency", frequencyLabel, icon: "fa-fw fa-calendar-alt", textAlign: "left" ) );
+                stringBuilder.Append( GetKpiShortCode( "Frequency", frequencyLabel, icon: "ti-fw ti-calendar-month", textAlign: "left" ) );
             }
 
             // Preferred currency KPI
@@ -606,11 +606,11 @@ $@"<span title=""{growthPercentText}"" class=""small text-{growthPercentClass}""
                         iconCssClass = preferredCurrencyValue.GetAttributeValue( "IconCssClass" );
                     }
 
-                    stringBuilder.Append( GetKpiShortCode( "Preferred Currency", preferredCurrencyValue.Value, icon: "fa-fw " + iconCssClass ) );
+                    stringBuilder.Append( GetKpiShortCode( "Preferred Currency", preferredCurrencyValue.Value, icon: "ti-fw " + iconCssClass ) );
                 }
                 else
                 {
-                    stringBuilder.Append( GetKpiShortCode( "Preferred Currency", string.Empty, icon: "fa-fw " + iconCssClass ) );
+                    stringBuilder.Append( GetKpiShortCode( "Preferred Currency", string.Empty, icon: "ti-fw " + iconCssClass ) );
                 }
             }
 
@@ -628,11 +628,11 @@ $@"<span title=""{growthPercentText}"" class=""small text-{growthPercentClass}""
                         iconCssClass = preferredSourceValue.GetAttributeValue( "IconCssClass" );
                     }
 
-                    stringBuilder.Append( GetKpiShortCode( "Preferred Source", preferredSourceValue.Value, icon: "fa-fw " + iconCssClass ) );
+                    stringBuilder.Append( GetKpiShortCode( "Preferred Source", preferredSourceValue.Value, icon: "ti-fw " + iconCssClass ) );
                 }
                 else
                 {
-                    stringBuilder.Append( GetKpiShortCode( "Preferred Source", string.Empty, icon: "fa-fw " + iconCssClass ) );
+                    stringBuilder.Append( GetKpiShortCode( "Preferred Source", string.Empty, icon: "ti-fw " + iconCssClass ) );
                 }
             }
 
