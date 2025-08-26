@@ -7897,9 +7897,6 @@ ul ul, ol ul, ul ol, ol ol {
   border-radius: var(--rounded-medium);
   border-bottom: none;
 }
-.panel.panel-collapsed .panel-help > .help-content {
-  border-top: 1px solid var(--color-interface-soft);
-}
 .panel.panel-collapsed .panel-drawer,
 .panel.panel-collapsed .tabbed-bar {
   border-radius: var(--rounded-medium);
@@ -7907,10 +7904,27 @@ ul ul, ol ul, ul ol, ol ol {
 .panel.panel-collapsed .panel-drawer > .drawer-pull {
   border-bottom: none;
 }
+.panel.panel-collapsed .panel-heading + .panel-help {
+  border-top: 1px solid var(--color-interface-soft);
+}
+.panel.panel-collapsed .panel-help + .tabbed-bar {
+  border-top: 1px solid var(--color-interface-soft);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
 .panel.panel-collapsed:has(.tabbed-bar) .panel-heading, .panel.panel-collapsed:has(.panel-drawer) .panel-heading, .panel.panel-collapsed:has(.panel-sub-header) .panel-heading {
   border-bottom: 1px solid var(--color-interface-soft);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+}
+.panel.panel-collapsed:has(.panel-heading + .panel-help) .panel-heading {
+  border-bottom: none;
+}
+.panel.panel-collapsed:has(.tabbed-bar) .panel-drawer > .drawer-pull, .panel.panel-collapsed:has(.tabbed-bar) .panel-sub-header, .panel.panel-collapsed:has(.panel-drawer) .panel-sub-header, .panel.panel-collapsed:has(.panel-help) .panel-sub-header, .panel.panel-collapsed:has(.panel-drawer) .panel-help {
+  border-bottom: 1px solid var(--color-interface-soft);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top: none;
 }
 
 .panel > .list-group,

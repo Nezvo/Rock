@@ -102,15 +102,13 @@
 
 // ===================== PANEL COLLAPSED =====================
 .panel {
+  // When a panel is in a collapsed state
   &.panel-collapsed {
     .panel-heading,
     .panel-sub-header,
     .panel-action-help {
       border-radius: var(--rounded-medium);
       border-bottom: none;
-    }
-    .panel-help > .help-content {
-      border-top: 1px solid var(--color-interface-soft);
     }
     .panel-drawer,
     .tabbed-bar {
@@ -119,13 +117,39 @@
     .panel-drawer > .drawer-pull {
       border-bottom: none;
     }
+    .panel-heading + .panel-help {
+      border-top: 1px solid var(--color-interface-soft);
+    }
+    .panel-help + .tabbed-bar {
+      border-top: 1px solid var(--color-interface-soft);
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
   }
+
+  // If a panel is collapsed and has a tabbed bar, drawer, or sub-header, the border should stay.
   &.panel-collapsed:has(.tabbed-bar) .panel-heading,
   &.panel-collapsed:has(.panel-drawer) .panel-heading,
   &.panel-collapsed:has(.panel-sub-header) .panel-heading {
     border-bottom: 1px solid var(--color-interface-soft);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+  }
+
+  // Remove heading bottom border if collapsed state only has help-content.
+  &.panel-collapsed:has(.panel-heading + .panel-help) .panel-heading {
+    border-bottom: none;
+  }
+
+  &.panel-collapsed:has(.tabbed-bar) .panel-drawer > .drawer-pull,
+  &.panel-collapsed:has(.tabbed-bar) .panel-sub-header,
+  &.panel-collapsed:has(.panel-drawer) .panel-sub-header,
+  &.panel-collapsed:has(.panel-help) .panel-sub-header,
+  &.panel-collapsed:has(.panel-drawer) .panel-help {
+    border-bottom: 1px solid var(--color-interface-soft);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top: none;
   }
 
 }
