@@ -20508,6 +20508,24 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   box-shadow: none;
 }
 
+.schedule-status-board th.location {
+  background: var(--color-interface-softest);
+  border-right: var(--color-interface-soft);
+}
+.schedule-status-board td.schedule-location {
+  border-left: 1px solid var(--color-interface-soft);
+}
+
+.location-scheduled-list .person {
+  background: var(--color-interface-softest);
+}
+.location-scheduled-list .person.pending {
+  color: var(--color-interface-medium);
+}
+.location-scheduled-list .slot {
+  border-bottom: 1px solid var(--color-interface-soft);
+}
+
 /*
 Used to manage styles related to the LMS pages.
 
