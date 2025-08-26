@@ -4445,13 +4445,36 @@ namespace Rock.Lava
 
                 if ( mimeType.IsNullOrWhiteSpace() )
                 {
-                    mimeType = "application/octet-stream";
+                    // Try to determine the mime type based on the file extension.
+                    if ( filename != null && filename.Contains( '.' ) )
+                    {
+                        var fileExtension = filename.Split( '.' ).Last().ToLower();
+
+                        if ( fileExtension == "png" )
+                        {
+                            mimeType = "image/png";
+                        }
+                        else if ( fileExtension == "jpg" || fileExtension == "jpeg" )
+                        {
+                            mimeType = "image/jpeg";
+                        }
+                        else if ( fileExtension == "pdf" )
+                        {
+                            mimeType = "application/pdf";
+                        }
+                    }
+
+                    // If we still don't have a mime type, default to
+                    // application/octet-stream.
+                    if ( mimeType.IsNullOrWhiteSpace() )
+                    {
+                        mimeType = "application/octet-stream";
+                    }
                 }
 
                 binaryFile.BinaryFileTypeId = binaryFileType.Id;
                 binaryFile.FileName = filename;
                 binaryFile.MimeType = mimeType;
-                binaryFile.FileSize = 0;
                 binaryFile.IsTemporary = isTemporary;
 
                 var inputString = input.ToStringSafe();
