@@ -17,7 +17,7 @@
                     <RockForm :id="createEmailFormId" @submit="onSaveEmailMessageClicked">
                         <TextBox v-model="emailName"
                                  :disabled="disabled"
-                                 help="This will be the internal name of the message."
+                                 help="This will be the name of the message."
                                  label="Name"
                                  rules="required" />
 

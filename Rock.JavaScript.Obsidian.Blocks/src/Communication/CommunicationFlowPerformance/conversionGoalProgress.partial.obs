@@ -163,10 +163,8 @@
     const uniquePeopleWhoAchievedGoalCount = computed((): number => {
         return Enumerable
             .from(props.messages)
-            .where(m => !!m.convertedDateTime)
-            .select(m => m.personAliasIdKey)
-            .distinct()
-            .count();
+            .groupBy(m => m.personAliasIdKey)
+            .count(g => g.any(m => !!m.convertedDateTime));
     });
 
     const percentageOfPeopleWhoAchievedGoal = computed((): number => {
@@ -335,11 +333,10 @@
             const goalNotMetInstances = Enumerable
                 .from(messagesGroupedByInstance.value)
                 .where(messagesByInstance => {
-                    const uniquePeopleConvertedCount = Enumerable.from(messagesByInstance)
-                        .where(m => !!m.convertedDateTime)
-                        .select(m => m.personAliasIdKey)
-                        .distinct()
-                        .count();
+                    const uniquePeopleConvertedCount = Enumerable
+                        .from(messagesByInstance)
+                        .groupBy(m => m.personAliasIdKey)
+                        .count(g => g.any(m => !!m.convertedDateTime));
 
                     const conversionPercent = props.uniquePersonCount ? uniquePeopleConvertedCount / props.uniquePersonCount : 0;
                     if (conversionPercent < conversionGoalTargetFractionalPercent) {

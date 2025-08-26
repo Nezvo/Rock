@@ -234,13 +234,16 @@ namespace Rock.Blocks.Communication
                 .Select( cfi => new
                 {
                     CommunicationFlowInstanceId = cfi.Id,
-                    UniquePersonCount = cfi.CommunicationFlowInstanceRecipients.Select( cfir => cfir.RecipientPersonAlias.PersonId ).Distinct().Count()
+                    UniquePersonAliasIds = cfi.CommunicationFlowInstanceRecipients.Select( cfir => cfir.RecipientPersonAliasId ).Distinct(),
+                    cfi.StartDate
                 } )
                 .ToList()
                 .Select( cfi => new CommunicationFlowInstanceBag
                 {
                     CommunicationFlowInstanceIdKey = IdHasher.Instance.GetHash( cfi.CommunicationFlowInstanceId ),
-                    UniquePersonCount = cfi.UniquePersonCount
+                    StartDate = cfi.StartDate,
+                    UniquePersonCount = cfi.UniquePersonAliasIds.Count(),
+                    UniquePersonAliasIdKeys = cfi.UniquePersonAliasIds.Select( paId => IdHasher.Instance.GetHash( paId ) ).ToList()
                 } )
                 .ToList();
 
