@@ -8098,7 +8098,6 @@ ul.activeusers {
 }
 
 .panel-default {
-  overflow: clip;
   border-color: var(--color-interface-soft);
 }
 .panel-default > .panel-heading {
@@ -8115,10 +8114,6 @@ ul.activeusers {
 }
 .panel-default > .panel-footer + .panel-collapse > .panel-body {
   border-bottom-color: var(--color-interface-soft);
-}
-
-.panel-default:has(.dropdown.open) {
-  overflow: visible;
 }
 
 .panel-primary {

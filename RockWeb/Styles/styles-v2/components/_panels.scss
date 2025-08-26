@@ -306,7 +306,6 @@ ul.activeusers {
 
 // ===================== ALTERNATIVE STYLE =====================
 .panel-default {
-  overflow: clip;
   border-color:         var(--color-interface-soft);
 
 & > .panel-heading {
@@ -327,10 +326,6 @@ ul.activeusers {
     border-bottom-color: var(--color-interface-soft);
   }
 }
-}
-
-.panel-default:has(.dropdown.open) { // Allows dropdown menus to overflow outside of Content Collection panel
-      overflow: visible;
 }
 
 .panel-primary {
