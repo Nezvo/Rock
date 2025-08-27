@@ -230,7 +230,7 @@
   border-right: 0;
 }
 
-.input-group .form-control:last-child,
+.input-group .form-control:not(.ant-select):last-child,
 .input-group-addon:last-child,
 .input-group-btn:last-child > .btn,
 .input-group-btn:last-child > .btn-group > .btn,
@@ -239,6 +239,8 @@
 .input-group-btn:first-child > .btn-group:not(:first-child) > .btn {
   border-top-left-radius:     0;
   border-bottom-left-radius:  0;
+  padding-top:                6px;
+  padding-bottom:             6px;
 }
 // ===================== END BORDER =====================
 
