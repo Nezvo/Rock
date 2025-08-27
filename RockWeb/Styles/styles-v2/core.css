@@ -2435,7 +2435,7 @@ iframe {
 }
 
 .alert-warning .navigation-tip {
-  color: var(--color-warning-soft);
+  color: var(--color-interface-softest);
   background-color: var(--color-warning-strong);
 }
 
