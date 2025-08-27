@@ -20483,6 +20483,12 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   border-radius: 50px;
   box-shadow: none;
 }
+.group-scheduler-v2 .progress-bar.bg-danger {
+  background-color: var(--color-danger-strong) !important;
+}
+.group-scheduler-v2 .progress-bar.bg-success {
+  background-color: var(--color-success-strong) !important;
+}
 .group-scheduler-v2 .avatar {
   flex-shrink: 0;
   width: 24px;

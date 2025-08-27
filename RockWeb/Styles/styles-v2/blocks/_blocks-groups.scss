@@ -235,6 +235,14 @@
     left:                0;
     border-radius:       50px;
     box-shadow:          none;
+
+    &.bg-danger {
+      background-color: var(--color-danger-strong) !important;
+    }
+    &.bg-success {
+      background-color: var(--color-success-strong) !important;
+    }
+
   }
 
   .avatar {
