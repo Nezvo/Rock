@@ -13181,9 +13181,8 @@ ul.list-group-panel .list-group-item:last-child,
 }
 .imageupload-group .imageupload-dropzone span::before {
   padding-right: 0.25em;
-  font-family: "FontAwesome";
-  font-weight: var(--font-weight-black);
-  content: "\f093";
+  font-family: "tabler-icons";
+  content: "\eb47";
 }
 .imageupload-group .upload-progress {
   position: absolute;
@@ -13217,7 +13216,7 @@ ul.list-group-panel .list-group-item:last-child,
 }
 .picker-asset .file-link-default::after {
   display: block;
-  content: "\f07c";
+  content: "﫷";
 }
 .picker-asset .picker-select-none {
   position: absolute;
@@ -13288,9 +13287,8 @@ ul.list-group-panel .list-group-item:last-child,
 .fileupload-group .fileupload-dropzone span::before,
 .fileupload-group .fileupload-button span::before {
   padding-right: var(--spacing-tiny);
-  font-family: "FontAwesome";
-  font-weight: var(--font-weight-black);
-  content: "\f093";
+  font-family: "tabler-icons";
+  content: "\eb47";
 }
 .fileupload-group .fileupload-dropzone {
   margin-top: 2px;
@@ -13365,15 +13363,15 @@ ul.list-group-panel .list-group-item:last-child,
   left: 0;
   z-index: -1;
   width: 100%;
-  font-family: "FontAwesome";
+  font-family: "tabler-icons";
   font-size: 50px;
-  font-weight: var(--font-weight-black);
   line-height: 0;
   color: var(--color-interface-soft);
-  content: "\f15b";
+  content: "\f747";
 }
 .fileupload-thumbnail .file-link.file-exists::after {
-  content: "\f15c";
+  font-family: "tabler-icons";
+  content: "\eaa2";
 }
 
 .fileupload-group-lg .fileupload-group {
@@ -13434,6 +13432,7 @@ ul.list-group-panel .list-group-item:last-child,
 }
 .fileupload-group-lg .fileupload-group .fileupload-thumbnail .file-link::after {
   font-size: 72px;
+  font-family: "tabler-icons";
   content: "\f15c";
 }
 @media (min-width: 768px) {
