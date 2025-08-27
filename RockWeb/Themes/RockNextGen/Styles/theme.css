@@ -1,10 +1,10 @@
-@charset "UTF-8";
 /* CSS Overrides Top Start */
-@import url('/Styles/styles-v2/icons/fontawesome-icon.css?v=4232385967');
-@import url('/Styles/styles-v2/icons/fontawesome-solid.css?v=4137481333');
-@import url('/Styles/styles-v2/icons/tabler-icon.css?v=225734114');
+@import url('/Styles/styles-v2/icons/fontawesome-icon.css');
+@import url('/Styles/styles-v2/icons/fontawesome-solid.css');
+@import url('/Styles/styles-v2/icons/tabler-icon.css');
 /* CSS Overrides Top End */
 
+@charset "UTF-8";
 @import "../../../Styles/summernote/summernote.min.css";
 /* ==================== NORMALIZE ==================== */
 * {
@@ -20489,6 +20489,12 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   left: 0;
   border-radius: 50px;
   box-shadow: none;
+}
+.group-scheduler-v2 .progress-bar.bg-danger {
+  background-color: var(--color-danger-strong) !important;
+}
+.group-scheduler-v2 .progress-bar.bg-success {
+  background-color: var(--color-success-strong) !important;
 }
 .group-scheduler-v2 .avatar {
   flex-shrink: 0;
