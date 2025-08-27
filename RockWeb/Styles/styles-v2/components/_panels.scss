@@ -1063,6 +1063,34 @@ ul.activeusers {
     overflow: hidden auto;
 }
 
+.panel-scrollable-content:has(.grid-obsidian) {
+  border: none;
+}
+
+.panel-body:has(.grid-obsidian) {
+  overflow: hidden auto;
+  flex-grow: 1;
+  padding: 0;
+}
+
+.panel-worksurface .panel-scrollable-content:has(.grid-obsidian) {
+  overflow: visible;
+  flex-grow: 0;
+  padding: var(--spacing-medium);
+}
+
+.panel-scrollable-content:has(.grid-obsidian) .grid-heading {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+}
+
+.panel-scrollable-content:has(.grid-obsidian) .grid-header-container {
+  position: sticky;
+  top: 57px;
+  z-index: 1;
+}
+
 .paneleditor-label {
   float: left;
 }
