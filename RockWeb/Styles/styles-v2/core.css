@@ -365,7 +365,7 @@ iframe {
   --focus-state-shadow: var(--input-focus-box-shadow);
   --input-border: var(--color-interface-soft);
   --slider-height: 8px;
-  --slider-bg: var(--color-interface-softer);
+  --slider-bg: var(--color-interface-soft);
   --slider-progress-bg: var(--color-primary);
   --slider-handle-offset: 29px;
   --slider-handle-bg: var(--color-interface-softest);
