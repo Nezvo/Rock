@@ -19904,7 +19904,7 @@ contentsection-body-overflow {
   padding: 5px 10px 7px;
   background: var(--color-interface-softest);
   border: 0;
-  border-radius: 0;
+  border-radius: var(--rounded-small);
   box-shadow: none;
 }
 .note-btn:hover, .note-btn:focus {

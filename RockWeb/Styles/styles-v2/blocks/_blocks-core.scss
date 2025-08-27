@@ -13,9 +13,9 @@
 
 
 // =============================================================
-// Table of Content           
-//  + 
-//  + 
+// Table of Content
+//  +
+//  +
 // =============================================================
 
 
@@ -647,7 +647,7 @@
   padding:        5px 10px 7px;
   background:     var(--color-interface-softest);
   border:         0;
-  border-radius:  0;
+  border-radius:  var(--rounded-small);
   box-shadow:     none;
 
   &:hover,
@@ -916,7 +916,7 @@
       color:            var(--color-interface-strongest);
       background-color: var(--color-interface-softer);
       border-color:     var(--color-interface-softer);
-  
+
       + .panel-collapse > .panel-body {
         border-top-color: var(--color-interface-soft);
       }
@@ -1032,7 +1032,7 @@
   &.active {
     color:        var(--color-interface-softest) !important;
     background:   var(--color-primary) !important;
-    border-color: var(--color-primary) !important; // TODO darken by 5% when available 
+    border-color: var(--color-primary) !important; // TODO darken by 5% when available
   }
 }
 
