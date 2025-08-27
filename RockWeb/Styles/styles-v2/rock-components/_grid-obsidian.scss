@@ -39,6 +39,7 @@
     position: sticky;
     top: calc(var(--sticky-element-offset) + 57px);
     z-index: 1;
+    background-color: var(--color-interface-softest);
 }
 
 .grid-obsidian > .grid-heading > .grid-title-heading {
