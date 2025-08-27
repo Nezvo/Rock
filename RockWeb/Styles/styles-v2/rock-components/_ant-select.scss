@@ -415,7 +415,7 @@
 }
 
 .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--color-interface-stronger);
   background: var(--color-interface-softer);
   cursor: not-allowed;
 }
@@ -546,7 +546,7 @@
   width: 12px;
   height: 12px;
   margin-top: -6px;
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--color-interface-stronger);
   font-size: var(--font-size-xsmall);
   font-style: normal;
   line-height: 1;
@@ -618,7 +618,7 @@
 }
 
 .ant-select-dropdown-empty {
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--color-interface-stronger);
 }
 
 .ant-select-item-empty {
@@ -630,7 +630,7 @@
   font-weight: normal;
   font-size: var(--font-size-small);
   line-height: 22px;
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--color-interface-stronger);
 }
 
 .ant-select-item {
@@ -682,7 +682,7 @@
 }
 
 .ant-select-item-option-disabled {
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--color-interface-stronger);
   cursor: not-allowed;
 }
 
