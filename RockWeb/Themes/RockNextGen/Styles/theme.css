@@ -1,10 +1,10 @@
+@charset "UTF-8";
 /* CSS Overrides Top Start */
-@import url('/Styles/styles-v2/icons/fontawesome-icon.css');
-@import url('/Styles/styles-v2/icons/fontawesome-solid.css');
-@import url('/Styles/styles-v2/icons/tabler-icon.css');
+@import url('/Styles/styles-v2/icons/fontawesome-icon.css?v=4232385967');
+@import url('/Styles/styles-v2/icons/fontawesome-solid.css?v=4137481333');
+@import url('/Styles/styles-v2/icons/tabler-icon.css?v=225734114');
 /* CSS Overrides Top End */
 
-@charset "UTF-8";
 @import "../../../Styles/summernote/summernote.min.css";
 /* ==================== NORMALIZE ==================== */
 * {
