@@ -6513,7 +6513,7 @@ tr.row-highlight td {
   margin-bottom: var(--spacing-medium);
 }
 .grid .grid-table {
-  border: 1px solid var(--color-interface-softer);
+  border: 1px solid var(--color-interface-soft);
 }
 .grid .grid-table.table-light {
   border: 0;
