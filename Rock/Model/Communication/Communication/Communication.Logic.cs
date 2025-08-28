@@ -29,6 +29,7 @@ using Microsoft.EntityFrameworkCore;
 using Rock.Communication;
 using Rock.Data;
 using Rock.Observability;
+using Rock.Utility;
 using Rock.Web.Cache;
 
 namespace Rock.Model
@@ -1027,70 +1028,7 @@ WHERE r.[RowNumber] > 1;";
         /// <param name="communication">The communication.</param>
         public static void Send( Rock.Model.Communication communication )
         {
-            if ( communication == null || communication.Status != CommunicationStatus.Approved )
-            {
-                return;
-            }
-
-            // Only alter the recipient list if Rock hasn't already begun sending to recipients.
-            using ( var rockContext = new RockContext() )
-            {
-                var hasSendingBegun = GetOrSetHasSendingBegun( communication.Id, rockContext );
-
-                if ( !communication.SendDateTime.HasValue && !hasSendingBegun )
-                {
-                    using ( var activity = ObservabilityHelper.StartActivity( "COMMUNICATION: Send > Prepare Recipient List" ) )
-                    {
-                        activity?.AddTag( "rock.communication.id", communication.Id );
-                        activity?.AddTag( "rock.communication.name", communication.Name );
-
-                        /*
-                            1/2/2024 - JPH
-
-                            We're increasing this timeout from the default of 30 seconds to give the following
-                            pre-send tasks more time to complete, as the sending of communications with a large
-                            number of recipients is most often done as a background task, and shouldn't risk
-                            tying up the UI.
-
-                            Reason: Communications with a large number of recipients time out and don't send.
-                            https://github.com/SparkDevNetwork/Rock/issues/5651
-                        */
-                        rockContext.Database.SetCommandTimeout( 90 );
-
-                        if ( communication.ListGroupId.HasValue )
-                        {
-                            communication.RefreshCommunicationRecipientList( rockContext );
-                        }
-
-                        if ( communication.ExcludeDuplicateRecipientAddress )
-                        {
-                            communication.RemoveRecipientsWithDuplicateAddress( rockContext );
-                        }
-
-                        communication.RemoveDuplicatePersonRecipients( rockContext );
-                    }
-                }
-            }
-
-            foreach ( var medium in communication.GetMediums() )
-            {
-                medium.Send( communication );
-            }
-
-            using ( var rockContext = new RockContext() )
-            {
-                var dbCommunication = new CommunicationService( rockContext ).Get( communication.Id );
-
-                dbCommunication.UpdateSendingRecipients();
-
-                if ( !dbCommunication.HasPendingRecipients( rockContext ) )
-                {
-                    // Set the SendDateTime of the Communication
-                    dbCommunication.SendDateTime = RockDateTime.Now;
-                }
-
-                rockContext.SaveChanges();
-            }
+            AsyncHelper.RunSync( () => SendAsync( communication ) );
         }
 
         /// <summary>
