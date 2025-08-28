@@ -1074,6 +1074,11 @@ ul.activeusers {
   padding: 0;
 }
 
+// Keep padding when there's a content section with a light grid
+.panel-body:has(.contentsection-container) {
+  padding: var(--spacing-medium);
+}
+
 .panel-worksurface .panel-scrollable-content:has(.grid-obsidian) {
   overflow: visible;
   flex-grow: 0;
