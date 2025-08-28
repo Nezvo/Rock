@@ -7882,6 +7882,7 @@ ul ul, ol ul, ul ol, ol ol {
   margin-bottom: 0;
   font-size: calc(var(--font-size-regular) * 1.125);
   color: inherit;
+  line-height: var(--line-height-normal);
 }
 .panel-title > a,
 .panel-title > small,
@@ -10965,7 +10966,7 @@ ul.activeusers {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: inherit;
+  line-height: var(--line-height-normal);
 }
 .panel-block > .panel-body {
   -ms-flex: 1 1 auto;

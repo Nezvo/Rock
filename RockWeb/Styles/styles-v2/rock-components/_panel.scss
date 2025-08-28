@@ -4,7 +4,7 @@
 
 
 // =============================================================
-// Table of Content           
+// Table of Content
 //  + Panel Parent
 //  + Panel with Sidebar
 // =============================================================
@@ -189,7 +189,7 @@
       overflow:           hidden;
       text-overflow:      ellipsis;
       white-space:        nowrap;
-      line-height:        inherit;
+      line-height:        var(--line-height-normal);
     }
   }
 
