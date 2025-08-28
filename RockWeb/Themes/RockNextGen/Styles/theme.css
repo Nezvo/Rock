@@ -8685,7 +8685,7 @@ ul.activeusers {
   border: none;
 }
 
-.panel-body:has(.grid-obsidian) {
+.panel-body:has(.grid-obsidian:not(.grid-light)) {
   overflow: hidden auto;
   flex-grow: 1;
   padding: 0;

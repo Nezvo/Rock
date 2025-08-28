@@ -1068,7 +1068,8 @@ ul.activeusers {
   border: none;
 }
 
-.panel-body:has(.grid-obsidian) {
+// If there's a non-light grid make the panel body take up the full height and remove padding
+.panel-body:has(.grid-obsidian:not(.grid-light)) {
   overflow: hidden auto;
   flex-grow: 1;
   padding: 0;
