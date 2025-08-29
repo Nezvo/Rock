@@ -19466,7 +19466,7 @@ contentsection-body-overflow {
   2. Schedule Builder - block for building schedules
   3. Workflow - styles for workflow blocks
   4. Electronic Signatures
-
+  5. Rapid Attendance
 */
 .rock-fullscreen-toggle {
   position: absolute;
@@ -20349,6 +20349,26 @@ contentsection-body-overflow {
 
 body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-role-action-aware) {
   display: none;
+}
+
+.rapid-attendance-entry .mh-300 {
+  min-height: 300px;
+}
+
+.family-select-item {
+  margin-bottom: var(--spacing-small);
+  color: var(--color-interface-strong);
+  border: 1px solid var(--color-interface-softest);
+}
+
+.family-select-item.active {
+  border-color: var(--color-primary);
+}
+
+.family-select-item a {
+  display: block;
+  padding: 15px 18px;
+  color: var(--color-interface-strong) !important;
 }
 
 .group-location-map {
