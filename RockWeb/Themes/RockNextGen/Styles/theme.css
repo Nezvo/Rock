@@ -2678,28 +2678,28 @@ iframe {
 }
 
 .btn.btn-success {
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
   background-color: var(--color-success-strong);
   border-color: var(--color-success-strong);
 }
 .btn.btn-success:focus, .btn.btn-success.focus {
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
   background-color: var(--color-success-strong);
   border-color: var(--color-success-strong);
 }
 .btn.btn-success:hover {
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
   background-color: var(--color-success-shade);
   border-color: var(--color-success-shade);
 }
 .btn.btn-success:active, .btn.btn-success.active, .open > .dropdown-toggle .btn.btn-success {
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
   background-color: var(--color-interface-softest);
   border-color: var(--color-success-strong);
   background-image: none;
 }
 .btn.btn-success:active:hover, .btn.btn-success:active:focus, .btn.btn-success:active.focus, .btn.btn-success.active:hover, .btn.btn-success.active:focus, .btn.btn-success.active.focus, .open > .dropdown-toggle .btn.btn-success:hover, .open > .dropdown-toggle .btn.btn-success:focus, .open > .dropdown-toggle .btn.btn-success.focus {
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
   background-color: var(--color-success-shade);
   border-color: var(--color-success-shade);
 }
