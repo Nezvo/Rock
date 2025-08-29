@@ -7009,6 +7009,7 @@ td.grid-actions {
 .input-group-btn:not(:first-child):not(:last-child),
 .input-group .form-control:not(:first-child):not(:last-child) {
   border-radius: 0;
+  box-shadow: var(--input-box-shadow);
 }
 
 .input-group-addon,
@@ -13161,7 +13162,6 @@ ul.list-group-panel .list-group-item:last-child,
   position: relative;
   display: inline-block;
   padding: 2px;
-  margin-bottom: var(--spacing-medium);
   cursor: pointer;
   border: 1px solid var(--color-interface-soft);
   border-radius: var(--rounded-small);
@@ -14443,13 +14443,13 @@ dl:not(.dl-horizontal) dt {
   display: flex;
   gap: 6px;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 @media (min-width: 768px) {
   .picker {
     position: relative;
-    width: 250px;
+    width: 100%;
     max-width: 100%;
   }
 }

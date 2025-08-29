@@ -89,6 +89,7 @@
 
   &:not(:first-child):not(:last-child) {
     border-radius: 0;
+    box-shadow: var(--input-box-shadow);
   }
 }
 
