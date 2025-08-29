@@ -369,6 +369,20 @@
   }
 }
 
+.schedule-status-board-header {
+  position: sticky;
+  inset-block-start: 0; /* "top" */
+  z-index: 1;
+
+  tr {
+    th {
+    background: var(--color-interface-softest);
+    border-bottom-color: transparent !important;
+    box-shadow: inset 0 -1px 0 var(--color-interface-medium) !important; // Emulate bottom-border for position sticky
+    }
+  }
+}
+
 .location-scheduled-list {
   & .person {
   background: var(--color-interface-softest);
