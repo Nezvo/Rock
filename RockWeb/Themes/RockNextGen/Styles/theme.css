@@ -6937,6 +6937,7 @@ td.grid-actions {
 .input-group {
   position: relative;
   display: table;
+  height: 100%;
   border-collapse: separate;
 }
 .input-group[class*=col-] {
@@ -7066,6 +7067,7 @@ td.grid-actions {
   position: relative;
   font-size: 0;
   white-space: nowrap;
+  height: 100%;
 }
 .input-group-btn > .btn {
   position: relative;
@@ -7117,6 +7119,8 @@ td.grid-actions {
   border-bottom-left-radius: 0;
   padding-top: 6px;
   padding-bottom: 6px;
+  height: 100%;
+  box-shadow: var(--input-box-shadow);
 }
 
 .chosen-select,
@@ -11570,6 +11574,7 @@ ul.rocklist .rocklist-item.selected {
   margin: 0;
   background: var(--color-interface-softest);
   border-bottom: 1px solid var(--color-interface-soft);
+  height: 100%;
 }
 
 .rocktree-loading {

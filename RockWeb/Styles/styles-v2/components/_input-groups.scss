@@ -14,6 +14,7 @@
 .input-group {
   position:         relative; // For dropdowns
   display:          table;
+  height:           100%;
   border-collapse:  separate; // prevent input groups from inheriting border styles from table cells when placed within a table
 
   // Undo padding and float of grid classes
@@ -173,6 +174,7 @@
   // `font-size` in combination with `inline-block` on buttons.
   font-size:    0;
   white-space:  nowrap;
+  height:       100%;
 
   // Negative margin for spacing, position for bringing hovered/focused/actived
   // element above the siblings.
@@ -241,6 +243,8 @@
   border-bottom-left-radius:  0;
   padding-top:                6px;
   padding-bottom:             6px;
+  height:                     100%;
+  box-shadow:                 var(--input-box-shadow);
 }
 // ===================== END BORDER =====================
 
