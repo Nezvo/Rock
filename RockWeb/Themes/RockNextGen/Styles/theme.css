@@ -7102,6 +7102,8 @@ td.grid-actions {
 .input-group-btn:last-child > .btn-group:not(:last-child) > .btn {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .input-group-addon:first-child {
@@ -7110,7 +7112,7 @@ td.grid-actions {
 
 .input-group .form-control:not(.ant-select):last-child,
 .input-group-addon:last-child,
-.input-group-btn:last-child > .btn,
+.input-group-btn:last-child > .btn:not(.btn-sm),
 .input-group-btn:last-child > .btn-group > .btn,
 .input-group-btn:last-child > .dropdown-toggle,
 .input-group-btn:first-child > .btn:not(:first-child),
@@ -7121,6 +7123,11 @@ td.grid-actions {
   padding-bottom: 6px;
   height: 100%;
   box-shadow: var(--input-box-shadow);
+}
+
+.input-group-btn:last-child > .btn.btn-sm {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .chosen-select,
