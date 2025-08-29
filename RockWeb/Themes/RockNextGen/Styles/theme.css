@@ -11682,7 +11682,7 @@ ul.rocktree-children {
   color: var(--color-interface-stronger);
 }
 .rocktree .selected::before {
-  background: var(--color-interface-soft) !important;
+  background: var(--color-info-soft) !important;
 }
 .rocktree .disabled {
   cursor: default;
