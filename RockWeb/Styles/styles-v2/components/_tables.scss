@@ -793,6 +793,11 @@ tr.row-highlight {
         border-color:     transparent;
       }
 
+      > a:hover {
+        background-color: var(--color-interface-softer);
+
+      }
+
       &.disabled > a {
         cursor: default;
       }
