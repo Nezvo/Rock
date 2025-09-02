@@ -17568,7 +17568,7 @@ iframe.file-browser {
   font-size: var(--font-size-xsmall);
   font-weight: var(--font-weight-semibold);
   color: var(--color-interface-strong);
-  background: #e9ecef;
+  background: var(--color-interface-softer);
 }
 .card-profile .bio-data {
   z-index: 1010;
