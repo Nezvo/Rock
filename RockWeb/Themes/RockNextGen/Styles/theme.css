@@ -32967,11 +32967,17 @@ a.rock-bookmark {
   align-items: center;
   height: 100vh;
 }
+#splash.obsidian-loading #content {
+  visibility: hidden;
+  opacity: 0;
+}
 #splash #content {
   position: relative;
   display: grid;
   grid-template-columns: 10fr 8fr;
   align-items: center;
+  transition: opacity 0.2s ease;
+  opacity: 1;
   background-color: var(--color-interface-softest);
   padding: var(--spacing-large);
   border-radius: var(--rounded-large);
