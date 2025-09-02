@@ -2594,10 +2594,13 @@ iframe {
   border-radius: 999px;
 }
 
-.btn-overflow {
+.btn-overflow,
+.dropdown > .btn-link.btn-overflow {
   color: var(--color-interface-medium);
 }
-.btn-overflow:hover, .btn-overflow:focus {
+.btn-overflow:hover, .btn-overflow:focus,
+.dropdown > .btn-link.btn-overflow:hover,
+.dropdown > .btn-link.btn-overflow:focus {
   color: var(--color-interface-stronger);
 }
 
