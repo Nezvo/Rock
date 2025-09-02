@@ -16218,7 +16218,7 @@ textarea:focus,
 .grid-footing {
   color: var(--color-interface-strongest);
   background-color: var(--color-interface-softest);
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 var(--spacing-xsmall) var(--spacing-xsmall);
   overflow: hidden;
 }
 
