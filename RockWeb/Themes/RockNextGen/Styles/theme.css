@@ -11816,6 +11816,7 @@ ul.rocktree-children {
   text-align: center;
   word-break: break-word;
   cursor: default;
+  margin-right: 6px;
 }
 .wizard .wizard-item a {
   color: var(--color-interface-stronger);
@@ -11832,6 +11833,7 @@ ul.rocktree-children {
   background: var(--color-interface-softest);
   border: 1px solid var(--color-interface-soft);
   border-radius: 60px;
+  margin-left: 6px;
 }
 .wizard .wizard-item .wizard-item-label {
   padding-top: var(--spacing-tiny);
@@ -11839,7 +11841,7 @@ ul.rocktree-children {
 .wizard .wizard-item::before {
   position: absolute;
   top: 18px;
-  left: -49%;
+  left: calc(-50% + 2px);
   width: calc(100% - 36px);
   height: 1px;
   margin-left: var(--spacing-medium); /* 11px = 1/2 icon width */
