@@ -3580,18 +3580,20 @@ input[type=button].btn-block {
   padding: 0 !important;
   margin: 0 0.08333em 0.08333em;
   font-size: 24px;
-  font-size: calc(var(--badge-size, 45px) * 0.533);
   line-height: 1;
 }
-.badge-grid .badge .fa-stack {
+.badge-grid .badge .fa-stack,
+.badge-grid .badge .ti-stacked {
   width: 1em;
   line-height: 1em;
 }
-.badge-grid .badge .fa-stack-1x {
+.badge-grid .badge .fa-stack-1x,
+.badge-grid .badge .ti-stacked-1x {
   font-size: 0.5em;
   color: var(--color-interface-softest);
 }
-.badge-grid .badge .fa-stack-2x {
+.badge-grid .badge .fa-stack-2x,
+.badge-grid .badge .ti-stacked-2x {
   font-size: 1em;
 }
 .badge-grid .badge-row:last-child .badge {
@@ -17895,11 +17897,11 @@ iframe.file-browser {
   color: inherit;
 }
 
-.rockbadge-assessment .fa-stack-1x {
+.rockbadge-assessment .ti-stacked-1x {
   color: var(--color-interface-softest) !important;
 }
 
-.rockbadge-assessment .fa-stack-2x {
+.rockbadge-assessment .ti-stacked-2x {
   color: currentColor !important;
 }
 
@@ -22339,15 +22341,18 @@ iframe.email-body {
   max-width: 300px;
   padding: var(--spacing-small);
 }
-.rockbadge .fa-stack {
+.rockbadge .fa-stack,
+.rockbadge .ti-stacked {
   width: 1em;
   height: 1em;
   line-height: 1em;
 }
-.rockbadge .fa-stack-1x {
+.rockbadge .fa-stack-1x,
+.rockbadge .ti-stacked-1x {
   font-size: 0.5em;
 }
-.rockbadge .fa-stack-2x {
+.rockbadge .fa-stack-2x,
+.rockbadge .ti-stacked-2x {
   font-size: 1em;
 }
 
