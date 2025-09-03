@@ -641,6 +641,10 @@
   padding:        0;
   border:         1px solid var(--color-interface-soft);
   border-bottom:  0;
+
+  .note-btn-group > .note-btn {
+    border-radius: 0;
+  }
 }
 
 .note-btn {
@@ -660,7 +664,7 @@
   &.active,
   &.active:focus,
   &.active:hover {
-    background: #cbeefa;
+    background: var(--color-info-strong);
   }
 
   &.btn-primary {
