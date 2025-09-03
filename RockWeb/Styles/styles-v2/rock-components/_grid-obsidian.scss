@@ -33,6 +33,10 @@
 
 .grid-obsidian .grid-header-prepend {
     border-bottom: 1px solid var(--color-interface-soft);
+
+    > * {
+        padding: var(--spacing-medium);
+    }
 }
 
 .grid-obsidian.grid-sticky .sticky-column-header {
