@@ -10952,6 +10952,10 @@ ul.activeusers {
   margin: inherit;
 }
 
+.panel .panel-body .actions + .alert {
+  margin-top: var(--spacing-small);
+}
+
 .panel-block {
   position: relative;
   display: -ms-flexbox;
