@@ -54,7 +54,6 @@
                       title="Known Individuals"
                       field="knownIndividualsCount"
                       :filter="numberValueFilter"
-                      :sortValue="getKnownIndividualsCountSortValue"
                       visiblePriority="sm">
             <template #format="{ row }">
                 <div v-if="row.knownIndividualsCount >= 0" class="flex-grow-1 text-right">
@@ -133,24 +132,6 @@
     // #endregion
 
     // #region Functions
-
-    /**
-     * Gets the sort value to use for the knownIndividualsCount column.
-     *
-     * @param row The row to be sorted.
-     */
-    function getKnownIndividualsCountSortValue(row: Record<string, unknown>): number {
-        const r = <Row>row;
-        const parsedNumber = Number(r.knownIndividualsCount);
-
-        if (isNaN(parsedNumber)) {
-            return 0;
-        }
-        else {
-            console.log("it's a number: " + parsedNumber);
-            return parsedNumber;
-        }
-    }
 
     /**
      * Called when the grid is requesting the row data be loaded.
