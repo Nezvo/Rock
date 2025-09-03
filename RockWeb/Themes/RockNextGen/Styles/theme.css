@@ -13202,7 +13202,6 @@ ul.list-group-panel .list-group-item:last-child,
 .imageupload-group .imageupload-thumbnail .imageupload-thumbnail-image {
   width: 100%;
   height: 100%;
-  background-color: var(--color-interface-soft);
   background-position: 50%;
   background-size: cover;
   border-radius: var(--rounded-xsmall) var(--rounded-xsmall) 0 0;
