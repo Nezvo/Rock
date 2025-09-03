@@ -2,7 +2,7 @@
 <template>
     <Panel :title="`Message Metrics: ${config.communicationFlowCommunication?.communicationFlowCommunicationName}`">
         <div class="row">
-            <div class="col-md-3">
+            <div v-if="config.isConversionGoalTrackingEnabled" class="col-md-3">
                 <ConversionRateKpi :modelValue="selectedFlowInstanceCommunication"
                                    :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
             </div>
@@ -24,19 +24,22 @@
             <template v-if="isInstanceVsAverageShown">
                 <div class="col-md-6">
                     <MessagePerformanceOverTime :modelValue="selectedFlowInstanceCommunication"
+                                                :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
                                                 :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
                 </div>
 
                 <div class="col-md-6">
                     <MessageInstanceVsFlowAverage :modelValue="selectedFlowInstanceCommunication"
                                                   :flowInstanceCommunications="config.communicationFlowCommunication?.communicationFlowInstanceCommunications"
-                                                  :instances="config.communicationFlowInstances ?? []" />
+                                                  :instances="config.communicationFlowInstances ?? []"
+                                                  :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled" />
                 </div>
             </template>
 
             <template v-else>
                 <div class="col-md-12">
                     <MessagePerformanceOverTime :modelValue="selectedFlowInstanceCommunication"
+                                                :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
                                                 :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
                 </div>
 
@@ -55,6 +58,7 @@
     </Panel>
 
     <RecipientLogGrid :modelValue="selectedFlowInstanceCommunication?.recipientMetrics"
+                      :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
                       @viewPerson="onViewPerson" />
 </template>
 

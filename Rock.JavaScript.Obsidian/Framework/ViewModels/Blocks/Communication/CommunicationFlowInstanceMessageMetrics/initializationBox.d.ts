@@ -31,4 +31,7 @@ export type InitializationBox = {
 
     /** Gets or sets the collection of communication flow instances associated with the parent communication flow. */
     communicationFlowInstances?: CommunicationFlowInstanceBag[] | null;
+
+    /** Gets or sets a value indicating whether conversion goal tracking is enabled. */
+    isConversionGoalTrackingEnabled: boolean;
 };

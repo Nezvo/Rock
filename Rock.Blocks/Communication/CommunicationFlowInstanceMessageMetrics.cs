@@ -76,12 +76,15 @@ namespace Rock.Blocks.Communication
                 {
                     c.CommunicationFlowCommunicationId,
                     c.CommunicationFlowCommunication.Name,
-                    c.CommunicationFlowInstance.CommunicationFlowId
+                    c.CommunicationFlowInstance.CommunicationFlowId,
+                    IsConversionGoalTrackingEnabled = c.CommunicationFlowInstance.CommunicationFlow.ConversionGoalType.HasValue
                 } )
                 .FirstOrDefault();
 
             if ( communicationFlowCommunication != null )
             {
+                box.IsConversionGoalTrackingEnabled = communicationFlowCommunication.IsConversionGoalTrackingEnabled;
+
                 var recipientMetrics = new CommunicationFlowInstanceCommunicationService( this.RockContext )
                     // Get all sibling "instance" communications associated with this one.
                     //  1. Get the blueprint associated with this "instance" communication.

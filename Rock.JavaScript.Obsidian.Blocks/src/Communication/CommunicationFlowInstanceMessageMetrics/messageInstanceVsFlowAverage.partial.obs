@@ -49,6 +49,11 @@
         instances: {
             type: Array as PropType<CommunicationFlowInstanceBag[]>,
             required: true
+        },
+
+        isConversionGoalTrackingEnabled: {
+            type: Boolean as PropType<boolean>,
+            required: true
         }
     });
 
@@ -121,7 +126,7 @@
         const hasUnsubscribeRates = averageUnsubscribeRate > 0 || selectedInstanceCommunicationRates.unsubscribeRate > 0;
 
         const labels: string[] = [];
-        if (hasConversionRates) {
+        if (props.isConversionGoalTrackingEnabled && hasConversionRates) {
             labels.push("Conversion Rate");
         }
         if (hasOpenRates) {
@@ -142,7 +147,7 @@
             color: instanceColors
         };
 
-        if (hasConversionRates) {
+        if (props.isConversionGoalTrackingEnabled && hasConversionRates) {
             instanceSeries.data.push(selectedInstanceCommunicationRates.conversionRate);
             instanceColors.push("#2F855A");
         }
@@ -166,7 +171,7 @@
             color: averageColors
         };
 
-        if (hasConversionRates) {
+        if (props.isConversionGoalTrackingEnabled && hasConversionRates) {
             averageSeries.data.push(averageConversionRate);
             averageColors.push("#9AE6B4");
         }

@@ -25,7 +25,7 @@
     import { isNullish } from "@Obsidian/Utility/util";
     import { CommunicationFlowInstanceCommunicationBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceCommunicationBag";
     import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
-    import { alignDataPointsByDate, LineSeries, TooltipCallback, TooltipContext, XYPoint, XYPointEnumerable } from "@Obsidian/Core/Controls/chart";
+    import { alignDataPointsByDate, LineSeries, XYPoint, XYPointEnumerable } from "@Obsidian/Core/Controls/chart";
 
     enum SeriesName {
         ConversionRate = "Conversion Rate",
@@ -37,6 +37,11 @@
     const props = defineProps({
         modelValue: {
             type: Object as PropType<CommunicationFlowInstanceCommunicationBag | null | undefined>,
+            required: true
+        },
+
+        isConversionGoalTrackingEnabled: {
+            type: Boolean as PropType<boolean>,
             required: true
         },
 
@@ -67,11 +72,12 @@
 
         const recipientMetricsEnumerable = Enumerable.from(recipientMetrics);
 
-        // There are 4 data series: Conversion Rate, Open Rate, Click-Through Rate, and Unsubscribe Rate.
+        // There are 4 data series: Conversion Rate (conditional), Open Rate, Click-Through Rate, and Unsubscribe Rate.
+        const dataPoints: XYPoint[][] = [];
 
-        // First let's process the Conversion Rates per day.
-        // These contain timestamps so they can be sorted with the other data series below.
-        const conversionDataPoints = XYPointEnumerable
+        // Process the Conversion Rates per day.
+        // These contain timestamps so they can be sorted with the other data series above.
+        dataPoints.push(XYPointEnumerable
             .fromData(recipientMetricsEnumerable
                 .where(m => !!m.personAliasIdKey && !!m.conversionDate)
                 .groupBy(m => m.personAliasIdKey!)
@@ -91,11 +97,11 @@
             .selectSquishedByDate()
             .selectAccumulated()
             .selectAsDecimalPercentage(props.uniquePersonCount)
-            .toArray();
+            .toArray());
 
         // Open Rates per day.
         // These contain timestamps so they can be sorted with the other data series.
-        const openDataPoints = XYPointEnumerable
+        dataPoints.push(XYPointEnumerable
             .fromData(
                 recipientMetricsEnumerable
                     .select(rm => parseRockDateTime(rm.openedDate))
@@ -111,13 +117,11 @@
             .selectSquishedByDate()
             .selectAccumulated()
             .selectAsDecimalPercentage(props.uniquePersonCount)
-            .toArray();
-
-        console.log(`open data points`, openDataPoints);
+            .toArray());
 
         // Click-Through Rates per day.
         // These contain timestamps so they can be sorvted with the other data series.
-        const clickThroughDataPoints = XYPointEnumerable
+        dataPoints.push(XYPointEnumerable
             .fromData(recipientMetricsEnumerable
                 .select(rm => parseRockDateTime(rm.clickedDate))
                 .ofType(isRockDateTime)
@@ -132,11 +136,11 @@
             .selectSquishedByDate()
             .selectAccumulated()
             .selectAsDecimalPercentage(props.uniquePersonCount)
-            .toArray();
+            .toArray());
 
         // Unsubscribe Rates per day.
         // These contain timestamps so they can be sorted with the other data series.
-        const unsubscribeDataPoints = XYPointEnumerable
+        dataPoints.push(XYPointEnumerable
             .fromData(
                 recipientMetricsEnumerable
                     .where(m => !!m.personAliasIdKey && !!m.unsubscribeDate)
@@ -156,43 +160,47 @@
             .selectSquishedByDate()
             .selectAccumulated()
             .selectAsDecimalPercentage(props.uniquePersonCount)
-            .toArray();
+            .toArray());
 
-        const alignedData = alignDataPointsByDate(
-            [
-                conversionDataPoints,
-                openDataPoints,
-                clickThroughDataPoints,
-                unsubscribeDataPoints
-            ],
+        // Align the data points. This will inject missing dates into each series
+        // so that they all have the same x-axis (date) values.
+        const alignedData = alignDataPointsByDate(dataPoints,
             {
                 fillWith: "previousValueOrZero"
             });
 
+        // Now that all the data is aligned, we can push it to the series.
+        const series: LineSeries[] = [];
+
+        if (props.isConversionGoalTrackingEnabled) {
+            series.push({
+                label: SeriesName.ConversionRate,
+                data: alignedData.values[0],
+                color: "#68D391"
+            });
+        }
+
+        series.push(
+            {
+                label: SeriesName.OpenRate,
+                data: alignedData.values[1],
+                color: "#63B3ED"
+            },
+            {
+                label: SeriesName.ClickThroughRate,
+                data: alignedData.values[2],
+                color: "#F6AD55"
+            },
+            {
+                label: SeriesName.UnsubscribeRate,
+                data: alignedData.values[3],
+                color: "#FC8181"
+            }
+        );
+
         return {
             labels: alignedData.labels,
-            series: [
-                {
-                    label: SeriesName.ConversionRate,
-                    data: alignedData.values[0],
-                    color: "#68D391"
-                },
-                {
-                    label: SeriesName.OpenRate,
-                    data: alignedData.values[1],
-                    color: "#63B3ED"
-                },
-                {
-                    label: SeriesName.ClickThroughRate,
-                    data: alignedData.values[2],
-                    color: "#F6AD55"
-                },
-                {
-                    label: SeriesName.UnsubscribeRate,
-                    data: alignedData.values[3],
-                    color: "#FC8181"
-                }
-            ]
+            series
         };
     });
 
