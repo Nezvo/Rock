@@ -11497,6 +11497,7 @@ ul.rocklist .rocklist-item.selected {
   height: 22px;
   font-size: 0.7em;
   line-height: 22px;
+  margin-left: var(--spacing-tiny);
 }
 .taglist .tag-wrap .tag.disabled:hover {
   padding-right: 12px;
