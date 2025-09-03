@@ -2676,7 +2676,7 @@ iframe {
   border-color: var(--color-primary);
 }
 .btn.btn-primary .badge {
-  color: var(--color-primary);
+  color: var(--base-interface-softest);
   background-color: var(--color-primary);
 }
 .btn.btn-primary:focus, .btn.btn-primary:not(:disabled):not(.disabled):active:focus {
