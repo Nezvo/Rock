@@ -149,7 +149,7 @@ namespace Rock.Blocks.Communication
                 {
                     if ( !communicationFlow.ConversionGoalType.HasValue )
                     {
-                        return 0;
+                        return null;
                     }
 
                     decimal recipientCountForAllInstances = communicationFlow
