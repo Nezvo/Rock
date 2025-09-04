@@ -9338,27 +9338,31 @@ ul.activeusers {
 }
 
 .nav-tabs {
-  border-bottom: 1px solid var(--color-interface-soft);
+  border: 1px solid var(--color-interface-soft);
+  border-radius: var(--rounded-medium);
+  background-color: var(--color-interface-softest);
+  padding: var(--spacing-small);
 }
 .nav-tabs > li {
   float: left;
   margin-bottom: -1px;
 }
 .nav-tabs > li > a {
-  margin-right: 2px;
+  margin-right: var(--spacing-small);
   line-height: var(--line-height-normal);
-  border: 1px solid transparent;
-  border-radius: var(--rounded-small) var(--rounded-small) 0 0;
+  border-radius: var(--rounded-small);
+  color: var(--color-interface-strong);
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-interface-softer);
 }
 .nav-tabs > li > a:hover {
-  border-color: var(--color-interface-softer) var(--color-interface-softer) var(--color-interface-soft);
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
 }
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-  color: var(--color-interface-strong);
+  color: var(--color-primary);
   cursor: default;
-  background-color: var(--color-interface-softest);
-  border: 1px solid var(--color-interface-soft);
-  border-bottom-color: transparent;
+  background-color: var(--color-primary-soft);
 }
 .nav-tabs.nav-justified {
   width: 100%;
@@ -9403,6 +9407,12 @@ ul.activeusers {
   .nav-tabs.nav-justified > .active > a:focus {
     border-bottom-color: var(--color-interface-softest);
   }
+}
+
+.panel:has(.nav-tabs) .nav-tabs {
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .nav-pills > li {
@@ -17336,6 +17346,7 @@ iframe.file-browser {
   padding: var(--spacing-xsmall) var(--spacing-small);
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
+  background-color: var(--color-interface-softer);
 }
 .profile-nav .nav-pills > li.active a,
 .profile-nav .nav-pills > li.active a:hover,
