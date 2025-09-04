@@ -8342,8 +8342,9 @@ ul.activeusers {
   margin-bottom: 6px;
 }
 .panel-toolbar .nav-pills > li > a {
-  background-color: transparent;
+  background-color: var(--color-interface-softer);
   color: var(--color-interface-strong);
+  font-weight: var(--font-weight-medium);
 }
 .panel-toolbar .nav-pills > li > a:hover {
   color: var(--color-primary);
