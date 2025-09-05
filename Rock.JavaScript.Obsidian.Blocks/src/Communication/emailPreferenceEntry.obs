@@ -346,8 +346,11 @@
 
     const errorMessage = ref(config?.errorMessage ?? "");
 
-    const isRemovedFromChurchInvolvement = ref(config.isRemovedFromChurchInvolvement);
     const isUnsubscribeMode = ref(config.isUnsubscribeMode);
+
+    const isRemovedFromChurchInvolvement = ref(config.isRemovedFromChurchInvolvement);
+    const removedInvolvementSuccessTitle = ref("");
+    const removedInvolvementSuccessDescriptionHtml = ref("");
 
     const unsubscribedFromChannel = ref(config.unsubscribedFromChannel);
     const isResubscribing = ref(false);
@@ -444,7 +447,10 @@
     });
 
     const headerTitle = computed((): string => {
-        if (isConfirmingDeactivation.value) {
+        if (removedInvolvementSuccessTitle.value) {
+            return removedInvolvementSuccessTitle.value;
+        }
+        else if (isConfirmingDeactivation.value) {
             return config.removeInvolvementConfirmationTitle ?? "";
         }
         else if (isUnsubscribeMode.value && hasResubscribed.value) {
@@ -455,7 +461,10 @@
     });
 
     const headerDescriptionHtml = computed((): string => {
-        if (isConfirmingDeactivation.value) {
+        if (removedInvolvementSuccessDescriptionHtml.value) {
+            return removedInvolvementSuccessDescriptionHtml.value;
+        }
+        else if (isConfirmingDeactivation.value) {
             return config.removeInvolvementConfirmationDescriptionHtml ?? "";
         }
         else if (isUnsubscribeMode.value && hasResubscribed.value) {
@@ -733,8 +742,8 @@
             return;
         }
 
-        internalHeaderTitle.value = result.data.removedInvolvementSuccessTitle ?? "";
-        internalHeaderDescriptionHtml.value = result.data.removedInvolvementSuccessDescriptionHtml ?? "";
+        removedInvolvementSuccessTitle.value = result.data.removedInvolvementSuccessTitle ?? "";
+        removedInvolvementSuccessDescriptionHtml.value = result.data.removedInvolvementSuccessDescriptionHtml ?? "";
 
         isConfirmingDeactivation.value = false;
         isRemovedFromChurchInvolvement.value = true;
