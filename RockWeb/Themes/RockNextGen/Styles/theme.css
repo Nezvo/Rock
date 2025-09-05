@@ -20297,11 +20297,11 @@ contentsection-body-overflow {
   width: 24px;
   height: 24px;
   margin-right: var(--spacing-small);
-  font-family: "FontAwesome";
-  font-size: var(--font-size-xsmall);
+  font-family: "tabler-icons";
+  font-size: var(--font-size-medium);
   font-weight: var(--font-weight-black);
   color: var(--color-info-strong);
-  content: "\f1b3";
+  content: "玲";
   background: fade(var(--color-info-strong), 20%);
   border-radius: 20px;
 }
@@ -20348,9 +20348,10 @@ contentsection-body-overflow {
 }
 .workflow-action .workflow-action-name::before {
   margin-right: var(--spacing-xsmall);
-  font-family: "FontAwesome";
+  font-family: "tabler-icons";
   font-weight: var(--font-weight-black);
-  content: "\f1b2";
+  color: var(--color-interface-medium);
+  content: "𐀡";
 }
 .workflow-action .criteria-exists {
   color: var(--color-interface-softest);
