@@ -20,10 +20,18 @@
 
 .tox-editor-container {
   background-color: var(--color-interface-softest) !important;
-
 }
 
-.tox:not(.tox-tinymce-inline) .tox-editor-header {
+.tox-tinymce-inline .tox-editor-container {
+  border-radius: var(--rounded-xsmall) !important;
+}
+
+.note-editor:has(.tox.tox-tinymce) {
+  border: 0 !important;
+}
+
+.tox:not(.tox-tinymce-inline) .tox-editor-header,
+.tox.tox-tinymce-inline .tox-editor-header {
   background-color: transparent !important;
 }
 
@@ -52,6 +60,10 @@
     padding: 0;
     border: none;
     box-shadow: none;
+}
+
+.note-toolbar:has(.tox.tox-tinymce-inline) {
+    border: none !important;
 }
 
 .codeeditor-header {
@@ -86,6 +98,10 @@
 
 // Toolbar Buttons
 
+.tox .tox-tbtn {
+  color: var(--color-interface-stronger) !important;
+}
+
 .tox .tox-tbtn svg {
   fill: var(--color-interface-strong) !important;
 }
@@ -107,6 +123,10 @@
   .tox-tbtn__select-label {
     color: var(--color-interface-strong) !important;
   }
+}
+
+.tox .tox-tbtn--disabled {
+  color: var(--color-interface-soft) !important;
 }
 
 // Toolbar Dropdowns
