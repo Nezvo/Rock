@@ -12795,15 +12795,16 @@ div.aspNetDisabled {
   width: 150px;
   height: 150px;
   border: 3px solid var(--color-interface-soft);
+  border-radius: var(--rounded-medium);
 }
 .image-editor-photo .options {
   position: absolute;
-  top: 110px;
-  right: 0;
+  bottom: var(--spacing-xsmall);
+  right: var(--spacing-xsmall);
   padding: 0 var(--spacing-xsmall);
   color: var(--color-interface-stronger);
-  background-color: #94bde1;
-  border-radius: var(--rounded-small) 0 0 var(--rounded-small);
+  background-color: var(--color-info-strong);
+  border-radius: var(--rounded-small);
   opacity: 0;
   -webkit-transition: opacity 0.25s ease-in-out;
   -moz-transition: opacity 0.25s ease-in-out;
