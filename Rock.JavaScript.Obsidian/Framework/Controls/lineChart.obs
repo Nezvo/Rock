@@ -11,6 +11,7 @@
     import { Enumerable } from "@Obsidian/Utility/linq";
     import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
     import { isNullish } from "@Obsidian/Utility/util";
+    import { getCssVariableValue } from "@Obsidian/Utility/cssUtils";
 
     const defaultLegendIsHidden = false;
     const defaultLegendPosition = LegendPosition.Bottom;
@@ -129,84 +130,84 @@
         },
 
         /**
-         * The x-axis label.
+         * The category axis label.
          */
-        xLabel: {
+        categoryLabel: {
             type: String as PropType<string | undefined>
         },
 
         /**
-         * The maximum number of ticks to show on the x-axis.
+         * The maximum number of ticks to show on the category axis.
          */
-        xMaxTickCount: {
+        categoryMaxTickCount: {
             type: Number as PropType<number | undefined>
         },
 
         /**
-         * Whether to show the x-axis grid lines. Hidden by default.
+         * Whether to show the category axis grid lines. Hidden by default.
          */
-        xShowGridLines: {
+        categoryShowGridLines: {
             type: Boolean as PropType<boolean | undefined>
         },
 
         /**
-         * Whether to hide the y-axis grid lines. Shown by default.
+         * Whether to hide the value axis grid lines. Shown by default.
          */
-        yHideGridLines: {
+        valueHideGridLines: {
             type: Boolean as PropType<boolean | undefined>
         },
 
         /**
-         * The y-axis label.
+         * The value axis label.
          */
-        yLabel: {
+        valueLabel: {
             type: String as PropType<string | undefined>
         },
 
         /**
-         * The maximum number of ticks to show on the y-axis.
+         * The maximum number of ticks to show on the value axis.
          */
-        yMaxTickCount: {
+        valueMaxTickCount: {
             type: Number as PropType<number | undefined>
         },
 
         /**
-         * The minimum value to display in the y-axis if there is nothing lower.
+         * The minimum value to display in the value axis if there is nothing lower.
          *
-         * This is useful for controlling the starting point of the y-axis.
+         * This is useful for controlling the starting point of the value axis.
          * The actual minimum value will be used if there is a lower value present.
          */
-        ySuggestedMin: {
+        valueSuggestedMin: {
             type: Number as PropType<number | undefined>
         },
 
         /**
-         * The maximum value to display in the y-axis if there is nothing higher.
+         * The maximum value to display in the value axis if there is nothing higher.
          *
-         * This is useful for controlling the ending point of the y-axis.
+         * This is useful for controlling the ending point of the value axis.
          * The actual maximum value will be used if there is a higher value present.
          */
-        ySuggestedMax: {
+        valueSuggestedMax: {
             type: Number as PropType<number | undefined>
         },
 
         /**
-         * The number of ticks to show on the y-axis.
+         * The number of ticks to show on the value axis.
          *
-         * This overrides `yMinTickCount` and `yMaxTickCount`.
+         * This overrides `valueMaxTickCount`.
          */
-        yTickCount: {
+        valueTickCount: {
             type: Number as PropType<number | undefined>
         }
     });
 
     // #region Computed Values
 
-    const internalYSuggestedMin = computed<number | undefined>(() => {
-        // Use the supplied ySuggestedMin if present,
+    const internalValueSuggestedMin = computed<number | undefined>(() => {
+        // Use the supplied valueSuggestedMin if present,
         // otherwise default to 0.0 (0%) for percent charts (based on min value).
-        if (!isNullish(props.ySuggestedMin)) {
-            return props.ySuggestedMin;
+        if (!isNullish(props.valueSuggestedMin)) {
+            return props.valueSuggestedMin;
         }
 
         if (props.type === "percent") {
@@ -230,12 +231,12 @@
         }
     });
 
-    const internalYSuggestedMax = computed<number | undefined>(() => {
-        // Use the supplied ySuggestedMax if present,
+    const internalValueSuggestedMax = computed<number | undefined>(() => {
+        // Use the supplied valueSuggestedMax if present,
         // otherwise default to the next highest 10s digit for percent charts,
         // (e.g., 0.7 for 70% if the highest value is 0.67).
-        if (!isNullish(props.ySuggestedMax)) {
-            return clamp(props.ySuggestedMax, 0);
+        if (!isNullish(props.valueSuggestedMax)) {
+            return clamp(props.valueSuggestedMax, 0);
         }
 
         if (props.type === "percent") {
@@ -459,7 +460,7 @@
                                     .select(tooltipItem => {
                                         // There are 3 versions of the label.
                                         // 1. The raw label (from prop.labels)
-                                        // 2. The formatted label (from the x-axis; using the options.scales.x.ticks.callback formatter)
+                                        // 2. The formatted label (from the category axis; using the options.scales.x.ticks.callback formatter)
                                         // 3. Unpredictable formatted label (from internal chart library formatting via `context.label`; unpredictable so don't use)
                                         const rawLabel = props.labels[tooltipItem.dataIndex];
 
@@ -495,7 +496,7 @@
                                 ? (context) => {
                                     // There are 3 versions of the label.
                                     // 1. The raw label (from prop.labels)
-                                    // 2. The formatted label (from the x-axis; using the options.scales.x.ticks.callback formatter)
+                                    // 2. The formatted label (from the category axis; using the options.scales.x.ticks.callback formatter)
                                     // 3. Unpredictable formatted label (from internal chart library formatting via `context.label`; unpredictable so don't use)
                                     const rawLabel = props.labels[context.dataIndex];
 
@@ -538,18 +539,18 @@
             scales: {
                 x: {
                     title: {
-                        display: !!props.xLabel,
-                        text: props.xLabel ?? undefined
+                        display: !!props.categoryLabel,
+                        text: props.categoryLabel ?? undefined
                     },
                     ticks: {
                         autoSkip: true,
                         autoSkipPadding: 10,
                         maxRotation: 45,
-                        maxTicksLimit: clamp(props.xMaxTickCount, 0)
+                        maxTicksLimit: clamp(props.categoryMaxTickCount, 0)
                     },
                     grid: {
-                        // Hide x-axis grid lines by default
-                        display: props.xShowGridLines === true
+                        // Hide category axis grid lines by default
+                        display: props.categoryShowGridLines === true
                     },
                     type: internalLabelDateFormat.value ? "timeseries" : "category",
                     time: internalLabelDateFormat.value ? {
@@ -565,10 +566,10 @@
                         : undefined
                 },
                 y: {
-                    beginAtZero: internalYSuggestedMin.value === 0,
+                    beginAtZero: internalValueSuggestedMin.value === 0,
 
                     grid: {
-                        display: props.yHideGridLines !== true
+                        display: props.valueHideGridLines !== true
                     },
 
                     stacked: props.stack,
@@ -577,12 +578,12 @@
                     // so points that are close to the edges are not cropped.
                     // min: props.min ?? undefined,
                     // max: props.max ?? undefined,
-                    suggestedMin: internalYSuggestedMin.value ?? undefined,
-                    suggestedMax: internalYSuggestedMax.value ?? undefined,
+                    suggestedMin: internalValueSuggestedMin.value ?? undefined,
+                    suggestedMax: internalValueSuggestedMax.value ?? undefined,
 
                     ticks: {
-                        count: clamp(props.yTickCount, 0),
-                        maxTicksLimit: clamp(props.yMaxTickCount, 0),
+                        count: clamp(props.valueTickCount, 0),
+                        maxTicksLimit: clamp(props.valueMaxTickCount, 0),
                         callback: props.type === "percent"
                             ? (tickValue) => {
                                 if (typeof tickValue !== "number") {
@@ -604,8 +605,8 @@
                     },
 
                     title: {
-                        display: !!props.yLabel,
-                        text: props.yLabel ?? undefined
+                        display: !!props.valueLabel,
+                        text: props.valueLabel ?? undefined
                     },
                 }
             }
@@ -655,7 +656,8 @@
             return cssVarValueCache.get(varName)!;
         }
 
-        const value = getComputedStyle(document.documentElement).getPropertyValue(varName);
+        const value = getCssVariableValue(varName);
+
         if (value) {
             // Only cache if there is a value.
             cssVarValueCache.set(varName, value);
