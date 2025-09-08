@@ -19,6 +19,27 @@
 
     const props = defineProps({
         /**
+         * The category axis label.
+         */
+        categoryLabel: {
+            type: String as PropType<string | undefined>
+        },
+
+        /**
+         * The maximum number of ticks to show on the category axis.
+         */
+        categoryMaxTickCount: {
+            type: Number as PropType<number | undefined>
+        },
+
+        /**
+         * Whether to show the category axis grid lines. Hidden by default.
+         */
+        categoryShowGridLines: {
+            type: Boolean as PropType<boolean | undefined>
+        },
+        
+        /**
          * Whether the legend is hidden.
          */
         hideLegend: {
@@ -130,27 +151,6 @@
         },
 
         /**
-         * The category axis label.
-         */
-        categoryLabel: {
-            type: String as PropType<string | undefined>
-        },
-
-        /**
-         * The maximum number of ticks to show on the category axis.
-         */
-        categoryMaxTickCount: {
-            type: Number as PropType<number | undefined>
-        },
-
-        /**
-         * Whether to show the category axis grid lines. Hidden by default.
-         */
-        categoryShowGridLines: {
-            type: Boolean as PropType<boolean | undefined>
-        },
-
-        /**
          * Whether to hide the value axis grid lines. Shown by default.
          */
         valueHideGridLines: {
@@ -200,6 +200,13 @@
             type: Number as PropType<number | undefined>
         }
     });
+
+    const dottedLineDotSize = 2;
+    const hoverPointRadius = 4.5;
+    const hoverPointBorderWidth = 2;
+    // Make the tooltip arrow point to the outside of the hovered point
+    // instead of the center of the point.
+    const tooltipArrowOffset = hoverPointRadius + hoverPointBorderWidth;
 
     // #region Computed Values
 
@@ -354,6 +361,7 @@
                     // Fill with a gradient by default (only shown when fill is true).
                     // For a stacked line chart, use a solid background color.
                     fill: isUnfilled !== true,
+
                     backgroundColor:
                         props.stack ? seriesColor
                             : isUnfilled !== true
@@ -364,11 +372,11 @@
                     // For dotted, also set the border width to the same size as the dot to give a circular appearance.
                     // For stacked, filled, solid lines, use thin lines.
                     borderDash:
-                        lineStyle === LineStyle.Dotted ? [2, 2] // Border width is set to 2 as well
+                        lineStyle === LineStyle.Dotted ? [dottedLineDotSize, dottedLineDotSize]
                             : lineStyle === LineStyle.Dashed ? [5, 3]
                                 : undefined,
                     borderWidth:
-                        lineStyle === LineStyle.Dotted ? 2
+                        lineStyle === LineStyle.Dotted ? dottedLineDotSize
                             : (props.stack && !isUnfilled && (!lineStyle || lineStyle === LineStyle.Solid)) ? 1
                                 : 3,
 
@@ -382,8 +390,10 @@
                     // causes hovered points to be clipped when they are min or max values.
                     pointBackgroundColor: Enumerable.from(series.data).where(d => typeof d === "number").count() > 1 ? "transparent" : seriesColor,
                     pointBorderColor: Enumerable.from(series.data).where(d => typeof d === "number").count() > 1 ? "transparent" : seriesColor,
-                    pointHoverBackgroundColor: seriesColor,
+                    pointHoverBackgroundColor: getCssVar("--color-interface-softest"),
                     pointHoverBorderColor: seriesColor,
+                    pointHoverBorderWidth: hoverPointBorderWidth,
+                    pointHoverRadius: hoverPointRadius
                 };
             })
         };
@@ -407,21 +417,21 @@
 
             plugins: {
                 legend: {
-                    display: !((props.hideLegend ?? defaultLegendIsHidden) === true),
-                    position: props.legendPosition ?? defaultLegendPosition,
                     align: props.legendAlign ?? defaultLegendAlign,
+                    display: !((props.hideLegend ?? defaultLegendIsHidden) === true),
+
                     labels: {
-                        // `usePointStyle: true` removes the boxes next to each legend item
-                        // and uses "points" instead. Control the "point" shape inside the
-                        // `generateLabels` callback.
-                        usePointStyle: true,
+                        font: {
+                            family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                            size: parseInt(getCssVar("--font-size-small")) || undefined,
+                            weight: getCssVar("--font-weight-semibold")
+                        },
+
                         generateLabels: (chart) => {
                             const data = chart.data;
                             if (!data || !data.datasets) {
                                 return [];
                             }
-
-                            const labelColor = chart.legend?.options.labels.color;
 
                             return Enumerable
                                 .from(data.datasets)
@@ -434,23 +444,53 @@
                                         hidden: !chart.isDatasetVisible(index),
                                         datasetIndex: index,
                                         lineWidth: 4, // Line thickness
-                                        fontColor: labelColor,
+                                        fontColor: getCssVar("--color-interface-strong"),
                                         lineCap: "round"
                                     };
                                 })
                                 .toArray();
-                        }
-                    }
+                        },
+
+                        // `usePointStyle: true` removes the boxes next to each legend item
+                        // and uses "points" instead. Control the "point" shape inside the
+                        // `generateLabels` callback.
+                        usePointStyle: true
+                    },
+
+                    position: props.legendPosition ?? defaultLegendPosition
                 },
 
                 title: {
+                    color: getCssVar("--color-interface-strong"),
                     display: !!props.title,
+
+                    font: {
+                        family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                        size: parseInt(getCssVar("--font-size-small")) || undefined,
+                        weight: getCssVar("--font-weight-semibold")
+                    },
+
                     text: props.title ?? undefined
                 },
 
                 tooltip: {
-                    // Remove colored box preceding the value.
-                    //displayColors: false,
+                    backgroundColor: getCssVar("--color-interface-softest"),
+
+                    bodyColor: getCssVar("--color-interface-stronger"),
+
+                    bodyFont: {
+                        family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                        size: parseInt(getCssVar("--font-size-xsmall")) || undefined,
+                        weight: getCssVar("--font-weight-regular")
+                    },
+
+                    borderColor: getCssVar("--color-interface-soft"),
+                    borderWidth: 1,
+
+                    // Adjust the colored box sizing next to the tooltip text (color is defined in `callbacks.labelColor`).
+                    boxHeight: parseInt(getCssVar("--font-size-regular")) || undefined,
+                    boxPadding: parseInt(getCssVar("--spacing-tiny")) || undefined,
+                    boxWidth: parseInt(getCssVar("--font-size-regular")) || undefined,
 
                     callbacks: {
                         title: props.tooltipTitle
@@ -529,46 +569,102 @@
 
                         labelColor: (context): TooltipLabelStyle => {
                             return {
-                                borderColor: context.dataset.borderColor as Color,
-                                backgroundColor: context.dataset.borderColor as Color
+                                backgroundColor: context.dataset.borderColor as Color,
+                                borderColor: "transparent",
+                                borderWidth: 0
                             };
                         }
-                    }
+                    },
+
+                    // Move the tooltip arrow outside the point so it doesn't cover the point.
+                    caretPadding: tooltipArrowOffset,
+
+                    cornerRadius: parseInt(getCssVar("--rounded-small")) || undefined,
+
+                    // Remove the little white box around the tooltip boxes.
+                    multiKeyBackground: "transparent",
+
+                    // Remove colored box preceding the value.
+                    //displayColors: false,
+
+                    padding: parseInt(getCssVar("--spacing-xsmall")) || undefined,
+
+                    titleColor: getCssVar("--color-interface-stronger"),
+
+                    titleFont: {
+                        family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                        size: parseInt(getCssVar("--font-size-small")) || undefined,
+                        weight: getCssVar("--font-weight-semibold")
+                    },
                 }
             },
+
             scales: {
                 x: {
-                    title: {
-                        display: !!props.categoryLabel,
-                        text: props.categoryLabel ?? undefined
+                    border: {
+                        color: getCssVar("--color-interface-soft")
                     },
-                    ticks: {
-                        autoSkip: true,
-                        autoSkipPadding: 10,
-                        maxRotation: 45,
-                        maxTicksLimit: clamp(props.categoryMaxTickCount, 0)
-                    },
+
                     grid: {
+                        color: getCssVar("--color-interface-soft"),
                         // Hide category axis grid lines by default
                         display: props.categoryShowGridLines === true
                     },
-                    type: internalLabelDateFormat.value ? "timeseries" : "category",
-                    time: internalLabelDateFormat.value ? {
-                        unit: internalLabelDateFormat.value,
-                        minUnit: internalLabelDateFormat.value,
-                        displayFormats: {
-                            day: "M/d/yy",
-                            week: "MMM d, yyyy",
-                            month: "MMM yyyy",
-                            year: "yyyy"
+
+                    ticks: {
+                        autoSkip: true,
+                        autoSkipPadding: 10,
+                        color: getCssVar("--color-interface-strong"),
+
+                        font: {
+                            family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                            size: parseInt(getCssVar("--font-size-xsmall")) || undefined,
+                            weight: getCssVar("--font-weight-regular")
+                        },
+
+                        maxRotation: 45,
+                        maxTicksLimit: clamp(props.categoryMaxTickCount, 0)
+                    },
+
+                    time: internalLabelDateFormat.value
+                        ? {
+                            unit: internalLabelDateFormat.value,
+                            minUnit: internalLabelDateFormat.value,
+
+                            displayFormats: {
+                                day: "M/d/yy",
+                                week: "MMM d, yyyy",
+                                month: "MMM yyyy",
+                                year: "yyyy"
+                            }
                         }
-                    }
-                        : undefined
+                        : undefined,
+
+                    title: {
+                        color: getCssVar("--color-interface-strong"),
+                        display: !!props.categoryLabel,
+
+                        font: {
+                            family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                            size: parseInt(getCssVar("--font-size-small")) || undefined,
+                            weight: getCssVar("--font-weight-semibold")
+                        },
+
+                        text: props.categoryLabel ?? undefined
+                    },
+
+                    type: internalLabelDateFormat.value ? "timeseries" : "category"
                 },
+
                 y: {
                     beginAtZero: internalValueSuggestedMin.value === 0,
 
+                    border: {
+                        color: getCssVar("--color-interface-soft")
+                    },
+
                     grid: {
+                        color: getCssVar("--color-interface-soft"),
                         display: props.valueHideGridLines !== true
                     },
 
@@ -582,8 +678,6 @@
                     suggestedMax: internalValueSuggestedMax.value ?? undefined,
 
                     ticks: {
-                        count: clamp(props.valueTickCount, 0),
-                        maxTicksLimit: clamp(props.valueMaxTickCount, 0),
                         callback: props.type === "percent"
                             ? (tickValue) => {
                                 if (typeof tickValue !== "number") {
@@ -601,11 +695,30 @@
                                     );
                                 }
                             }
-                            : undefined
+                            : undefined,
+
+                        color: getCssVar("--color-interface-strong"),
+                        count: clamp(props.valueTickCount, 0),
+
+                        font: {
+                            family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                            size: parseInt(getCssVar("--font-size-xsmall")) || undefined,
+                            weight: getCssVar("--font-weight-regular")
+                        },
+
+                        maxTicksLimit: clamp(props.valueMaxTickCount, 0)
                     },
 
                     title: {
+                        color: getCssVar("--color-interface-strong"),
                         display: !!props.valueLabel,
+
+                        font: {
+                            family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
+                            size: parseInt(getCssVar("--font-size-small")) || undefined,
+                            weight: getCssVar("--font-weight-semibold")
+                        },
+
                         text: props.valueLabel ?? undefined
                     },
                 }
@@ -648,10 +761,7 @@
 
     const cssVarValueCache = new Map<string, string>();
 
-    function getCategoricalColor(num: number): string {
-        // There are only 8 categorical colors so cycle through them.
-        num = num > 0 ? ((num - 1) % 8) + 1 : 1;
-        const varName = `--color-categorical-${num}`;
+    function getCssVar(varName: string): string {
         if (cssVarValueCache.has(varName)) {
             return cssVarValueCache.get(varName)!;
         }
@@ -664,6 +774,12 @@
         }
 
         return value;
+    }
+
+    function getCategoricalColor(num: number): string {
+        // There are only 8 categorical colors so cycle through them.
+        num = num > 0 ? ((num - 1) % 8) + 1 : 1;
+        return getCssVar(`--color-categorical-${num}`);
     }
 
     /**
