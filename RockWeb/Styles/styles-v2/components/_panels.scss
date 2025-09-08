@@ -268,11 +268,11 @@ ul.activeusers {
 
         td:first-child,
         th:first-child {
-          border-bottom-left-radius:  3px;
+          border-bottom-left-radius:  var(--rounded-medium);
         }
         td:last-child,
         th:last-child {
-          border-bottom-right-radius: 3px;
+          border-bottom-right-radius: var(--rounded-medium);
         }
       }
     }
