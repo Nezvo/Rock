@@ -7962,6 +7962,10 @@ ul ul, ol ul, ul ol, ol ol {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+.panel.panel-note:not(:has(.note-new)) .panel-heading {
+  border-bottom: none;
+  border-radius: var(--rounded-medium);
+}
 .panel.panel-collapsed:has(.tabbed-bar) .panel-heading, .panel.panel-collapsed:has(.panel-drawer) .panel-heading, .panel.panel-collapsed:has(.panel-sub-header) .panel-heading {
   border-bottom: 1px solid var(--color-interface-soft);
   border-bottom-left-radius: 0;
