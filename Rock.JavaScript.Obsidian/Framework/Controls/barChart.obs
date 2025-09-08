@@ -656,6 +656,9 @@
                         weight: getCssVar("--font-weight-regular")
                     },
 
+                    borderColor: getCssVar("--color-interface-soft"),
+                    borderWidth: 1,
+
                     // Adjust the colored box sizing next to the tooltip text (color is defined in `callbacks.labelColor`).
                     boxHeight: parseInt(getCssVar("--font-size-regular")) || undefined,
                     boxPadding: parseInt(getCssVar("--spacing-tiny")) || undefined,
@@ -754,7 +757,7 @@
 
                     padding: parseInt(getCssVar("--spacing-xsmall")) || undefined,
 
-                    titleColor: getCssVar("--color-interface-softest"),
+                    titleColor: getCssVar("--color-interface-stronger"),
 
                     titleFont: {
                         family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
