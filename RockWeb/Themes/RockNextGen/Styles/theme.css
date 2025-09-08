@@ -21972,6 +21972,14 @@ iframe.email-body {
   margin-top: 0;
 }
 
+.panel-workflowitem .list-group-item {
+  display: flex;
+  justify-content: space-between;
+}
+.panel-workflowitem .list-group-item::before, .panel-workflowitem .list-group-item::after {
+  all: unset;
+}
+
 .htmlcontent-edit-header {
   padding: 7.5px 15px 0 15px;
 }
