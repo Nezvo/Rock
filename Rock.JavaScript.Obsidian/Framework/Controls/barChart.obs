@@ -740,7 +740,10 @@
 
                         labelColor: (context): TooltipLabelStyle => {
                             return {
-                                backgroundColor: context.dataset.borderColor as Color,
+                                backgroundColor:
+                                    (Array.isArray(context.dataset.borderColor)
+                                        ? context.dataset.borderColor[context.dataIndex]
+                                        : context.dataset.borderColor) as Color,
                                 borderColor: "transparent",
                                 borderWidth: 0
                             };
