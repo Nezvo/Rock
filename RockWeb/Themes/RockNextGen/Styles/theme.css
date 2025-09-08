@@ -19673,6 +19673,16 @@ contentsection-body-overflow {
 .ce-toolbar__plus {
   color: var(--color-interface-strong);
 }
+.ce-toolbar__plus:hover {
+  background-color: var(--color-interface-softer);
+}
+
+.ce-toolbar__settings-btn {
+  color: var(--color-interface-medium);
+}
+.ce-toolbar__settings-btn:hover {
+  background-color: var(--color-interface-softer);
+}
 
 /* ===================== BLOCK =================== */
 /*
