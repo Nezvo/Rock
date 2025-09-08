@@ -21672,6 +21672,10 @@ span.data-view-filter-label {
   margin: 0;
 }
 
+.form-inline .form-group.person-picker:first-child:not(:only-child) {
+  margin-right: var(--spacing-medium);
+}
+
 .filter-rule-remove,
 .filtervisibilityrules-type {
   margin-bottom: var(--spacing-medium);
