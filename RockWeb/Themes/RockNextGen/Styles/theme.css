@@ -15305,7 +15305,7 @@ textarea:focus,
 }
 
 /*
-    DOCUMENTATION: 
+    DOCUMENTATION:
 
     This is copy from ion.rangeSlider.Rock.css.
     Located: `RockWeb\Scripts\ion.rangeSlider\css\ion.rangeSlider.Rock.css`.
@@ -15316,7 +15316,7 @@ textarea:focus,
 /*
     MODIFICATION MADE:
 
-    We wrap all the style under .form-group { } to win in specificity 
+    We wrap all the style under .form-group { } to win in specificity
     over the ion.rangeSlider.Rock.css stylesheet added by the controls.
 */
 .form-group .irs {
@@ -15419,7 +15419,7 @@ textarea:focus,
   padding: 1px 5px;
   font-size: var(--font-size-xsmall);
   line-height: 1.333;
-  color: #333;
+  color: var(--color-interface-strong);
   text-shadow: none;
   cursor: default;
   background: var(--color-interface-soft);
@@ -15441,7 +15441,7 @@ textarea:focus,
   padding: 1px 5px;
   font-size: var(--font-size-small);
   line-height: 1.333;
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
   text-shadow: none;
   white-space: nowrap;
   cursor: default;
