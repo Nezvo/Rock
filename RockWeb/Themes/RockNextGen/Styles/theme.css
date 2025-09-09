@@ -19004,7 +19004,6 @@ iframe.file-browser {
   background-color: var(--color-interface-softer);
   padding-left: 0;
   padding-right: 0;
-  overflow: hidden;
 }
 
 /* HEADER */
@@ -19080,7 +19079,7 @@ contentsection-body-overflow {
 
 /* OVERFLOW BODY */
 .contentsection-body-overflow-toggle {
-  margin-bottom: var(--spacing-small);
+  padding-bottom: var(--spacing-small);
 }
 
 .contentsection-body-overflow-toggle .btn {
