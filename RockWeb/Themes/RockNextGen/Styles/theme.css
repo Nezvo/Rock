@@ -19114,6 +19114,9 @@ contentsection-body-overflow {
 .contentsection-body-overflow-content {
   border-top: 1px var(--color-interface-soft) solid;
   padding: var(--spacing-large);
+  background-color: var(--color-interface-softer);
+  border-bottom-left-radius: var(--rounded-large);
+  border-bottom-right-radius: var(--rounded-large);
 }
 
 /* SECTION FOOTER */
