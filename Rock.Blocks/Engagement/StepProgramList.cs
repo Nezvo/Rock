@@ -29,8 +29,6 @@ using Rock.ViewModels.Blocks;
 using Rock.ViewModels.Blocks.Engagement.StepProgramList;
 using Rock.Web.Cache;
 
-using static Rock.Blocks.Engagement.StepTypeList;
-
 namespace Rock.Blocks.Engagement
 {
     /// <summary>
