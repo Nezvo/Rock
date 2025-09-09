@@ -25253,6 +25253,7 @@ body.rock-modal-page {
   background: var(--color-interface-softer);
 }
 
+.card.card-profile,
 .card.card-profile.card-profile-bio,
 .card:has(.dropdown.open) {
   overflow: visible;
