@@ -193,6 +193,13 @@
         },
 
         /**
+         * Whether to show all ticks on the category axis.
+         */
+        categoryShowAllTicks: {
+            type: Boolean as PropType<boolean | undefined>
+        },
+
+        /**
          * Whether to hide the value axis grid lines. Shown by default.
          */
         valueHideGridLines: {
@@ -236,7 +243,7 @@
         /**
          * The number of ticks to show on the value axis.
          *
-         * This overrides `valueMinTickCount` and `valueMaxTickCount`.
+         * This overrides `valueMaxTickCount`.
          */
         valueTickCount: {
             type: Number as PropType<number | undefined>
@@ -355,6 +362,12 @@
 
             // Convert back to a decimal.
             return nextTens / 100;
+        }
+    });
+
+    const internalCategoryMaxTickCount = computed<number | undefined>(() => {
+        if (!props.categoryShowAllTicks && !isNullish(props.categoryMaxTickCount)) {
+            return clamp(props.categoryMaxTickCount, 0);
         }
     });
 
@@ -785,8 +798,10 @@
                     stacked: props.stack,
 
                     ticks: {
-                        autoSkip: true,
-                        autoSkipPadding: 10,
+                        // Only auto-skip ticks if we are not showing all ticks.
+                        autoSkip: !props.categoryShowAllTicks,
+                        autoSkipPadding: !props.categoryShowAllTicks ? 10 : undefined,
+
                         color: getCssVar("--color-interface-strong"),
 
                         font: {
@@ -795,8 +810,9 @@
                             weight: getCssVar("--font-weight-regular")
                         },
 
-                        maxRotation: 45,
-                        maxTicksLimit: clamp(props.categoryMaxTickCount, 0)
+                        // Limit the maximum label rotation to 45 degrees when not showing all ticks (showing all ticks may require more rotation).
+                        maxRotation: !props.categoryShowAllTicks ? 45 : undefined,
+                        maxTicksLimit: internalCategoryMaxTickCount.value
                     },
 
                     time: internalLabelDateFormat.value
