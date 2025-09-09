@@ -22803,7 +22803,7 @@ iframe.email-body {
 .rockbadge-fraction .metric-value {
   position: absolute;
   top: 0.388em;
-  left: 0.2em;
+  left: 0.1em;
   display: block;
   width: 1em;
   font-size: 0.45em;
@@ -22813,7 +22813,7 @@ iframe.email-body {
 }
 .rockbadge-fraction .metric-unit {
   position: absolute;
-  right: 0.363em;
+  right: 0.6em;
   bottom: 0.9em;
   font-size: 0.275em;
   font-weight: var(--font-weight-semibold);
@@ -22914,19 +22914,19 @@ iframe.email-body {
 }
 .rockbadge-overlay .badge-icon {
   position: absolute;
-  top: 0;
+  top: -6px;
   right: 0;
-  left: 0;
-  font-size: inherit;
+  left: -5px;
   line-height: 1.15em;
   text-align: center;
+  font-size: 45px;
 }
 .rockbadge-overlay-invert .metric-value {
   color: var(--color-interface-softest);
 }
 .rockbadge-overlay .metric-value {
   position: absolute;
-  top: 0.7em;
+  top: 0.4em;
   right: 0.3em;
   bottom: 0.95em;
   left: 0.3em;
@@ -22942,7 +22942,7 @@ iframe.email-body {
   color: var(--color-info-strong);
 }
 .rockbadge-overlay .badge-content.today .metric-value {
-  font-size: 0.275em;
+  font-size: 0.25em;
 }
 .rockbadge-overlay .badge-content.recent {
   opacity: 0.8;
@@ -22963,10 +22963,12 @@ iframe.email-body {
 }
 
 .rockbadge-personaldevice {
-  width: 0.6em;
+  width: 0.9em;
 }
 .rockbadge-personaldevice .badge-content .metric-value {
-  top: 0.7142em;
+  top: 0.9em;
+  left: 0.6em;
+  font-size: 0.3em;
 }
 
 .rockbadge-assessment a {
