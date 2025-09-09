@@ -212,6 +212,11 @@
             return await alert(result.errorMessage || "Unable to interact with the action.");
         }
 
+        // Temporary fix to force the reminder/notification counts to update
+        // on next page load. In the future this will be replaced with a browser
+        // bus message to cause an immediate update.
+        localStorage.removeItem("Rock.Core.ReminderLinks.Counts");
+
         props.message.isRead = request.isRead;
 
         if (result.data?.isDeleted) {
@@ -250,6 +255,11 @@
         }
 
         props.message.isRead = request.isRead;
+
+        // Temporary fix to force the reminder/notification counts to update
+        // on next page load. In the future this will be replaced with a browser
+        // bus message to cause an immediate update.
+        localStorage.removeItem("Rock.Core.ReminderLinks.Counts");
 
         if (result.data?.isDeleted) {
             emit("remove");
