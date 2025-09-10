@@ -13406,7 +13406,7 @@ ul.list-group-panel .list-group-item:last-child,
   border-radius: var(--rounded-small);
 }
 .fileupload-group .fileupload-button span {
-  color: var(--color-interface-softest);
+  color: var(--base-interface-softest);
 }
 .fileupload-group .fileuploaddefault-button {
   width: 100px;
