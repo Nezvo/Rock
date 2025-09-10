@@ -6214,7 +6214,7 @@ th {
 .table.table-light > thead > tr > th {
   color: var(--color-interface-stronger);
   background-color: transparent;
-  border-color: var(--color-interface-strong);
+  border-color: var(--color-interface-soft);
 }
 .table .table {
   background-color: var(--color-interface-softest);
