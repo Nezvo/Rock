@@ -375,6 +375,7 @@ namespace Rock.Jobs
                     new CommunicationFlowService( rockContext ),
                     new CommunicationService( rockContext ),
                     new PersonService( rockContext ),
+                    new CommunicationFlowInstanceRecipientService( rockContext ),
                     conversionGoalProcessor
                 );
             }
@@ -1214,14 +1215,8 @@ namespace Rock.Jobs
 
                 // Ensure unsubscribed recipients are pruned from this flow instance.
                 var unsubscribedPersonIds = communicationFlowInstanceRecipientService
-                    .Queryable()
-                    .Where( cfir =>
-                        cfir.CommunicationFlowInstance.CommunicationFlowId == communicationFlow.Id
-                        && cfir.CommunicationFlowInstanceId != communicationFlowInstance.Id
-                        && cfir.Status == CommunicationFlowInstanceRecipientStatus.Inactive
-                        && cfir.InactiveReason == CommunicationFlowInstanceRecipientInactiveReason.UnsubscribedFromFlow
-                        && cfir.RecipientPersonAlias != null
-                    )
+                    .GetUnsubscribedFromCommunicationFlow( communicationFlow.Id )
+                    .Where( r => r.CommunicationFlowInstanceId != communicationFlowInstance.Id && r.RecipientPersonAlias != null )
                     .Select( r => r.RecipientPersonAlias.PersonId )
                     .Distinct()
                     .ToList();
@@ -1358,19 +1353,38 @@ namespace Rock.Jobs
             private readonly CommunicationFlowService _communicationFlowService;
             private readonly CommunicationService _communicationService;
             private readonly PersonService _personService;
+            private readonly CommunicationFlowInstanceRecipientService _communicationFlowInstanceRecipientService;
             private readonly IConversionGoalProcessor _conversionGoalProcessor;
 
-            private InstanceCommunicationHelper( CommunicationFlowService communicationFlowService, CommunicationService communicationService, PersonService personService, IConversionGoalProcessor conversionGoalProcessor )
+            private InstanceCommunicationHelper(
+                CommunicationFlowService communicationFlowService,
+                CommunicationService communicationService,
+                PersonService personService,
+                CommunicationFlowInstanceRecipientService communicationFlowInstanceRecipientService,
+                IConversionGoalProcessor conversionGoalProcessor
+            )
             {
                 _communicationFlowService = communicationFlowService ?? throw new ArgumentNullException( nameof( communicationFlowService ) );
                 _communicationService = communicationService ?? throw new ArgumentNullException( nameof( communicationService ) );
                 _personService = personService ?? throw new ArgumentNullException( nameof( personService ) );
+                _communicationFlowInstanceRecipientService = communicationFlowInstanceRecipientService ?? throw new ArgumentNullException( nameof( communicationFlowInstanceRecipientService ) );
                 _conversionGoalProcessor = conversionGoalProcessor ?? throw new ArgumentNullException( nameof( conversionGoalProcessor ) );
             }
 
-            public static InstanceCommunicationHelper Create( CommunicationFlowService communicationFlowService, CommunicationService communicationService, PersonService personService, IConversionGoalProcessor conversionGoalProcessor )
+            public static InstanceCommunicationHelper Create(
+                CommunicationFlowService communicationFlowService,
+                CommunicationService communicationService,
+                PersonService personService,
+                CommunicationFlowInstanceRecipientService communicationFlowInstanceRecipientService,
+                IConversionGoalProcessor conversionGoalProcessor
+            )
             {
-                return new InstanceCommunicationHelper( communicationFlowService, communicationService, personService, conversionGoalProcessor );
+                return new InstanceCommunicationHelper(
+                    communicationFlowService,
+                    communicationService,
+                    personService,
+                    communicationFlowInstanceRecipientService,
+                    conversionGoalProcessor );
             }
 
             public bool CreateNextCommunication( CommunicationFlowInstance instance, out Model.Communication communication )
@@ -1620,15 +1634,25 @@ namespace Rock.Jobs
                 var preMetPersonIds = _conversionGoalProcessor.GetConversionQuery( instance, personIdQuery )
                         .Select( h => h.PersonId )
                         .ToList();
+                
+                var unsubscribedPersonIds = _communicationFlowInstanceRecipientService
+                    .GetUnsubscribedFromCommunicationFlow( instance.CommunicationFlowId )
+                    .Where( r => r.CommunicationFlowInstanceId != instance.Id && r.RecipientPersonAlias != null )
+                    .Select( r => r.RecipientPersonAlias.PersonId )
+                    .Distinct()
+                    .ToList();
 
                 foreach ( var ids in personAndPersonAliasIds )
                 {
+                    var isUnsubscribed = unsubscribedPersonIds.Contains( ids.PersonId );
+
                     instance.CommunicationFlowInstanceRecipients.Add(
                         new CommunicationFlowInstanceRecipient
                         {
                             CommunicationFlowInstance = instance,
                             RecipientPersonAliasId = ids.PersonAliasId,
-                            Status = CommunicationFlowInstanceRecipientStatus.Active,
+                            Status = !isUnsubscribed ? CommunicationFlowInstanceRecipientStatus.Active : CommunicationFlowInstanceRecipientStatus.Inactive,
+                            InactiveReason = !isUnsubscribed ? default : CommunicationFlowInstanceRecipientInactiveReason.UnsubscribedFromFlow,
                             WasConversionGoalPreMet = preMetPersonIds.Contains( ids.PersonId )
                         }
                     );
