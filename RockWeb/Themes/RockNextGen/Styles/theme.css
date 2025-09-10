@@ -3282,6 +3282,14 @@ input[type=button].btn-block {
 .btn-group .btn.btn-primary:focus, .btn-group .btn.btn-primary:not(:disabled):not(.disabled):active:focus {
   box-shadow: none;
 }
+.btn-group .btn-tool {
+  background-color: var(--color-interface-soft);
+  border-color: var(--color-interface-soft);
+  color: var(--color-interface-stronger);
+}
+.btn-group .btn-tool:hover {
+  border-color: var(--color-interface-medium);
+}
 
 .btn-toolbar {
   margin-left: calc(var(--spacing-tiny) * -1);
