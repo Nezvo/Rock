@@ -19797,15 +19797,20 @@ contentsection-body-overflow {
 }
 
 /* ===================== BLOCK =================== */
-/*
-  Used to manage styles for specific blocks.
+.rock-top-header .rock-bookmark.active.has-reminders > .indicator-bottom {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background-color: var(--color-primary);
+  width: 8px;
+  height: 8px;
+  border-radius: var(--rounded-xsmall);
+}
 
-  1. Notes - block to display, add, edit, delete notes
-  2. Schedule Builder - block for building schedules
-  3. Workflow - styles for workflow blocks
-  4. Electronic Signatures
-  5. Rapid Attendance
-*/
+.rock-top-header .rock-bookmark:hover {
+  border: 1px solid var(--color-interface-medium);
+}
+
 .rock-fullscreen-toggle {
   position: absolute;
   top: 0;
