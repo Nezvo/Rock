@@ -209,7 +209,7 @@
     import { isNullish } from "@Obsidian/Utility/util";
     import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
 
-    const importCode = getSfcControlImportPath("chart");
+    const importCode = getSfcControlImportPath("barChart");
     const legendPositionItems = [
         { text: LegendPositionDescription[LegendPosition.Top], value: LegendPosition.Top },
         { text: LegendPositionDescription[LegendPosition.Bottom], value: LegendPosition.Bottom },
