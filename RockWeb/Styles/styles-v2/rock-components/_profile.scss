@@ -284,6 +284,8 @@
     align-items: center;
     padding: var(--spacing-small) var(--spacing-xsmall) var(--spacing-small) var(--spacing-medium);
     font-weight: var(--font-weight-semibold);
+    border-top-left-radius: var(--rounded-small);
+    border-top-right-radius: var(--rounded-small);
 
     .card-title {
         margin: 0 auto 0 0;
