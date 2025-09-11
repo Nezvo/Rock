@@ -19802,6 +19802,46 @@ contentsection-body-overflow {
   display: none;
 }
 
+.monaco-editor > .overflow-guard > .margin,
+.monaco-editor > .overflow-guard > .monaco-scrollable-element > .monaco-editor-background {
+  background-color: var(--color-interface-softest) !important;
+}
+
+.monaco-editor .line-numbers.active-line-number {
+  color: var(--color-interface-strong) !important;
+}
+
+.monaco-editor .view-overlays .current-line-exact {
+  border-color: var(--color-interface-soft) !important;
+}
+
+.mtk14,
+.mtk10 {
+  color: var(--color-danger-strong) !important;
+}
+
+.mtk1 {
+  color: var(--color-interface-strong) !important;
+}
+
+.mtk23 {
+  color: var(--color-info-strong) !important;
+}
+
+canvas.decorationsOverviewRuler {
+  background-color: var(--color-interface-softest) !important;
+}
+
+.monaco-editor .cursors-layer .cursor {
+  background-color: var(--color-interface-strongest) !important;
+  border-color: var(--color-interface-strongest) !important;
+  color: var(--color-interface-softest) !important;
+}
+
+.monaco-editor .sticky-widget {
+  background-color: var(--color-interface-soft) !important;
+}
+
 /* ===================== BLOCK =================== */
 .rock-top-header .rock-bookmark.active.has-reminders > .indicator-bottom {
   position: absolute;
