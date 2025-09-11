@@ -138,7 +138,7 @@
         },
 
         onViewMessage: {
-            type: Function as PropType<((communicationFlowInstanceCommunicationIdKey: string) => void) | undefined>
+            type: Function as PropType<((communicationFlowCommunicationIdKey: string) => void) | undefined>
         },
 
         uniquePersonCount: {
@@ -147,7 +147,7 @@
         }
     });
 
-    const keyField = getField("communicationFlowInstanceCommunicationIdKey");
+    const keyField = getField("communicationFlowCommunicationIdKey");
 
     // #region Computed Values
 
@@ -159,28 +159,27 @@
         }
 
         return messageEnumerable
-            .groupBy(m => m.communicationFlowInstanceCommunicationIdKey)
+            .groupBy(m => m.communicationFlowCommunicationIdKey)
             .ofType((g): g is GroupedEnumerable<string, MessageBag> => !isNullish(g.key))
             .where(g => g.any())
-            .select<GridRowBag>(messagesByInstance => {
-                const key = messagesByInstance.key;
-                const firstMessage = messagesByInstance.first();
-
+            .select<GridRowBag>(messagesByTemplate => {
+                const firstMessage = messagesByTemplate.first();
+                // TODO JMH - Use average rate between each instance communication since they may be aggregated. Consider unique person calculations as well.
                 return {
-                    communicationFlowCommunicationIdKey: key,
+                    communicationFlowCommunicationIdKey: firstMessage.communicationFlowCommunicationIdKey,
                     communicationFlowInstanceCommunicationIdKey: firstMessage.communicationFlowInstanceCommunicationIdKey,
                     communicationFlowCommunicationName: firstMessage.communicationFlowCommunicationName,
                     communicationType: firstMessage.communicationType,
-                    clicks: messagesByInstance.count(m => !!m.clickedDateTime),
-                    opens: messagesByInstance.count(m => !!m.openedDateTime),
-                    sent: messagesByInstance.count(m => !!m.sentDateTime),
+                    clicks: messagesByTemplate.count(m => !!m.clickedDateTime),
+                    opens: messagesByTemplate.count(m => !!m.openedDateTime),
+                    sent: messagesByTemplate.count(m => !!m.sentDateTime),
                     // `conversions` are the number of unique people who converted,
                     // not the total number of conversions.
                     conversions: Enumerable
-                        .from(messagesByInstance)
+                        .from(messagesByTemplate)
                         .groupBy(m => m.personAliasIdKey)
                         .count(g => g.any(m => !!m.convertedDateTime)),
-                    unsubscribes: messagesByInstance.count(m => !!m.unsubscribedDateTime),
+                    unsubscribes: messagesByTemplate.count(m => !!m.unsubscribedDateTime),
                     communicationFlowInstanceIdKey: firstMessage.communicationFlowInstanceIdKey,
                     communicationFlowInstanceStartDate: firstMessage.communicationFlowInstanceStartDate,
                 };
@@ -196,13 +195,6 @@
         return {
             rows: gridRows.value
         };
-    });
-
-    const hasMultipleInstanceMessages = computed((): boolean => {
-        return Enumerable.from(gridRows.value)
-            .select(m => m.communicationFlowInstanceIdKey)
-            .distinct()
-            .count() > 1;
     });
 
     // #endregion Computed Values

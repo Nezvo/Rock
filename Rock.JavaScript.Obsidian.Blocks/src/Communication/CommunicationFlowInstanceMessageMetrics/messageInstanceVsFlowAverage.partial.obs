@@ -25,6 +25,7 @@
     import { isNullish } from "@Obsidian/Utility/util";
     import { CommunicationFlowInstanceBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceBag";
     import { CommunicationFlowInstanceCommunicationBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceCommunicationBag";
+    import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
 
     /**
      *  Purpose: "How does this instance of this message compare across all instances of this flow?"
@@ -36,23 +37,28 @@
     }
 
     const props = defineProps({
-        modelValue: {
-            type: Object as PropType<CommunicationFlowInstanceCommunicationBag | null | undefined>,
+        allCommunicationFlowInstanceCommunications: {
+            type: Array as PropType<CommunicationFlowInstanceCommunicationBag[]>,
             required: true
         },
 
-        flowInstanceCommunications: {
-            type: Array as PropType<CommunicationFlowInstanceCommunicationBag[] | null | undefined>,
-            required: true
-        },
-
-        instances: {
+        allCommunicationFlowInstances: {
             type: Array as PropType<CommunicationFlowInstanceBag[]>,
             required: true
         },
 
         isConversionGoalTrackingEnabled: {
             type: Boolean as PropType<boolean>,
+            required: true
+        },
+
+        recipientMetrics: {
+            type: Array as PropType<RecipientMetricsBag[]>,
+            required: true
+        },
+
+        selectedCommunicationFlowInstanceCommunications: {
+            type: Array as PropType<CommunicationFlowInstanceCommunicationBag[]>,
             required: true
         }
     });
@@ -73,19 +79,24 @@
     });
 
     const data = computed<{ series: BarSeries[]; labels: string[]; }>(() => {
-        const instanceCommunications = props.flowInstanceCommunications ?? [];
-
-        if (isNullish(props.modelValue) || instanceCommunications.length <= 0) {
+        if (isNullish(props.recipientMetrics) || props.allCommunicationFlowInstanceCommunications.length === 0) {
             return { labels: [], series: [] };
         }
 
         const uniquePersonCountPerInstance = Enumerable
-            .from(props.instances)
+            .from(props.allCommunicationFlowInstances)
             .toDictionary(i => i.communicationFlowInstanceIdKey, i => i.uniquePersonCount);
 
+        type Rates = {
+            conversionRate: number;
+            unsubscribeRate: number;
+            openRate: number;
+            clickRate: number;
+        };
+
         // Calculate conversion and unsubscribe rates for each instance.
-        const allInstanceCommunicationRates = Enumerable
-            .from(instanceCommunications)
+        const allCommunicationFlowInstanceCommunicationRates = Enumerable
+            .from(props.allCommunicationFlowInstanceCommunications)
             .select(ic => {
                 const recipientMetrics = ic.recipientMetrics ?? [];
                 const uniquePersonCount = uniquePersonCountPerInstance.get(ic.communicationFlowInstanceIdKey) ?? 0;
@@ -95,35 +106,50 @@
                 const openCount = Enumerable.from(recipientMetrics).count(rm => !isNullish(rm.openedDate));
                 const clickCount = Enumerable.from(recipientMetrics).count(rm => !isNullish(rm.clickedDate));
 
+                const rates: Rates = {
+                    conversionRate: uniquePersonCount && conversionCount ? conversionCount / uniquePersonCount : 0,
+                    unsubscribeRate: recipientCount && unsubscribeCount ? unsubscribeCount / recipientCount : 0,
+                    openRate: recipientCount && openCount ? openCount / recipientCount : 0,
+                    clickRate: recipientCount && clickCount ? clickCount / recipientCount : 0
+                };
+
                 return {
                     instanceCommunication: ic,
-                    rates: {
-                        conversionRate: uniquePersonCount && conversionCount ? conversionCount / uniquePersonCount : 0,
-                        unsubscribeRate: recipientCount && unsubscribeCount ? unsubscribeCount / recipientCount : 0,
-                        openRate: recipientCount && openCount ? openCount / recipientCount : 0,
-                        clickRate: recipientCount && clickCount ? clickCount / recipientCount : 0
-                    }
+                    rates
                 };
             })
             .toDictionary(ir => ir.instanceCommunication, ir => ir.rates);
 
-        const selectedInstanceCommunicationRates = allInstanceCommunicationRates.has(props.modelValue)
-            ? allInstanceCommunicationRates.get(props.modelValue)
-            : null;
+        const selectedCommunicationFlowInstanceCommunicationRatesList = Enumerable
+            .from(props.selectedCommunicationFlowInstanceCommunications)
+            .where(cfic => allCommunicationFlowInstanceCommunicationRates.has(cfic))
+            .select<Rates>(cfic => allCommunicationFlowInstanceCommunicationRates.get(cfic)!)
+            .toArray();
+        const selectedRatesCount = selectedCommunicationFlowInstanceCommunicationRatesList.length;
+        const selectedCommunicationFlowInstanceCommunicationRates = selectedRatesCount === 0
+            ? null
+            : selectedRatesCount === 1
+                ? selectedCommunicationFlowInstanceCommunicationRatesList[0]
+                : {
+                    conversionRate: Enumerable.from(selectedCommunicationFlowInstanceCommunicationRatesList).average(i => i.conversionRate),
+                    unsubscribeRate: Enumerable.from(selectedCommunicationFlowInstanceCommunicationRatesList).average(i => i.unsubscribeRate),
+                    openRate: Enumerable.from(selectedCommunicationFlowInstanceCommunicationRatesList).average(i => i.openRate),
+                    clickRate: Enumerable.from(selectedCommunicationFlowInstanceCommunicationRatesList).average(i => i.clickRate)
+                };
 
-        if (isNullish(selectedInstanceCommunicationRates)) {
+        if (isNullish(selectedCommunicationFlowInstanceCommunicationRates)) {
             return { labels: [], series: [] };
         }
 
-        const averageConversionRate = Enumerable.from(allInstanceCommunicationRates.values()).average(i => i.conversionRate);
-        const averageOpenRate = Enumerable.from(allInstanceCommunicationRates.values()).average(i => i.openRate);
-        const averageClickRate = Enumerable.from(allInstanceCommunicationRates.values()).average(i => i.clickRate);
-        const averageUnsubscribeRate = Enumerable.from(allInstanceCommunicationRates.values()).average(i => i.unsubscribeRate);
+        const averageConversionRate = Enumerable.from(allCommunicationFlowInstanceCommunicationRates.values()).average(i => i.conversionRate);
+        const averageOpenRate = Enumerable.from(allCommunicationFlowInstanceCommunicationRates.values()).average(i => i.openRate);
+        const averageClickRate = Enumerable.from(allCommunicationFlowInstanceCommunicationRates.values()).average(i => i.clickRate);
+        const averageUnsubscribeRate = Enumerable.from(allCommunicationFlowInstanceCommunicationRates.values()).average(i => i.unsubscribeRate);
 
-        const hasConversionRates = averageConversionRate > 0 || selectedInstanceCommunicationRates.conversionRate > 0;
-        const hasOpenRates = averageOpenRate > 0 || selectedInstanceCommunicationRates.openRate > 0;
-        const hasClickRates = averageClickRate > 0 || selectedInstanceCommunicationRates.clickRate > 0;
-        const hasUnsubscribeRates = averageUnsubscribeRate > 0 || selectedInstanceCommunicationRates.unsubscribeRate > 0;
+        const hasConversionRates = averageConversionRate > 0 || selectedCommunicationFlowInstanceCommunicationRates.conversionRate > 0;
+        const hasOpenRates = averageOpenRate > 0 || selectedCommunicationFlowInstanceCommunicationRates.openRate > 0;
+        const hasClickRates = averageClickRate > 0 || selectedCommunicationFlowInstanceCommunicationRates.clickRate > 0;
+        const hasUnsubscribeRates = averageUnsubscribeRate > 0 || selectedCommunicationFlowInstanceCommunicationRates.unsubscribeRate > 0;
 
         const labels: string[] = [];
         if (props.isConversionGoalTrackingEnabled && hasConversionRates) {
@@ -148,19 +174,19 @@
         };
 
         if (props.isConversionGoalTrackingEnabled && hasConversionRates) {
-            instanceSeries.data.push(selectedInstanceCommunicationRates.conversionRate);
+            instanceSeries.data.push(selectedCommunicationFlowInstanceCommunicationRates.conversionRate);
             instanceColors.push("#2F855A");
         }
         if (hasOpenRates) {
-            instanceSeries.data.push(selectedInstanceCommunicationRates.openRate);
+            instanceSeries.data.push(selectedCommunicationFlowInstanceCommunicationRates.openRate);
             instanceColors.push("#3182CE");
         }
         if (hasClickRates) {
-            instanceSeries.data.push(selectedInstanceCommunicationRates.clickRate);
+            instanceSeries.data.push(selectedCommunicationFlowInstanceCommunicationRates.clickRate);
             instanceColors.push("#DD6B20");
         }
         if (hasUnsubscribeRates) {
-            instanceSeries.data.push(selectedInstanceCommunicationRates.unsubscribeRate);
+            instanceSeries.data.push(selectedCommunicationFlowInstanceCommunicationRates.unsubscribeRate);
             instanceColors.push("#C53030");
         }
 

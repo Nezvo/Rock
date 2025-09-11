@@ -45,7 +45,7 @@
     const getField = useGetTypeMemberName<RecipientMetricsBag>();
 
     const props = defineProps({
-        modelValue: {
+        recipientMetrics: {
             type: Array as PropType<RecipientMetricsBag[] | null | undefined>,
             required: true
         }
@@ -59,7 +59,7 @@
 
     const gridDataSource = computed<GridDataBag>(() => {
         return {
-            rows: props.modelValue
+            rows: props.recipientMetrics
         };
     });
 
@@ -68,7 +68,7 @@
     // #region Event Handlers
 
     function onPersonClicked(rowKey: string): void {
-        const row = props.modelValue?.find(r => r.personAliasIdKey === rowKey);
+        const row = props.recipientMetrics?.find(r => r.personAliasIdKey === rowKey);
 
         if (row) {
             emit("viewPerson", row);

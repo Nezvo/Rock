@@ -23,9 +23,9 @@
     import Panel from "@Obsidian/Controls/panel.obs";
     import { Enumerable } from "@Obsidian/Utility/linq";
     import { isNullish } from "@Obsidian/Utility/util";
-    import { CommunicationFlowInstanceCommunicationBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceCommunicationBag";
     import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
     import { alignDataPointsByDate, LineSeries, XYPoint, XYPointEnumerable } from "@Obsidian/Core/Controls/chart";
+    import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
 
     enum SeriesName {
         ConversionRate = "Conversion Rate",
@@ -35,13 +35,13 @@
     }
 
     const props = defineProps({
-        modelValue: {
-            type: Object as PropType<CommunicationFlowInstanceCommunicationBag | null | undefined>,
+        isConversionGoalTrackingEnabled: {
+            type: Boolean as PropType<boolean>,
             required: true
         },
 
-        isConversionGoalTrackingEnabled: {
-            type: Boolean as PropType<boolean>,
+        recipientMetrics: {
+            type: Array as PropType<RecipientMetricsBag[]>,
             required: true
         },
 
@@ -64,13 +64,11 @@
     });
 
     const dataPoints = computed<{ labels: string[]; series: LineSeries[] }>(() => {
-        const recipientMetrics = props.modelValue?.recipientMetrics ?? [];
-
-        if (recipientMetrics.length <= 0) {
+        if (props.recipientMetrics.length <= 0) {
             return { labels: [], series: [] };
         }
 
-        const recipientMetricsEnumerable = Enumerable.from(recipientMetrics);
+        const recipientMetricsEnumerable = Enumerable.from(props.recipientMetrics);
 
         // There are 4 data series: Conversion Rate (conditional), Open Rate, Click-Through Rate, and Unsubscribe Rate.
         const dataPoints: XYPoint[][] = [];

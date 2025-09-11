@@ -13,11 +13,11 @@
     import Kpi from "@Obsidian/Controls/kpi.obs";
     import { Enumerable } from "@Obsidian/Utility/linq";
     import { isNullish } from "@Obsidian/Utility/util";
-    import { CommunicationFlowInstanceCommunicationBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceCommunicationBag";
+    import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
 
     const props = defineProps({
-        modelValue: {
-            type: Object as PropType<CommunicationFlowInstanceCommunicationBag | null | undefined>,
+        recipientMetrics: {
+            type: Array as PropType<RecipientMetricsBag[]>,
             required: true
         }
     });
@@ -36,11 +36,11 @@
      * Computes the open rate percentage [0-100] for the selected flow instance communications.
      */
     const openRatePercent = computed<number | null | undefined>(() => {
-        if (isNullish(props.modelValue)) {
+        if (isNullish(props.recipientMetrics)) {
             return null;
         }
 
-        const recipientMetrics = props.modelValue.recipientMetrics ?? [];
+        const recipientMetrics = props.recipientMetrics ?? [];
 
         const recipientCount = Enumerable.from(recipientMetrics).count();
         const openCount = Enumerable.from(recipientMetrics).count(rm => !isNullish(rm.openedDate));

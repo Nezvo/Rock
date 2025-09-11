@@ -3,42 +3,43 @@
     <Panel :title="`Message Metrics: ${config.communicationFlowCommunication?.communicationFlowCommunicationName}`">
         <div class="row">
             <div v-if="config.isConversionGoalTrackingEnabled" class="col-md-3">
-                <ConversionRateKpi :modelValue="selectedFlowInstanceCommunication"
+                <ConversionRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
                                    :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
             </div>
 
             <div class="col-md-3">
-                <OpenRateKpi :modelValue="selectedFlowInstanceCommunication" />
+                <OpenRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
             </div>
 
             <div class="col-md-3">
-                <ClickThroughRateKpi :modelValue="selectedFlowInstanceCommunication" />
+                <ClickThroughRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
             </div>
 
             <div class="col-md-3">
-                <UnsubscribeRateKpi :modelValue="selectedFlowInstanceCommunication" />
+                <UnsubscribeRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
             </div>
         </div>
 
         <div class="row">
             <template v-if="isInstanceVsAverageShown">
                 <div class="col-md-6">
-                    <MessagePerformanceOverTime :modelValue="selectedFlowInstanceCommunication"
-                                                :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
+                    <MessagePerformanceOverTime :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
+                                                :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
                                                 :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
                 </div>
 
                 <div class="col-md-6">
-                    <MessageInstanceVsFlowAverage :modelValue="selectedFlowInstanceCommunication"
-                                                  :flowInstanceCommunications="config.communicationFlowCommunication?.communicationFlowInstanceCommunications"
-                                                  :instances="config.communicationFlowInstances ?? []"
-                                                  :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled" />
+                    <MessageInstanceVsFlowAverage :allCommunicationFlowInstanceCommunications="config.communicationFlowCommunication?.communicationFlowInstanceCommunications ?? []"
+                                                  :allCommunicationFlowInstances="config.communicationFlowInstances ?? []"
+                                                  :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
+                                                  :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
+                                                  :selectedCommunicationFlowInstanceCommunications="selectedFlowInstanceCommunications" />
                 </div>
             </template>
 
             <template v-else>
                 <div class="col-md-12">
-                    <MessagePerformanceOverTime :modelValue="selectedFlowInstanceCommunication"
+                    <MessagePerformanceOverTime :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
                                                 :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
                                                 :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
                 </div>
@@ -57,8 +58,8 @@
         </div>
     </Panel>
 
-    <RecipientLogGrid :modelValue="selectedFlowInstanceCommunication?.recipientMetrics"
-                      :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
+    <RecipientLogGrid :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
+                      :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
                       @viewPerson="onViewPerson" />
 </template>
 
@@ -94,6 +95,8 @@
     import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
     import { Enumerable } from "@Obsidian/Utility/linq";
     import { CommunicationFlowInstanceBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceBag";
+    import { calculateSlidingDateRange, parseSlidingDateRangeString, SlidingDateRange } from "@Obsidian/Utility/slidingDateRange";
+    import { isNullish } from "@Obsidian/Utility/util";
 
     const config = useConfigurationValues<InitializationBox>();
     const { getPageParameter } = useStore();
@@ -101,19 +104,79 @@
 
     // #region Computed Values
 
-    const selectedFlowInstanceCommunication = computed<CommunicationFlowInstanceCommunicationBag | null | undefined>(() => {
-        // Always select the instance communication that matches the page parameter.
+    const selectedFlowInstanceCommunications = computed<CommunicationFlowInstanceCommunicationBag[]>(() => {
+        // Select the specific instance communication that matches the page parameter if set.
         const selectedInstanceCommunicationKey = getPageParameter("CommunicationFlowInstanceCommunication");
 
-        return config.communicationFlowCommunication?.communicationFlowInstanceCommunications?.find(ic => ic.communicationFlowInstanceCommunicationIdKey === selectedInstanceCommunicationKey);
+        if (selectedInstanceCommunicationKey) {
+            return Enumerable
+                .from(config.communicationFlowCommunication?.communicationFlowInstanceCommunications ?? [])
+                .where(ic => ic.communicationFlowInstanceCommunicationIdKey === selectedInstanceCommunicationKey)
+                .toArray();
+        }
+        else {
+            const communicationFlowInstanceStartDateLookup = Enumerable
+                .from(config.communicationFlowInstances ?? [])
+                .where(cfi => !isNullish(cfi.communicationFlowInstanceIdKey))
+                .toDictionary(cfi => cfi.communicationFlowInstanceIdKey!, cfi => cfi.startDate ? RockDateTime.parseISO(cfi.startDate) : null);
+
+            let communicationFlowInstanceCommunicationsEnumerable = Enumerable
+                .from(config.communicationFlowCommunication?.communicationFlowInstanceCommunications ?? []);
+
+            const startDateRange = getStartDateRange();
+
+            if (startDateRange) {
+                const { start: startFilter, end: endFilter } = calculateSlidingDateRange(startDateRange);
+
+                if (!isNullish(startFilter)) {
+                    communicationFlowInstanceCommunicationsEnumerable = communicationFlowInstanceCommunicationsEnumerable
+                        .where(cfic => {
+                            const communicationFlowInstanceStartDate = communicationFlowInstanceStartDateLookup.get(cfic.communicationFlowInstanceIdKey ?? "");
+
+                            if (isNullish(communicationFlowInstanceStartDate)) {
+                                return false;
+                            }
+
+                            if (startFilter.isLaterThan(communicationFlowInstanceStartDate)) {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                }
+
+                if (!isNullish(endFilter)) {
+                    communicationFlowInstanceCommunicationsEnumerable = communicationFlowInstanceCommunicationsEnumerable
+                        .where(cfic => {
+                            const communicationFlowInstanceStartDate = communicationFlowInstanceStartDateLookup.get(cfic.communicationFlowInstanceIdKey ?? "");
+
+                            return !isNullish(communicationFlowInstanceStartDate)
+                                && !endFilter.isEarlierThan(communicationFlowInstanceStartDate);
+                        });
+                }
+            }
+
+            return communicationFlowInstanceCommunicationsEnumerable.toArray();
+        }
+    });
+
+    const selectedFlowInstanceCommunicationRecipientMetrics = computed<RecipientMetricsBag[]>(() => {
+        return Enumerable
+            .from(selectedFlowInstanceCommunications.value ?? [])
+            .selectMany(c => c.recipientMetrics ?? [])
+            .toArray();
     });
 
     const selectedFlowInstance = computed<CommunicationFlowInstanceBag | null | undefined>(() => {
         // Always select the flow instance that matches the page parameter.
-        selectedFlowInstanceCommunication.value?.communicationFlowInstanceIdKey;
+        const selectedCommunicationFlowInstanceIdKey = Enumerable
+            .from(selectedFlowInstanceCommunications.value)
+            .select(cfic => cfic.communicationFlowInstanceIdKey)
+            .ofType((k): k is string => typeof k === "string")
+            .firstOrDefault("");
         return Enumerable
             .from(config.communicationFlowInstances ?? [])
-            .where(cfi => cfi.communicationFlowInstanceIdKey === selectedFlowInstanceCommunication.value?.communicationFlowInstanceIdKey)
+            .where(cfi => cfi.communicationFlowInstanceIdKey === selectedCommunicationFlowInstanceIdKey)
             .firstOrDefault();
     });
 
@@ -142,4 +205,21 @@
     }
 
     // #endregion Event Handlers
+
+    // #region Functions
+
+    function getStartDateRange(): SlidingDateRange | null {
+        const startDateRangePageParameter = getPageParameter("StartDateRange");
+
+        if (typeof startDateRangePageParameter === "string" && startDateRangePageParameter.length > 0) {
+            const startDateRange = parseSlidingDateRangeString(startDateRangePageParameter);
+            if (startDateRange) {
+                return startDateRange;
+            }
+        }
+
+        return null;
+    }
+
+    // #endregion Functions
 </script>
