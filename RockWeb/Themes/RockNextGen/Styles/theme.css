@@ -17362,6 +17362,10 @@ iframe.file-browser {
   margin: 0 !important;
 }
 
+.main-content:has(.profile-content, .person-profile) .main-footer:has(.html-content) {
+  margin: var(--spacing-large) var(--spacing-large) var(--spacing-small);
+}
+
 .profile-nav {
   display: flex;
   flex-wrap: wrap;

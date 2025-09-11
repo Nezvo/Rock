@@ -4,6 +4,11 @@
   margin: 0 !important;
 }
 
+// When there is profile content, reduce the margin on the footer
+.main-content:has(.profile-content, .person-profile) .main-footer:has(.html-content) {
+  margin: var(--spacing-large) var(--spacing-large) var(--spacing-small);
+}
+
 .profile-nav {
   display: flex;
   flex-wrap: wrap;
