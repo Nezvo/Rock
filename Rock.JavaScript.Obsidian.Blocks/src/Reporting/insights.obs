@@ -1,0 +1,429 @@
+<template>
+    <NotificationBox v-if="!dataAvailable" alertType="info">
+        Either no Insight data is available or all data categories have been set not to show in the block properties.
+    </NotificationBox>
+    <div v-else class="insights">
+        <Panel title="Insights" type="block">
+            <div v-if="blockProperties.isDemographicsShown" class="rock-header">
+                <h3 class="title">Demographics</h3>
+                <span class="description">The demographic charts below provide a broad view of who we are as a community.</span>
+                <hr class="section-header-hr">
+            </div>
+            <div v-if="blockProperties.isDemographicsShown" class="row">
+                <div v-if="blockProperties.isConnectionStatusShown" class="col-md-3">
+                    <Panel title="Connection Status">
+                        <BarChart v-if="barSeriesDataExists(connectionStatusChartBarSeries)"
+                                  :labels="connectionStatusChartBag.labels ?? []"
+                                  :series="connectionStatusChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="300px" />
+                        <NotificationBox v-else alertType="info">There is no data on connection status demographics.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isAgeShown" class="col-md-3">
+                    <Panel title="Age">
+                        <BarChart v-if="barSeriesDataExists(ageChartBarSeries)"
+                                  :labels="ageChartBag.labels ?? []"
+                                  :series="ageChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="300px" />
+                        <NotificationBox v-else alertType="info">There is no data on age demographics.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isMaritalStatusShown" class="col-md-3">
+                    <Panel title="Marital Status">
+                        <BarChart v-if="barSeriesDataExists(maritalStatusChartBarSeries)"
+                                  :labels="maritalStatusChartBag.labels ?? []"
+                                  :series="maritalStatusChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="300px" />
+                        <NotificationBox v-else alertType="info">There is no data on marital status demographics.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isGenderShown" class="col-md-3">
+                    <Panel title="Gender">
+                        <PieChart v-if="pieSeriesDataExists(genderChartPieSeries)"
+                                  :labels="genderChartBag.labels ?? []"
+                                  :series="genderChartPieSeries"
+                                  hideLegend="false"
+                                  type="percent"
+                                  chartContainerHeight="300px" />
+                        <NotificationBox v-else alertType="info">There is no data on gender demographics.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isRaceShown" class="col-md-3">
+                    <Panel title="Race">
+                        <BarChart v-if="barSeriesDataExists(raceChartBarSeries)"
+                                  :labels="raceChartBag.labels ?? []"
+                                  :series="raceChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="300px" />
+                        <NotificationBox v-else alertType="info">There is no data on race demographics.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isEthnicityShown" class="col-md-3">
+                    <Panel title="Ethnicity">
+                        <BarChart v-if="barSeriesDataExists(ethnicityChartBarSeries)"
+                                  :labels="ethnicityChartBag.labels ?? []"
+                                  :series="ethnicityChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="300px" />
+                        <NotificationBox v-else alertType="info">There is no data on ethnicity demographics.</NotificationBox>
+                    </Panel>
+                </div>
+            </div>
+            <div v-if="blockProperties.isInformationStatisticsShown" class="rock-header">
+                <h3 class="title">Information Statistics</h3>
+                <span class="description">The more we know about our people the more we can serve them and tailor our ministry for their unique needs.</span>
+                <hr class="section-header-hr">
+            </div>
+            <div v-if="blockProperties.isInformationStatisticsShown">
+                <div v-if="blockProperties.isInformationCompletenessShown" class="row">
+                    <Panel title="Information Completeness">
+                        <BarChart v-if="barSeriesDataExists(informationCompletenessChartBarSeries)"
+                                  :labels="informationCompletenessChartBag.labels ?? []"
+                                  :series="informationCompletenessChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="400px" />
+                        <NotificationBox v-else alertType="info">There is no data on information completeness.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isPercentageOfIndividualsWithAssessmentsShown" class="row">
+                    <Panel title="Percentage of Individuals with Assessments">
+                        <BarChart v-if="barSeriesDataExists(activeIndividualsWithAssessmentsChartBarSeries)"
+                                  :labels="activeIndividualsWithAssessmentsChartBag.labels ?? []"
+                                  :series="activeIndividualsWithAssessmentsChartBarSeries"
+                                  :categoryShowAllTicks="true"
+                                  :categoryShowGridLines="true"
+                                  :hideLegend="true"
+                                  :horizontal="false"
+                                  :overlap="false"
+                                  :stack="false"
+                                  type="percent"
+                                  :unfilled="false"
+                                  valueHideGridLines="false"
+                                  chartContainerHeight="400px" />
+                        <NotificationBox v-else alertType="info">There is no data on active individuals with assessments.</NotificationBox>
+                    </Panel>
+                </div>
+                <div v-if="blockProperties.isRecordStatusesShown" class="row">
+                    <div class="col-md-3">
+                        <Panel title="Record Statuses">
+                            <PieChart v-if="pieSeriesDataExists(recordStatusesChartPieSeries)"
+                                      :labels="recordStatusesChartBag.labels ?? []"
+                                      :series="recordStatusesChartPieSeries"
+                                      hideLegend="false"
+                                      legendPosition="right"
+                                      type="percent"
+                                      chartContainerHeight="200px" />
+                            <NotificationBox v-else alertType="info">There is no data on record statuses.</NotificationBox>
+                        </Panel>
+                    </div>
+                </div>
+            </div>
+        </Panel>
+    </div>
+</template>
+<style scoped>
+.insights :deep(.panel-heading) {
+    background-color: var(--theme-white)
+}
+</style>
+<script setup lang="ts">
+    import Panel from "@Obsidian/Controls/panel.obs";
+    import NotificationBox from "@Obsidian/Controls/notificationBox.obs";
+    import PieChart from "@Obsidian/Controls/pieChart.obs";
+    import BarChart from "@Obsidian/Controls/barChart.obs";
+    import { onConfigurationValuesChanged, useConfigurationValues, useReloadBlock } from "@Obsidian/Utility/block";
+    import { InsightsInitializationBox } from "@Obsidian/ViewModels/Blocks/Reporting/Insights/insightsInitializationBox";
+    import { InsightsChartDataBag } from "@Obsidian/ViewModels/Blocks/Reporting/Insights/insightsChartDataBag";
+    import { ChartOptionsBag } from "@Obsidian/ViewModels/Reporting/chartOptionsBag";
+    import { BarChartBag } from "@Obsidian/ViewModels/Reporting/BarChart/barChartBag";
+    import { PieChartBag } from "@Obsidian/ViewModels/Reporting/PieChart/pieChartBag";
+    import { BarSeries, PieSeries } from "@Obsidian/Core/Controls/chart";
+    import { BarSeriesBag } from "@Obsidian/ViewModels/Reporting/BarChart/barSeriesBag";
+    import { PieSeriesBag } from "@Obsidian/ViewModels/Reporting/PieChart/pieSeriesBag";
+
+    // #region Values
+
+    const config = useConfigurationValues<InsightsInitializationBox>();
+
+    const chartDataBags = config.chartDataBags ?? new Array<InsightsChartDataBag>();
+
+    const dataAvailable = Object.keys(chartDataBags).length > 0;
+
+    const blockProperties = config.optionsBags?.BlockProperties ?? {
+        isDemographicsShown: true,
+        isConnectionStatusShown: true,
+        isAgeShown: true,
+        isMaritalStatusShown: true,
+        isGenderShown: true,
+        isEthnicityShown: false,
+        isRaceShown: false,
+        isInformationStatisticsShown: true,
+        isInformationCompletenessShown: true,
+        isPercentageOfIndividualsWithAssessmentsShown: true,
+        isRecordStatusesShown: true
+    };
+
+    // #region Values > Demographics Charts - Declarations
+
+    let connectionStatusChartDataBag: InsightsChartDataBag;
+    let connectionStatusChartBag: BarChartBag;
+    let connectionStatusChartBarSeries: BarSeries[];
+    let connectionStatusChartOptionsBag: ChartOptionsBag | null;
+
+    let ageChartDataBag: InsightsChartDataBag;
+    let ageChartBag: BarChartBag;
+    let ageChartBarSeries: BarSeries[];
+    let ageChartOptionsBag: ChartOptionsBag | null;
+
+    let maritalStatusChartDataBag: InsightsChartDataBag;
+    let maritalStatusChartBag: BarChartBag;
+    let maritalStatusChartBarSeries: BarSeries[];
+    let maritalStatusChartOptionsBag: ChartOptionsBag | null;
+
+    let genderChartDataBag: InsightsChartDataBag;
+    let genderChartBag: PieChartBag;
+    let genderChartPieSeries: PieSeries[];
+    let genderChartOptionsBag: ChartOptionsBag | null;
+
+    let raceChartDataBag: InsightsChartDataBag;
+    let raceChartBag: BarChartBag;
+    let raceChartBarSeries: BarSeries[];
+    let raceChartOptionsBag: ChartOptionsBag | null;
+
+    let ethnicityChartDataBag: InsightsChartDataBag;
+    let ethnicityChartBag: BarChartBag;
+    let ethnicityChartBarSeries: BarSeries[];
+    let ethnicityChartOptionsBag: ChartOptionsBag | null;
+
+    // #endregion
+
+    // #region Values > Information Statistics - Declarations
+
+    let informationCompletenessChartDataBag: InsightsChartDataBag;
+    let informationCompletenessChartBag: BarChartBag;
+    let informationCompletenessChartBarSeries: BarSeries[];
+    let informationCompletenessChartOptionsBag: ChartOptionsBag | null;
+
+    let activeIndividualsWithAssessmentsChartDataBag: InsightsChartDataBag;
+    let activeIndividualsWithAssessmentsChartBag: BarChartBag;
+    let activeIndividualsWithAssessmentsChartBarSeries: BarSeries[];
+    let activeIndividualsWithAssessmentsChartOptionsBag: ChartOptionsBag | null;
+
+    let recordStatusesChartDataBag: InsightsChartDataBag;
+    let recordStatusesChartBag: PieChartBag;
+    let recordStatusesChartPieSeries: PieSeries[];
+    let recordStatusesChartOptionsBag: ChartOptionsBag | null;
+
+    // #endregion
+
+    // #region Values > Set Charts Data and Options
+
+    if (blockProperties.isDemographicsShown) {
+        if (blockProperties.isConnectionStatusShown) {
+            connectionStatusChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "Demographics" &&
+                bag.insightSubcategory === "ConnectionStatus"
+            ) ?? {};
+            connectionStatusChartBag = connectionStatusChartDataBag.chartBag as BarChartBag;
+            connectionStatusChartBarSeries = connectionStatusChartBag.seriesBags as BarSeries[];
+            connectionStatusChartOptionsBag = connectionStatusChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isAgeShown) {
+            ageChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "Demographics" &&
+                bag.insightSubcategory === "Age"
+            ) ?? {};
+            ageChartBag = moveUnknownToLast(ageChartDataBag.chartBag as BarChartBag);
+            ageChartBarSeries = ageChartBag.seriesBags as BarSeries[];
+            ageChartOptionsBag = ageChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isMaritalStatusShown) {
+            maritalStatusChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "Demographics" &&
+                bag.insightSubcategory === "MaritalStatus"
+            ) ?? {};
+            maritalStatusChartBag = maritalStatusChartDataBag.chartBag as BarChartBag;
+            maritalStatusChartBarSeries = maritalStatusChartBag.seriesBags as BarSeries[];
+            maritalStatusChartOptionsBag = maritalStatusChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isGenderShown) {
+            genderChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "Demographics" &&
+                bag.insightSubcategory === "Gender"
+            ) ?? {};
+            genderChartBag = genderChartDataBag.chartBag as PieChartBag;
+            genderChartPieSeries = genderChartBag.seriesBags as PieSeries[];
+            genderChartOptionsBag = genderChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isRaceShown) {
+            raceChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "Demographics" &&
+                bag.insightSubcategory === "Race"
+            ) ?? {};
+            raceChartBag = raceChartDataBag.chartBag as BarChartBag;
+            raceChartBarSeries = raceChartBag.seriesBags as BarSeries[];
+            raceChartOptionsBag = raceChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isEthnicityShown) {
+            ethnicityChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "Demographics" &&
+                bag.insightSubcategory === "Ethnicity"
+            ) ?? {};
+            ethnicityChartBag = ethnicityChartDataBag.chartBag as BarChartBag;
+            ethnicityChartBarSeries = ethnicityChartBag.seriesBags as BarSeries[];
+            ethnicityChartOptionsBag = ethnicityChartBag.chartOptionsBag ?? null;
+        }
+    }
+
+    if (blockProperties.isInformationStatisticsShown) {
+        if (blockProperties.isInformationCompletenessShown) {
+            informationCompletenessChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "InformationStatistics" &&
+                bag.insightSubcategory === "InformationCompleteness"
+            ) ?? {};
+            informationCompletenessChartBag = informationCompletenessChartDataBag.chartBag as BarChartBag;
+            informationCompletenessChartBarSeries = informationCompletenessChartBag.seriesBags as BarSeries[];
+            informationCompletenessChartOptionsBag = informationCompletenessChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isPercentageOfIndividualsWithAssessmentsShown) {
+            activeIndividualsWithAssessmentsChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "InformationStatistics" &&
+                bag.insightSubcategory === "ActiveIndividualsWithAssessments"
+            ) ?? {};
+            activeIndividualsWithAssessmentsChartBag = activeIndividualsWithAssessmentsChartDataBag.chartBag as BarChartBag;
+            activeIndividualsWithAssessmentsChartBarSeries = activeIndividualsWithAssessmentsChartBag.seriesBags as BarSeries[];
+            activeIndividualsWithAssessmentsChartOptionsBag = activeIndividualsWithAssessmentsChartBag.chartOptionsBag ?? null;
+        }
+        if (blockProperties.isRecordStatusesShown) {
+            recordStatusesChartDataBag = chartDataBags.find((bag: InsightsChartDataBag) =>
+                bag.insightCategory === "InformationStatistics" &&
+                bag.insightSubcategory === "RecordStatuses"
+            ) ?? {};
+            recordStatusesChartBag = recordStatusesChartDataBag.chartBag as PieChartBag;
+            recordStatusesChartPieSeries = recordStatusesChartBag.seriesBags as PieSeries[];
+            recordStatusesChartOptionsBag = recordStatusesChartBag.chartOptionsBag ?? null;
+        }
+    }
+
+    // #endregion
+
+    // #endregion
+
+    // #region Functions
+
+    /**
+     * Determines if the provided BarSeries data contains valid data for rendering.
+     *
+     * @param {BarSeries[] | null} barSeries - The chart data to check.
+     * @returns {boolean} True if the chart data exists and contains non-zero string values; otherwise, false.
+     */
+    function barSeriesDataExists(barSeries: BarSeries[] | null): boolean {
+        return barSeries !== null
+            && barSeries.length > 0
+            && barSeries.some(series => series.data.some(value =>
+                (typeof value === "number" && value !== 0) ||
+                (typeof value === "string" && value !== "0" && value !== "")
+            ));
+    }
+
+    /**
+     * Determines if the provided BarSeries data contains valid data for rendering.
+     *
+     * @param {PieSeries[] | null} pieSeries - The chart data to check.
+     * @returns {boolean} True if the chart data exists and contains non-zero string values; otherwise, false.
+     */
+    function pieSeriesDataExists(pieSeries: PieSeries[] | null): boolean {
+        return pieSeries !== null
+            && pieSeries.length > 0
+            && pieSeries.some(series => series.data.some(value =>
+                (typeof value === "number" && value !== 0) ||
+                (typeof value === "string" && value !== "0" && value !== "")
+            ));
+    }
+
+    /**
+     * Moves the "Unknown" label and its corresponding data point to the end of the BarChartBag.
+     *
+     * @param {BarChartBag} barChartBag - The BarChartBag to modify.
+     * @returns {BarChartBag} The modified BarChartBag with "Unknown" moved to the end.
+     */
+    function moveUnknownToLast(barChartBag: BarChartBag): BarChartBag {
+        if (barChartBag.labels && barChartBag.seriesBags && barChartBag.labels.length > 1) {
+            const unknownLabelIndex = barChartBag.labels.findIndex(label => label.toLowerCase() === "unknown");
+            if (unknownLabelIndex > -1 && unknownLabelIndex !== barChartBag.labels.length - 1) {
+                // Move the "Unknown" label to the end of the labels array
+                const [unknownLabel] = barChartBag.labels.splice(unknownLabelIndex, 1);
+                barChartBag.labels.push(unknownLabel);
+
+                // Move the corresponding data point in each series to the end of the data array
+                barChartBag.seriesBags.forEach((seriesBag: BarSeriesBag) => {
+                    if (seriesBag.data && seriesBag.data.length > unknownLabelIndex) {
+                        const [unknownData] = seriesBag.data.splice(unknownLabelIndex, 1);
+                        seriesBag.data.push(unknownData);
+                    }
+                });
+            }
+        }
+        return barChartBag;
+    }
+
+    // #endregion
+
+    // #region Event Handlers
+
+    onConfigurationValuesChanged(useReloadBlock());
+
+    // #endregion
+
+</script>

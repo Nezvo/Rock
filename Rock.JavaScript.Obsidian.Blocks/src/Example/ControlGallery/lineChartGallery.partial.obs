@@ -36,6 +36,16 @@
                                      label="Chart Title"
                                      @update:modelValue="title = $event" />
                         </div>
+                        <div class="autolayout">
+                            <TextBox :modelValue="chartContainerHeight ?? ''"
+                                     label="Chart Container Height"
+                                     help="CSS size value (e.g., '300px' or '50%')."
+                                     @update:modelValue="chartContainerHeight = $event" />
+                            <TextBox :modelValue="chartContainerWidth ?? ''"
+                                     label="Chart Container Width"
+                                     help="CSS size value (e.g., '300px' or '50%')."
+                                     @update:modelValue="chartContainerWidth = $event" />
+                        </div>
                     </ContentStack>
 
                     <ContentStack title="Data">
@@ -237,6 +247,8 @@
     const valueHideGridLines = ref<boolean | undefined>();
     const categoryMaxTickCount = ref<number | undefined>();
     const valueMaxTickCount = ref<number | undefined>();
+    const chartContainerHeight = ref<string | undefined>();
+    const chartContainerWidth = ref<string | undefined>();
     const isUnfilled = ref<boolean | undefined>();
     const isLinear = ref<boolean | undefined>();
     const isStacked = ref<boolean | undefined>();
@@ -288,7 +300,13 @@
             lineChartProps.push(`:categoryMaxTickCount="${categoryMaxTickCount.value}"`);
         }
         if (!isNullish(categoryShowGridLines.value)) {
-            lineChartProps.push(`categoryShowGridLines="${categoryShowGridLines.value}"`);
+            lineChartProps.push(`:categoryShowGridLines="${categoryShowGridLines.value}"`);
+        }
+        if (!isNullish(chartContainerHeight.value)) {
+            lineChartProps.push(`chartContainerHeight="${chartContainerHeight.value}"`);
+        }
+        if (!isNullish(chartContainerWidth.value)) {
+            lineChartProps.push(`chartContainerWidth="${chartContainerWidth.value}"`);
         }
         if (!isNullish(isLegendHidden.value)) {
             lineChartProps.push(`hideLegend="${isLegendHidden.value}"`);
