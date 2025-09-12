@@ -90,7 +90,6 @@
         const list = parseCustomActions(customActions);
         list.forEach(({ href, text }) => {
             const { classes, withtext } = parseIconAndText(text);
-            console.log("withtext: >" + withtext + "<");
 
             if (href) {
                 actions.push({
@@ -111,8 +110,6 @@
                 });
             }
             else {
-                console.log("else seomething else");
-
                 actions.push({
                     title: text,
                     type: "default",

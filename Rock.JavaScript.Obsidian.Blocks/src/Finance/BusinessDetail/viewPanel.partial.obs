@@ -59,7 +59,6 @@
     const tagCategoryGuid = ref<Guid | null>(toGuidOrNull(props.options?.tagCategoryGuid));
 
     const badgeTypeGuids = computed((): string[] => {
-        console.log("there are badgeTypeGuids: " + badgeTypeGuids);
         return props.modelValue?.badgeTypeGuids ?? [];
     });
 
