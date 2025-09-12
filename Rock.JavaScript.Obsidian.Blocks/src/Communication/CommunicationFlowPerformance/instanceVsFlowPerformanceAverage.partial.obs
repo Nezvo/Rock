@@ -96,11 +96,10 @@
 
     const data = computed<{ series: BarSeries[]; labels: string[]; }>(() => {
         // Calculate conversion and unsubscribe rates for each instance.
+        // TODO JMH For on-demand flows this will 
         const allInstanceRates = Enumerable
             .from(allMessagesGroupedByInstance.value)
             .select(messagesByInstance => {
-                const messageCount = messagesByInstance.count();
-                const personCount = Enumerable.from(props.instances).where(i => i.communicationFlowInstanceIdKey === messagesByInstance.key).select(i => i.uniquePersonCount).firstOrDefault(0);
                 // Count the number of PEOPLE who converted, not the number of conversion events.
                 const conversionCount = messagesByInstance
                     .groupBy(m => m.personAliasIdKey)
@@ -110,8 +109,8 @@
                 return {
                     communicationFlowInstanceIdKey: messagesByInstance.key,
                     rates: {
-                        conversionRate: personCount ? conversionCount / personCount : 0,
-                        unsubscribeRate: messageCount ? unsubscribeCount / personCount : 0
+                        conversionRate: props.uniquePersonCount ? conversionCount / props.uniquePersonCount : 0,
+                        unsubscribeRate: props.uniquePersonCount ? unsubscribeCount / props.uniquePersonCount : 0
                     }
                 };
             })

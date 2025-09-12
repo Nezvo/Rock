@@ -13,9 +13,10 @@
                 <DisplayCardContainer hasConnectors>
                     <template v-for="(communication, index) in orderedCommunications" :key="communication.communicationTemplate?.guid">
                         <CommunicationTrigger :communication="communication"
+                                              :communications="orderedCommunications"
                                               :disabled="disabled"
                                               :index="index"
-                                              :communications="orderedCommunications"
+                                              :triggerType="triggerType"
                                               @update:communication="onCommunicationUpdated(communication, $event)" />
 
                         <DisplayCard :aside="getDisplayCardAside(communication)"

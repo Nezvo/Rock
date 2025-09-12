@@ -181,44 +181,16 @@ namespace Rock.Blocks.Communication
                 } )
                 .AddTextField( "status", communicationFlow =>
                 {
-                    if ( communicationFlow.IsActive )
+                    if ( communicationFlow.IsMessagingClosed ) // This status does not include conversion goal tracking
                     {
-                        if ( communicationFlow.TriggerType == Enums.Communication.CommunicationFlowTriggerType.Recurring || communicationFlow.TriggerType == Enums.Communication.CommunicationFlowTriggerType.OneTime )
-                        {
-                            if ( communicationFlow.Schedule == null || communicationFlow.Schedule.GetNextStartDateTime( RockDateTime.Now ).HasValue )
-                            {
-                                // The communication flow has no schedule
-                                // or the schedule has upcoming instances
-                                // so mark it as active.
-                                return "Active";
-                            }
-                            else
-                            {
-                                var hasMoreCommunicationsToSendOrSchedule = communicationFlow
-                                    .CommunicationFlowInstances
-                                    .OrderByDescending( cfi => cfi.StartDate )
-                                    .FirstOrDefault()
-                                    ?.GetHasMoreCommunicationsToSendOrSchedule() ?? false;
-
-                                if ( hasMoreCommunicationsToSendOrSchedule )
-                                {
-                                    return "Active";
-                                }
-                                else
-                                {
-                                    // The communication flow has completed all scheduled instances.
-                                    return "Completed";
-                                }
-                            }
-                        }
-                        else
-                        {
-                            return "Active";
-                        }
+                        return "Completed";
+                    }
+                    else if ( communicationFlow.IsActive )
+                    {
+                        return "Active";
                     }
                     else
                     {
-                        // The communication flow is inactive.
                         return "Inactive";
                     }
                 } )

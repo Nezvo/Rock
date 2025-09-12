@@ -55,6 +55,7 @@
         <DateColumn name="lastTriggered"
                     title="Last Triggered"
                     field="lastTriggered"
+                    sortField="lastTriggered"
                     :filter="dateValueFilter"
                     visiblePriority="xs" />
 

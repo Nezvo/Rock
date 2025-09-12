@@ -13,13 +13,13 @@
           :showMergeTemplate="false"
           disablePaging
           isFooterHidden>
-        <Column v-if="hasMultipleInstanceMessages"
+        <Column v-if="false"
                 :field="getField('communicationFlowInstanceStartDate')"
                 :name="getField('communicationFlowInstanceStartDate')"
                 title="Instance Start Date">
             <template #format="{ row }">
                 <span>
-                    {{ RockDateTimeFormatter.format_1_1_1970_1_00_AM(parseRockDateTime(getRow(row).communicationFlowInstanceStartDate)) }}
+                    {{ RockDateTimeFormatter.format_1_1_1970(parseRockDateTime(getRow(row).communicationFlowInstanceStartDate)) }}
                 </span>
             </template>
         </Column>
@@ -210,7 +210,7 @@
     // #region Functions
 
     function getConversionPercentFormatted(conversionCount: number): string {
-        if (props.uniquePersonCount === 0) {
+        if (props.uniquePersonCount === 0 || conversionCount === 0) {
             return "0%";
         }
         else {
