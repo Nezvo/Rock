@@ -152,18 +152,35 @@ namespace Rock.Blocks.Communication
                         return null;
                     }
 
-                    decimal recipientCountForAllInstances = communicationFlow
-                        .CommunicationFlowInstances
-                        .SelectMany( cfi => cfi.CommunicationFlowInstanceCommunications.SelectMany( cfic => cfic.Communication.Recipients.Where( r => r.SendDateTime.HasValue ) ) )
+                    var communicationFlowInstanceQuery = new CommunicationFlowService( RockContext )
+                        .Queryable()
+                        .Where( cf => cf.Id == communicationFlow.Id )
+                        .SelectMany( cf =>
+                            cf.CommunicationFlowInstances
+                        );
+
+                    // Get the unique number of people for all instances.
+                    decimal uniquePeopleCount = communicationFlowInstanceQuery
+                        .SelectMany( cfi =>
+                            cfi.CommunicationFlowInstanceRecipients.Select( cfir => cfir.RecipientPersonAlias.PersonId )
+                        )
+                        .Distinct()
                         .Count();
 
-                    decimal conversionCountForAllInstances = communicationFlow
-                        .CommunicationFlowInstances
-                        .SelectMany( i => i.CommunicationFlowInstanceCommunications )
-                        .Sum( ic => ic.CommunicationFlowInstanceCommunicationConversions.Count );
+                    // Get the number of people that have converted at least once.
+                    decimal convertedPeopleCount = communicationFlowInstanceQuery
+                        .SelectMany( cfi =>
+                            cfi.CommunicationFlowInstanceCommunications.SelectMany( cfic =>
+                                cfic.CommunicationFlowInstanceCommunicationConversions.Select( cficc =>
+                                    cficc.PersonAlias.PersonId
+                                )
+                            )
+                        )
+                        .Distinct()
+                        .Count();
 
-                    return conversionCountForAllInstances > 0
-                        ? ( conversionCountForAllInstances / recipientCountForAllInstances )
+                    return uniquePeopleCount > 0
+                        ? ( convertedPeopleCount / uniquePeopleCount )
                         : 0m;
                 })
                 .AddDateTimeField( "lastTriggered", communicationFlow =>
