@@ -264,32 +264,41 @@
     // #region Event Handlers
 
     function onTriggerTypeUpdated(newTriggerType: CommunicationFlowTriggerType): void {
-        if (newTriggerType === CommunicationFlowTriggerType.OneTime || newTriggerType === CommunicationFlowTriggerType.Recurring) {
-            // Clear the recurring schedule if the trigger type is one-time.
-            const calendar = iCalendarContent.value ? new Calendar(iCalendarContent.value) : new Calendar();
+        switch (newTriggerType) {
+            case CommunicationFlowTriggerType.OneTime: {
+                // Clear the recurring schedule if the trigger type is one-time.
+                const calendar = iCalendarContent.value ? new Calendar(iCalendarContent.value) : new Calendar();
 
-            if (calendar) {
-                if (calendar.events?.length) {
-                    calendar.events = calendar.events.slice(0, 1);
+                if (calendar) {
+                    if (calendar.events?.length) {
+                        calendar.events = calendar.events.slice(0, 1);
+                    }
+                    else {
+                        calendar.events = [new Event()];
+                    }
+
+                    const event = calendar.events[0];
+
+                    event.excludedDates = [];
+                    event.recurrenceDates = [];
+                    event.recurrenceRules = [];
+
+                    iCalendarContent.value = calendar.build();
                 }
-                else {
-                    calendar.events = [new Event()];
-                }
 
-                const event = calendar.events[0];
-
-                event.excludedDates = [];
-                event.recurrenceDates = [];
-                event.recurrenceRules = [];
-
-                iCalendarContent.value = calendar.build();
+                break;
             }
-        }
-        else {
-            // Clear the target audience and schedule if the
-            // trigger type is neither recurring nor one-time.
-            iCalendarContent.value = null;
-            targetAudienceDataView.value = null;
+
+            case CommunicationFlowTriggerType.OnDemand: {
+                // Clear the target audience and schedule if the
+                // trigger type is neither recurring nor one-time.
+                targetAudienceDataView.value = null;
+                iCalendarContent.value = null;
+
+                break;
+            }
+
+            default: break;
         }
     }
 
