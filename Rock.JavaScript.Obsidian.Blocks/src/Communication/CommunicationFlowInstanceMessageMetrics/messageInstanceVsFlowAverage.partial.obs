@@ -1,6 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <Panel v-if="hasSentCommunications"
+    <Panel v-if="hasData"
            panelBodyCssClass="chart-container"
            title="Message Instance vs. Flow Average">
         <BarChart :series="data.series"
@@ -26,11 +26,9 @@
     import Panel from "@Obsidian/Controls/panel.obs";
     import { BarLabelsConfig, BarSeries } from "@Obsidian/Core/Controls/chart";
     import { Enumerable, GroupedEnumerable } from "@Obsidian/Utility/linq";
-    import { isNullish } from "@Obsidian/Utility/util";
     import { CommunicationFlowInstanceBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceBag";
     import { CommunicationFlowInstanceCommunicationBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/communicationFlowInstanceCommunicationBag";
     import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
-    import { RockDateTime } from "@Obsidian/Utility/rockDateTime";
 
     /**
      *  Purpose: "How does this instance of this message compare across all instances of this flow?"
@@ -40,14 +38,6 @@
         Instance = "Instance",
         Average = "Average"
     }
-
-    type Metrics = {
-        peopleConverted: number;
-        peopleUnsubscribed: number;
-        peopleOpened: number;
-        peopleClicked: number;
-        uniquePersonCount: number;
-    };
 
     const props = defineProps({
         allCommunicationFlowInstanceCommunications: {
@@ -91,10 +81,8 @@
         };
     });
 
-    const hasSentCommunications = computed<boolean>(() => {
-        // Check if there are any recipients with a sent date.
-        return Enumerable.from(props.selectedCommunicationFlowInstanceRecipientMetrics).any(m => !!m.sentDate)
-            && data.value.labels.length > 0;
+    const hasData = computed<boolean>(() => {
+        return Enumerable.from(data.value.series).any(s => !!s.data.length);
     });
 
     const selectedInstanceMetricsByPerson = computed(() => {
