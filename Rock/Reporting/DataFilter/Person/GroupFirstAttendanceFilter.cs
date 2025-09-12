@@ -204,7 +204,7 @@ namespace Rock.Reporting.DataFilter.Person
 
             string dateRangeText = SlidingDateRangePicker.FormatDelimitedValues( groupFirstAttendanceFilterSelection.SlidingDateRange );
             var dateRangeType = SlidingDateRangePicker.GetSlidingDateRangeTypeFromDelimitedValues( groupFirstAttendanceFilterSelection.SlidingDateRange );
-            
+
             bool isDateRange = dateRangeType == SlidingDateRangePicker.SlidingDateRangeType.DateRange;
 
             selectionOutput = $"Returns individuals who attended any one of the following groups for the first time within the {( isDateRange ? "date range" : "" )} {dateRangeText.ToLower()}: {groupsList}.";
