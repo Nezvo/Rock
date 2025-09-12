@@ -309,7 +309,7 @@
             lineChartProps.push(`chartContainerWidth="${chartContainerWidth.value}"`);
         }
         if (!isNullish(isLegendHidden.value)) {
-            lineChartProps.push(`hideLegend="${isLegendHidden.value}"`);
+            lineChartProps.push(`:hideLegend="${isLegendHidden.value}"`);
         }
         if (!isNullish(labelDateFormat.value)) {
             lineChartProps.push(`labelDateFormat="${labelDateFormat.value}"`);
@@ -321,13 +321,13 @@
             lineChartProps.push(`legendPosition="${legendPosition.value}"`);
         }
         if (!isNullish(isLinear.value)) {
-            lineChartProps.push(`linear="${isLinear.value}"`);
+            lineChartProps.push(`:linear="${isLinear.value}"`);
         }
         if (!isNullish(lineStyle.value)) {
             lineChartProps.push(`lineStyle="${lineStyle.value}"`);
         }
         if (!isNullish(isStacked.value)) {
-            lineChartProps.push(`stack="${isStacked.value}"`);
+            lineChartProps.push(`:stack="${isStacked.value}"`);
         }
         if (title.value) {
             lineChartProps.push(`title="${title.value}"`);

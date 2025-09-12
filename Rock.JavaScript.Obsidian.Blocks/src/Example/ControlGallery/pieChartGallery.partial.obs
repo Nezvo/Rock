@@ -169,7 +169,7 @@
             pieChartProps.push(`chartContainerWidth="${chartContainerWidth.value}"`);
         }
         if (!isNullish(isLegendHidden.value)) {
-            pieChartProps.push(`hideLegend="${isLegendHidden.value}"`);
+            pieChartProps.push(`:hideLegend="${isLegendHidden.value}"`);
         }
         if (!isNullish(legendAlign.value)) {
             pieChartProps.push(`legendAlign="${legendAlign.value}"`);

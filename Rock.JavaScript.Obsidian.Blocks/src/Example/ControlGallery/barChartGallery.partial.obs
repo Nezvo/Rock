@@ -347,10 +347,10 @@
             }
         }
         if (!isNullish(isUnfilled.value)) {
-            barChartProps.push(`"unfilled="${isUnfilled.value}"`);
+            barChartProps.push(`":unfilled="${isUnfilled.value}"`);
         }
         if (!isNullish(valueHideGridLines.value)) {
-            barChartProps.push(`valueHideGridLines="${valueHideGridLines.value}"`);
+            barChartProps.push(`:valueHideGridLines="${valueHideGridLines.value}"`);
         }
         if (valueLabel.value) {
             barChartProps.push(`valueLabel="${valueLabel.value}"`);

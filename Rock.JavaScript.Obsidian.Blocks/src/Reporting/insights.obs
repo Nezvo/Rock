@@ -23,7 +23,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="300px" />
                         <NotificationBox v-else alertType="info">There is no data on connection status demographics.</NotificationBox>
                     </Panel>
@@ -41,7 +41,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="300px" />
                         <NotificationBox v-else alertType="info">There is no data on age demographics.</NotificationBox>
                     </Panel>
@@ -59,7 +59,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="300px" />
                         <NotificationBox v-else alertType="info">There is no data on marital status demographics.</NotificationBox>
                     </Panel>
@@ -69,7 +69,7 @@
                         <PieChart v-if="pieSeriesDataExists(genderChartPieSeries)"
                                   :labels="genderChartBag.labels ?? []"
                                   :series="genderChartPieSeries"
-                                  hideLegend="false"
+                                  :hideLegend="false"
                                   type="percent"
                                   chartContainerHeight="300px" />
                         <NotificationBox v-else alertType="info">There is no data on gender demographics.</NotificationBox>
@@ -88,7 +88,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="300px" />
                         <NotificationBox v-else alertType="info">There is no data on race demographics.</NotificationBox>
                     </Panel>
@@ -106,7 +106,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="300px" />
                         <NotificationBox v-else alertType="info">There is no data on ethnicity demographics.</NotificationBox>
                     </Panel>
@@ -131,7 +131,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="400px" />
                         <NotificationBox v-else alertType="info">There is no data on information completeness.</NotificationBox>
                     </Panel>
@@ -149,7 +149,7 @@
                                   :stack="false"
                                   type="percent"
                                   :unfilled="false"
-                                  valueHideGridLines="false"
+                                  :valueHideGridLines="false"
                                   chartContainerHeight="400px" />
                         <NotificationBox v-else alertType="info">There is no data on active individuals with assessments.</NotificationBox>
                     </Panel>
@@ -160,7 +160,7 @@
                             <PieChart v-if="pieSeriesDataExists(recordStatusesChartPieSeries)"
                                       :labels="recordStatusesChartBag.labels ?? []"
                                       :series="recordStatusesChartPieSeries"
-                                      hideLegend="false"
+                                      :hideLegend="false"
                                       legendPosition="right"
                                       type="percent"
                                       chartContainerHeight="200px" />
