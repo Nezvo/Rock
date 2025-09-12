@@ -203,8 +203,11 @@ namespace Rock.Reporting.DataFilter.Person
             var comparisonType = groupFirstAttendanceFilterSelection.IntegerCompare.ConvertToEnum<ComparisonType>( ComparisonType.GreaterThanOrEqualTo );
 
             string dateRangeText = SlidingDateRangePicker.FormatDelimitedValues( groupFirstAttendanceFilterSelection.SlidingDateRange );
+            var dateRangeType = SlidingDateRangePicker.GetSlidingDateRangeTypeFromDelimitedValues( groupFirstAttendanceFilterSelection.SlidingDateRange );
+            
+            bool isDateRange = dateRangeType == SlidingDateRangePicker.SlidingDateRangeType.DateRange;
 
-            selectionOutput = $"Attended '{groupsList}' for the first time in the Date Range: {dateRangeText}";
+            selectionOutput = $"Returns individuals who attended any one of the following groups for the first time within the {( isDateRange ? "date range" : "" )} {dateRangeText.ToLower()}: {groupsList}.";
 
             return selectionOutput;
         }
