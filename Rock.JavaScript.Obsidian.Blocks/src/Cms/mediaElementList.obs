@@ -1,7 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <Grid v-if="isVisible"
-          :definition="config.gridDefinition ?? undefined"
+    <Grid :definition="config.gridDefinition ?? undefined"
           :data="gridDataSource"
           keyField="idKey"
           :title="config?.options?.mediaFolderName + ' Media Elements'"
@@ -76,10 +75,6 @@
     // #endregion
 
     // #region Computed Values
-
-    const isVisible = computed((): boolean => {
-        return store.state.areSecondaryBlocksShown;
-    });
 
     // #endregion
 

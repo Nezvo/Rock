@@ -62,6 +62,7 @@ namespace Rock.Blocks.Engagement
         Category = AttributeCategory.LinkedPages,
         Order = 3 )]
 
+    [Rock.Cms.DefaultBlockRole( Rock.Enums.Cms.BlockRole.Secondary )]
     [Rock.SystemGuid.EntityTypeGuid( "f3a7b501-61c4-4784-8f73-958e2f1fc353" )]
     [Rock.SystemGuid.BlockTypeGuid( "6a7c7c71-4760-4e6c-9d6f-6926c81caf8f" )]
     [CustomizedGrid]
