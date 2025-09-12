@@ -1075,6 +1075,10 @@ ul.activeusers {
   border: none;
 }
 
+.panel-scrollable-content .contentsection {
+  margin: var(--spacing-medium);
+}
+
 // If there's a non-light grid make the panel body take up the full height and remove padding
 .panel-body:has(.grid-obsidian:not(.grid-light)) {
   overflow: hidden auto;
@@ -1090,7 +1094,6 @@ ul.activeusers {
 .panel-worksurface .panel-scrollable-content:has(.grid-obsidian) {
   overflow: visible;
   flex-grow: 0;
-  padding: var(--spacing-medium);
 }
 
 .panel-scrollable-content:has(.grid-obsidian) .grid-heading {
