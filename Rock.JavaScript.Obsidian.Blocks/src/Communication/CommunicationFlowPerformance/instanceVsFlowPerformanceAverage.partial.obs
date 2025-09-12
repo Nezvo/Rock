@@ -1,6 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <Panel v-if="hasSentCommunications"
+    <Panel v-if="hasData"
            hasFullscreen
            panelBodyCssClass="chart-container"
            title="Instance vs. Flow Performance Average">
@@ -82,9 +82,9 @@
         };
     });
 
-    const hasSentCommunications = computed<boolean>(() => {
+    const hasData = computed<boolean>(() => {
         // Check if there are any recipients with a sent date.
-        return Enumerable.from(props.messages).any(m => !!m.sentDateTime);
+        return Enumerable.from(data.value.series).any(s => !!s.data.length);
     });
 
     const selectedInstanceCount = computed<number>(() => {
