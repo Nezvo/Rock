@@ -44,19 +44,9 @@
 // ======================== COMMUNICATION DETAIL ========================
 
 .communication-detail .panel-worksurface {
-  .panel-body:has(.grid-obsidian:not(.grid-light)) {
-    overflow-y: hidden;
-  }
-  .panel-scrollable-content:has(.grid-obsidian) {
-    overflow: hidden;
-    overflow-y: scroll;
-    flex-grow: 1;
-  }
-  .communication-detail-recipient-details {
-    padding: var(--spacing-medium);
-  }
   .panel-body .actions:last-of-type {
     margin-bottom: 0;
+    padding-bottom: 0;
   }
 }
 

@@ -1071,42 +1071,38 @@ ul.activeusers {
     overflow: hidden auto;
 }
 
-.panel-scrollable-content:has(.grid-obsidian) {
-  border: none;
-}
+// .panel-scrollable-content:has(.grid-obsidian) {
+//   border: none;
+// }
 
-.panel-scrollable-content .contentsection {
-  margin: var(--spacing-medium);
-}
+// // If there's a non-light grid make the panel body take up the full height and remove padding
+// .panel-body:has(.grid-obsidian:not(.grid-light)) {
+//   overflow: hidden auto;
+//   flex-grow: 1;
+//   padding: 0;
+// }
 
-// If there's a non-light grid make the panel body take up the full height and remove padding
-.panel-body:has(.grid-obsidian:not(.grid-light)) {
-  overflow: hidden auto;
-  flex-grow: 1;
-  padding: 0;
-}
+// // Keep padding when there's a content section with a light grid
+// .panel-body:has(.contentsection-container) {
+//   padding: var(--spacing-medium);
+// }
 
-// Keep padding when there's a content section with a light grid
-.panel-body:has(.contentsection-container) {
-  padding: var(--spacing-medium);
-}
+// .panel-worksurface .panel-scrollable-content:has(.grid-obsidian) {
+//   overflow: visible;
+//   flex-grow: 0;
+// }
 
-.panel-worksurface .panel-scrollable-content:has(.grid-obsidian) {
-  overflow: visible;
-  flex-grow: 0;
-}
+// .panel-scrollable-content:has(.grid-obsidian) .grid-heading {
+//   position: sticky;
+//   top: 0;
+//   overflow: hidden;
+// }
 
-.panel-scrollable-content:has(.grid-obsidian) .grid-heading {
-  position: sticky;
-  top: 0;
-  overflow: hidden;
-}
-
-.panel-scrollable-content:has(.grid-obsidian) .grid-header-container {
-  position: sticky;
-  top: 57px;
-  z-index: 1;
-}
+// .panel-scrollable-content:has(.grid-obsidian) .grid-header-container {
+//   position: sticky;
+//   top: 57px;
+//   z-index: 1;
+// }
 
 .paneleditor-label {
   float: left;
