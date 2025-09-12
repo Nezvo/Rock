@@ -27,6 +27,7 @@ using Rock.ViewModels.Blocks.Communication.CommunicationFlowInstanceMessageMetri
 using Rock.ViewModels.Core.Grid;
 using Rock.Web;
 using Rock.Web.Cache;
+using Rock.Web.UI.Controls;
 
 namespace Rock.Blocks.Communication
 {
@@ -102,6 +103,27 @@ namespace Rock.Blocks.Communication
         }
 
         #endregion Keys
+
+        #region Properties
+
+        private DateRange StartDateRangePageParameter
+        {
+            get
+            {
+                var startDateRange = PageParameter( PageParameterKey.StartDateRange );
+
+                if ( startDateRange.IsNullOrWhiteSpace() )
+                {
+                    return null;
+                }
+
+                return SlidingDateRangePicker.CalculateDateRangeFromDelimitedValues( startDateRange );
+            }
+        }
+
+        private bool AreIntegerIdentifiersAllowed => !PageCache.Layout.Site.DisablePredictableIds;
+
+        #endregion Properties
 
         public override object GetObsidianBlockInitialization()
         {
@@ -231,6 +253,9 @@ namespace Rock.Blocks.Communication
                         UniquePersonCount = cfi.UniquePersonCount
                     } )
                     .ToList();
+
+                box.UniquePersonCount = GetUniquePersonCount( communicationFlowCommunication.CommunicationFlowId );
+                box.AllUniquePersonCount = GetAllUniquePersonCount( communicationFlowCommunication.CommunicationFlowId );
             }
 
             return box;
@@ -264,13 +289,13 @@ namespace Rock.Blocks.Communication
             if ( communicationFlowInstanceCommunicationKey.IsNotNullOrWhiteSpace() )
             {
                 return communicationFlowInstanceCommunicationService
-                    .GetQueryableByKey( communicationFlowInstanceCommunicationKey, !this.PageCache.Layout.Site.DisablePredictableIds )
+                    .GetQueryableByKey( communicationFlowInstanceCommunicationKey, AreIntegerIdentifiersAllowed )
                     .Select( cfic => cfic.CommunicationFlowCommunication );
             }
             else if ( communicationFlowCommunicationKey.IsNotNullOrWhiteSpace() )
             {
                 return communicationFlowCommunicationService
-                    .GetQueryableByKey( communicationFlowCommunicationKey, !this.PageCache.Layout.Site.DisablePredictableIds );
+                    .GetQueryableByKey( communicationFlowCommunicationKey, AreIntegerIdentifiersAllowed );
             }
             else
             {
@@ -278,6 +303,56 @@ namespace Rock.Blocks.Communication
                     .Empty<CommunicationFlowCommunication>()
                     .AsQueryable();
             }
+        }
+
+        private int GetUniquePersonCount( int communicationFlowId )
+        {
+            var communicationFlowInstanceService = new CommunicationFlowInstanceService( RockContext );
+
+            var communicationFlowInstanceIdKey = PageParameter( PageParameterKey.CommunicationFlowInstance );
+
+            if ( communicationFlowInstanceIdKey.IsNotNullOrWhiteSpace() )
+            {
+                return communicationFlowInstanceService
+                    .GetQueryableByKey( communicationFlowInstanceIdKey, AreIntegerIdentifiersAllowed )
+                    .SelectMany( cfi => cfi
+                        .CommunicationFlowInstanceRecipients
+                        .Select( cfir => cfir.RecipientPersonAlias.PersonId )
+                    )
+                    .Distinct()
+                    .Count();
+            }
+
+            var startDateRange = StartDateRangePageParameter;
+
+            if ( startDateRange != null )
+            {
+                return communicationFlowInstanceService
+                    .Queryable()
+                    .Where( cfi => cfi.CommunicationFlowId == communicationFlowId )
+                    .SelectMany( cfi => cfi
+                        .CommunicationFlowInstanceRecipients
+                        .Select( cfir => cfir.RecipientPersonAlias.PersonId )
+                    )
+                    .Distinct()
+                    .Count();
+            }
+
+            return 0;
+        }
+
+        private int GetAllUniquePersonCount( int communicationFlowId )
+        {
+            return new CommunicationFlowService( RockContext )
+                .Queryable()
+                .Where( cf => cf.Id == communicationFlowId )
+                .SelectMany( cf => cf.CommunicationFlowInstances
+                    .SelectMany(cfi => cfi.CommunicationFlowInstanceRecipients
+                        .Select( cfir => cfir.RecipientPersonAlias.PersonId )
+                    )
+                )
+                .Distinct()
+                .Count();
         }
     }
 }

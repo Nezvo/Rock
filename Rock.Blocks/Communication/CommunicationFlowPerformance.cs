@@ -124,7 +124,6 @@ namespace Rock.Blocks.Communication
                 [NavigationUrlKey.MessagesMetricsPage] = this.GetLinkedPageUrl( AttributeKey.MessageMetricsPage, new Dictionary<string, string>
                 {
                     { "CommunicationFlow", PageParameter( PageParameterKey.CommunicationFlow ) },
-                    { "CommunicationFlowInstance", "((CommunicationFlowInstanceKey))" },
                     { "CommunicationFlowCommunication", "((CommunicationFlowCommunicationKey))" },
                     { "StartDateRange", "((StartDateRange))" }
                 } )

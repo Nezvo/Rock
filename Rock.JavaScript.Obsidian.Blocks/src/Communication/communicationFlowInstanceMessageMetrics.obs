@@ -3,20 +3,20 @@
     <Panel :title="`Message Metrics: ${config.communicationFlowCommunication?.communicationFlowCommunicationName}`">
         <div class="row">
             <div v-if="config.isConversionGoalTrackingEnabled" class="col-md-3">
-                <ConversionRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
-                                   :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
+                <ConversionRateKpi :selectedFlowInstanceCommunicationRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
+                                   :uniquePersonCount="config.uniquePersonCount" />
             </div>
 
             <div class="col-md-3">
-                <OpenRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
+                <OpenRateKpi :selectedFlowInstanceCommunicationRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
             </div>
 
             <div class="col-md-3">
-                <ClickThroughRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
+                <ClickThroughRateKpi :selectedFlowInstanceCommunicationRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
             </div>
 
             <div class="col-md-3">
-                <UnsubscribeRateKpi :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
+                <UnsubscribeRateKpi :selectedCommunicationFlowInstanceRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
             </div>
         </div>
 
@@ -24,24 +24,24 @@
             <template v-if="isInstanceVsAverageShown">
                 <div class="col-md-6">
                     <MessagePerformanceOverTime :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
-                                                :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
-                                                :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
+                                                :selectedCommunicationFlowInstanceRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
+                                                :uniquePersonCount="config.uniquePersonCount" />
                 </div>
 
                 <div class="col-md-6">
                     <MessageInstanceVsFlowAverage :allCommunicationFlowInstanceCommunications="config.communicationFlowCommunication?.communicationFlowInstanceCommunications ?? []"
                                                   :allCommunicationFlowInstances="config.communicationFlowInstances ?? []"
+                                                  :allUniquePersonCount="config.uniquePersonCount"
                                                   :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
-                                                  :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
-                                                  :selectedCommunicationFlowInstanceCommunications="selectedFlowInstanceCommunications" />
+                                                  :selectedCommunicationFlowInstanceRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics" />
                 </div>
             </template>
 
             <template v-else>
                 <div class="col-md-12">
-                    <MessagePerformanceOverTime :recipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
-                                                :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
-                                                :uniquePersonCount="selectedFlowInstance?.uniquePersonCount ?? 0" />
+                    <MessagePerformanceOverTime :isConversionGoalTrackingEnabled="config.isConversionGoalTrackingEnabled"
+                                                :selectedCommunicationFlowInstanceRecipientMetrics="selectedFlowInstanceCommunicationRecipientMetrics"
+                                                :uniquePersonCount="config.uniquePersonCount" />
                 </div>
 
             </template>
@@ -115,13 +115,44 @@
                 .toArray();
         }
         else {
-            const communicationFlowInstanceStartDateLookup = Enumerable
-                .from(config.communicationFlowInstances ?? [])
-                .where(cfi => !isNullish(cfi.communicationFlowInstanceIdKey))
-                .toDictionary(cfi => cfi.communicationFlowInstanceIdKey!, cfi => cfi.startDate ? RockDateTime.parseISO(cfi.startDate) : null);
+            const selectedCommunicationFlowInstanceIdKeys = Enumerable
+                .from(selectedFlowInstances.value ?? [])
+                .select(cfi => cfi.communicationFlowInstanceIdKey)
+                .ofType<string>((k): k is string => !isNullish(k))
+                .distinct()
+                .toArray();
+            return Enumerable
+                .from(config.communicationFlowCommunication?.communicationFlowInstanceCommunications ?? [])
+                .where(cfic => selectedCommunicationFlowInstanceIdKeys.includes(cfic.communicationFlowInstanceIdKey ?? ""))
+                .toArray();
+        }
+    });
 
-            let communicationFlowInstanceCommunicationsEnumerable = Enumerable
-                .from(config.communicationFlowCommunication?.communicationFlowInstanceCommunications ?? []);
+    const selectedFlowInstanceCommunicationRecipientMetrics = computed<RecipientMetricsBag[]>(() => {
+        return Enumerable
+            .from(selectedFlowInstanceCommunications.value ?? [])
+            .selectMany(c => c.recipientMetrics ?? [])
+            .toArray();
+    });
+
+    const selectedFlowInstances = computed<CommunicationFlowInstanceBag[]>(() => {
+        // Select the specific instance that matches the page parameter if set.
+        const selectedCommunicationFlowInstanceIdKey = getPageParameter("CommunicationFlowInstance");
+
+        if (selectedCommunicationFlowInstanceIdKey) {
+            return Enumerable
+                .from(config.communicationFlowInstances ?? [])
+                .where(cfi => cfi.communicationFlowInstanceIdKey === selectedCommunicationFlowInstanceIdKey)
+                .toArray();
+        }
+        else {
+            let communicationFlowInstanceEnumerable = Enumerable
+                .from(config.communicationFlowInstances ?? []);
+
+            const communicationFlowInstanceStartDateLookup =
+                communicationFlowInstanceEnumerable
+                    .where(cfi => !isNullish(cfi.communicationFlowInstanceIdKey))
+                    .toDictionary(cfi => cfi.communicationFlowInstanceIdKey!, cfi => cfi.startDate ? RockDateTime.parseISO(cfi.startDate) : null);
 
             const startDateRange = getStartDateRange();
 
@@ -129,9 +160,9 @@
                 const { start: startFilter, end: endFilter } = calculateSlidingDateRange(startDateRange);
 
                 if (!isNullish(startFilter)) {
-                    communicationFlowInstanceCommunicationsEnumerable = communicationFlowInstanceCommunicationsEnumerable
-                        .where(cfic => {
-                            const communicationFlowInstanceStartDate = communicationFlowInstanceStartDateLookup.get(cfic.communicationFlowInstanceIdKey ?? "");
+                    communicationFlowInstanceEnumerable = communicationFlowInstanceEnumerable
+                        .where(cfi => {
+                            const communicationFlowInstanceStartDate = communicationFlowInstanceStartDateLookup.get(cfi.communicationFlowInstanceIdKey ?? "");
 
                             if (isNullish(communicationFlowInstanceStartDate)) {
                                 return false;
@@ -146,9 +177,9 @@
                 }
 
                 if (!isNullish(endFilter)) {
-                    communicationFlowInstanceCommunicationsEnumerable = communicationFlowInstanceCommunicationsEnumerable
-                        .where(cfic => {
-                            const communicationFlowInstanceStartDate = communicationFlowInstanceStartDateLookup.get(cfic.communicationFlowInstanceIdKey ?? "");
+                    communicationFlowInstanceEnumerable = communicationFlowInstanceEnumerable
+                        .where(cfi => {
+                            const communicationFlowInstanceStartDate = communicationFlowInstanceStartDateLookup.get(cfi.communicationFlowInstanceIdKey ?? "");
 
                             return !isNullish(communicationFlowInstanceStartDate)
                                 && !endFilter.isEarlierThan(communicationFlowInstanceStartDate);
@@ -156,28 +187,8 @@
                 }
             }
 
-            return communicationFlowInstanceCommunicationsEnumerable.toArray();
+            return communicationFlowInstanceEnumerable.toArray();
         }
-    });
-
-    const selectedFlowInstanceCommunicationRecipientMetrics = computed<RecipientMetricsBag[]>(() => {
-        return Enumerable
-            .from(selectedFlowInstanceCommunications.value ?? [])
-            .selectMany(c => c.recipientMetrics ?? [])
-            .toArray();
-    });
-
-    const selectedFlowInstance = computed<CommunicationFlowInstanceBag | null | undefined>(() => {
-        // Always select the flow instance that matches the page parameter.
-        const selectedCommunicationFlowInstanceIdKey = Enumerable
-            .from(selectedFlowInstanceCommunications.value)
-            .select(cfic => cfic.communicationFlowInstanceIdKey)
-            .ofType((k): k is string => typeof k === "string")
-            .firstOrDefault("");
-        return Enumerable
-            .from(config.communicationFlowInstances ?? [])
-            .where(cfi => cfi.communicationFlowInstanceIdKey === selectedCommunicationFlowInstanceIdKey)
-            .firstOrDefault();
     });
 
     const dataLastUpdatedMessage = computed<string>(() => {

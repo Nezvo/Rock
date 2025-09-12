@@ -16,7 +16,7 @@
     import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
 
     const props = defineProps({
-        recipientMetrics: {
+        selectedFlowInstanceCommunicationRecipientMetrics: {
             type: Array as PropType<RecipientMetricsBag[]>,
             required: true
         }
@@ -36,11 +36,11 @@
      * Computes the open rate percentage [0-100] for the selected flow instance communications.
      */
     const openRatePercent = computed<number | null | undefined>(() => {
-        if (isNullish(props.recipientMetrics)) {
+        if (isNullish(props.selectedFlowInstanceCommunicationRecipientMetrics)) {
             return null;
         }
 
-        const recipientMetrics = props.recipientMetrics ?? [];
+        const recipientMetrics = props.selectedFlowInstanceCommunicationRecipientMetrics ?? [];
 
         const recipientCount = Enumerable.from(recipientMetrics).count();
         const openCount = Enumerable.from(recipientMetrics).count(rm => !isNullish(rm.openedDate));

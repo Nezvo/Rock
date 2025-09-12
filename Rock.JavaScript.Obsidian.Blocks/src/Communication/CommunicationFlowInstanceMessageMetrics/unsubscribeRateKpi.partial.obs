@@ -16,7 +16,7 @@
     import { RecipientMetricsBag } from "@Obsidian/ViewModels/Blocks/Communication/CommunicationFlowInstanceMessageMetrics/recipientMetricsBag";
 
     const props = defineProps({
-        recipientMetrics: {
+        selectedCommunicationFlowInstanceRecipientMetrics: {
             type: Array as PropType<RecipientMetricsBag[]>,
             required: true
         }
@@ -36,11 +36,11 @@
      * Computes the unsubscribe rate percentage [0-100] for the selected flow instance communications.
      */
     const unsubscribeRatePercent = computed<number | null | undefined>(() => {
-        if (isNullish(props.recipientMetrics)) {
+        if (isNullish(props.selectedCommunicationFlowInstanceRecipientMetrics)) {
             return null;
         }
 
-        const recipientMetricsEnumerable = Enumerable.from(props.recipientMetrics ?? []);
+        const recipientMetricsEnumerable = Enumerable.from(props.selectedCommunicationFlowInstanceRecipientMetrics ?? []);
 
         const recipientCount = recipientMetricsEnumerable.count();
         const unsubscribeCount = recipientMetricsEnumerable.count(rm => !isNullish(rm.unsubscribeDate));

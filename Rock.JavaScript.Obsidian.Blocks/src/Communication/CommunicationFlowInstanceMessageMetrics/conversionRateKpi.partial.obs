@@ -21,7 +21,7 @@
      */
 
     const props = defineProps({
-        recipientMetrics: {
+        selectedFlowInstanceCommunicationRecipientMetrics: {
             type: Array as PropType<RecipientMetricsBag[]>,
             required: true
         },
@@ -46,7 +46,7 @@
      * Computes the conversion rate percentage [0-1] for the selected flow instance communications.
      */
     const conversionPercent = computed<number | null | undefined>(() => {
-        if (isNullish(props.recipientMetrics) || isNullish(props.uniquePersonCount)) {
+        if (isNullish(props.selectedFlowInstanceCommunicationRecipientMetrics) || isNullish(props.uniquePersonCount)) {
             return null;
         }
 
@@ -55,7 +55,7 @@
         }
 
         const conversionCount = Enumerable
-            .from(props.recipientMetrics ?? [])
+            .from(props.selectedFlowInstanceCommunicationRecipientMetrics ?? [])
             .count(rm => !isNullish(rm.conversionDate));
 
         return conversionCount / props.uniquePersonCount;

@@ -1,6 +1,7 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <Panel panelBodyCssClass="chart-container"
+    <Panel v-if="hasSentCommunications"
+           panelBodyCssClass="chart-container"
            title="Message Performance Over Time">
         <LineChart :series="series"
                    :labels="labels"
@@ -8,6 +9,8 @@
                    legendPosition="top"
                    type="percent" />
     </Panel>
+
+    <NothingToShowPartial v-else title="Message Performance Over Time" />
 </template>
 
 <style scoped>
@@ -18,6 +21,7 @@
 
 <script setup lang="ts">
     import { computed, PropType } from "vue";
+    import NothingToShowPartial from "./nothingToShow.partial.obs";
     import { isRockDateTime, useRockDateTimeParser } from "./utils.partial";
     import LineChart from "@Obsidian/Controls/lineChart.obs";
     import Panel from "@Obsidian/Controls/panel.obs";
@@ -40,7 +44,7 @@
             required: true
         },
 
-        recipientMetrics: {
+        selectedCommunicationFlowInstanceRecipientMetrics: {
             type: Array as PropType<RecipientMetricsBag[]>,
             required: true
         },
@@ -63,12 +67,19 @@
         return dataPoints.value.series;
     });
 
+    const hasSentCommunications = computed<boolean>(() => {
+        return Enumerable
+            .from(props.selectedCommunicationFlowInstanceRecipientMetrics)
+            .any(rm => !!rm.sentDate)
+            && dataPoints.value.labels.length > 0;
+    });
+
     const dataPoints = computed<{ labels: string[]; series: LineSeries[] }>(() => {
-        if (props.recipientMetrics.length <= 0) {
+        if (props.selectedCommunicationFlowInstanceRecipientMetrics.length <= 0) {
             return { labels: [], series: [] };
         }
 
-        const recipientMetricsEnumerable = Enumerable.from(props.recipientMetrics);
+        const recipientMetricsEnumerable = Enumerable.from(props.selectedCommunicationFlowInstanceRecipientMetrics);
 
         // There are 4 data series: Conversion Rate (conditional), Open Rate, Click-Through Rate, and Unsubscribe Rate.
         const dataPoints: XYPoint[][] = [];
@@ -102,12 +113,17 @@
         dataPoints.push(XYPointEnumerable
             .fromData(
                 recipientMetricsEnumerable
-                    .select(rm => parseRockDateTime(rm.openedDate))
-                    .ofType(isRockDateTime)
+                    .where(m => !!m.personAliasIdKey && !!m.openedDate)
+                    .groupBy(m => m.personAliasIdKey!)
+                    .select<RockDateTime>(g => g
+                        .select(rm => parseRockDateTime(rm.openedDate))
+                        .ofType(isRockDateTime)
+                        .first()
+                    )
                     .orderBy(r => r.toMilliseconds()) // Sort before accumulating.
                     .select<XYPoint>(openedRockDateTime => {
                         return {
-                            x: openedRockDateTime,
+                            x: openedRockDateTime, // Represents a datetime that a person opened (only a person's first opened date is counted)
                             y: 1
                         };
                     })
@@ -121,12 +137,17 @@
         // These contain timestamps so they can be sorvted with the other data series.
         dataPoints.push(XYPointEnumerable
             .fromData(recipientMetricsEnumerable
-                .select(rm => parseRockDateTime(rm.clickedDate))
-                .ofType(isRockDateTime)
+                .where(m => !!m.personAliasIdKey && !!m.clickedDate)
+                .groupBy(m => m.personAliasIdKey!)
+                .select<RockDateTime>(g => g
+                    .select(rm => parseRockDateTime(rm.clickedDate))
+                    .ofType(isRockDateTime)
+                    .first()
+                )
                 .orderBy(r => r.toMilliseconds()) // Sort before accumulating.
-                .select<XYPoint>(rm => {
+                .select<XYPoint>(clickedRockDateTime => {
                     return {
-                        x: rm,
+                        x: clickedRockDateTime, // Represents a datetime that a person clicked (only a person's first clicked date is counted)
                         y: 1
                     };
                 })

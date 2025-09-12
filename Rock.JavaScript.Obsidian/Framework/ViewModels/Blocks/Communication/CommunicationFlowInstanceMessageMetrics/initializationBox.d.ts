@@ -26,6 +26,9 @@ import { CommunicationFlowInstanceBag } from "@Obsidian/ViewModels/Blocks/Commun
 
 /** Box containing the data needed to initialize the Communication Flow Instance Message Metrics block. */
 export type InitializationBox = {
+    /** Gets the number of unique people in the entire flow. */
+    allUniquePersonCount: number;
+
     /** Gets or sets the high-level flow communication details. */
     communicationFlowCommunication?: CommunicationFlowCommunicationBag | null;
 
@@ -34,4 +37,7 @@ export type InitializationBox = {
 
     /** Gets or sets a value indicating whether conversion goal tracking is enabled. */
     isConversionGoalTrackingEnabled: boolean;
+
+    /** Gets the number of unique people included in the message metrics. */
+    uniquePersonCount: number;
 };
