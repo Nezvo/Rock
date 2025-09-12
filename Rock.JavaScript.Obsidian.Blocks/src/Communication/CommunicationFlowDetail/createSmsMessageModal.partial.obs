@@ -23,6 +23,7 @@
                                       :showBlankItem="false" />
 
                         <SmsMessageEditor v-model="smsMessage"
+                                          :commonMergeFields="commonMergeFields"
                                           :disabled="disabled"
                                           :editorHeight="210"
                                           :isCharacterCountShown="true"
@@ -150,6 +151,12 @@
     }>();
 
     const createSmsFormId = `create-sms-form-${newGuid()}`;
+
+    const commonMergeFields = [
+        "Person.FirstName^First Name|ti ti-user",
+        "Person.NickName^Nick Name|ti ti-user",
+        "Person.FullName^Full Name|ti ti-user",
+    ];
 
     // #region Values
 
