@@ -41,7 +41,7 @@
         <TextColumn name="category"
                     title="Category"
                     field="category"
-                    :filter="textValueFilter"
+                    :filter="pickExistingValueFilter"
                     visiblePriority="xs" />
 
         <Column field="conversionRate"
