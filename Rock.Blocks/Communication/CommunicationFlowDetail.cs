@@ -623,7 +623,7 @@ namespace Rock.Blocks.Communication
             communication.FromEmail = bag.CommunicationTemplate.FromEmail.TrimForMaxLength( communication, nameof( Model.Communication.FromEmail ) );
             communication.FromName = bag.CommunicationTemplate.FromName.TrimForMaxLength( communication, nameof( Model.Communication.FromName ) );
             communication.FutureSendDateTime = null;
-            communication.IsBulkCommunication = false;
+            communication.IsBulkCommunication = true;
             communication.Message = bag.CommunicationTemplate.Message;
             communication.Name = bag.Name.TrimForMaxLength( communication, nameof( Model.Communication.Name ) );
             communication.PersonalizationSegments = null;

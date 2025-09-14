@@ -1546,7 +1546,7 @@ namespace Rock.Jobs
                 {
                     communication = _communicationService.CreateEmailCommunication( new CommunicationService.CreateEmailCommunicationArgs
                     {
-                        BulkCommunication = false,
+                        BulkCommunication = true,
                         CommunicationTemplateId = template.Id,
                         FromAddress = template.FromEmail,
                         FromName = template.FromName,
@@ -1600,12 +1600,18 @@ namespace Rock.Jobs
                     communication = null;
                 }
 
-                foreach ( var attachment in template.Attachments.ToList() )
+                if ( communication != null )
                 {
-                    var newAttachment = new CommunicationAttachment();
-                    newAttachment.BinaryFileId = attachment.BinaryFileId;
-                    newAttachment.CommunicationType = attachment.CommunicationType;
-                    communication.Attachments.Add( newAttachment );
+                    // Always set Communication Flow Communications as bulk.
+                    communication.IsBulkCommunication = true;
+
+                    foreach ( var attachment in template.Attachments.ToList() )
+                    {
+                        var newAttachment = new CommunicationAttachment();
+                        newAttachment.BinaryFileId = attachment.BinaryFileId;
+                        newAttachment.CommunicationType = attachment.CommunicationType;
+                        communication.Attachments.Add( newAttachment );
+                    }
                 }
                 
                 isContextDirty |= communication != null;
