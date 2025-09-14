@@ -910,22 +910,22 @@ namespace Rock.Blocks.Communication
                 communicationTemplate.Subject = bag.Subject;
                 communicationTemplate.Message = bag.Message;
 
-                var binaryFileGuids = bag.EmailAttachmentBinaryFiles?.Select( a => a.Value ).AsGuidList() ?? new List<Guid>();
-                var binaryFileIds = binaryFileService.Queryable()
-                    .Where( b => binaryFileGuids.Contains( b.Guid ) )
+                var emailBinaryFileGuids = bag.EmailAttachmentBinaryFiles?.Select( a => a.Value ).AsGuidList() ?? new List<Guid>();
+                var emailBinaryFileIds = binaryFileService.Queryable()
+                    .Where( b => emailBinaryFileGuids.Contains( b.Guid ) )
                     .Select( b => b.Id )
                     .ToList();
 
-                // Delete any attachments that are no longer included.
+                // Delete any email attachments that are no longer included.
                 foreach ( var attachment in communicationTemplate.Attachments
-                    .Where( a => !binaryFileIds.Contains( a.BinaryFileId ) ).ToList() )
+                    .Where( a => a.CommunicationType == Rock.Model.CommunicationType.Email && !emailBinaryFileIds.Contains( a.BinaryFileId ) ).ToList() )
                 {
                     communicationTemplate.Attachments.Remove( attachment );
                     communicationTemplateAttachmentService.Delete( attachment );
                 }
 
-                // Add any new attachments that were added.
-                foreach ( var binaryFileId in binaryFileIds
+                // Add any new email attachments that were added.
+                foreach ( var binaryFileId in emailBinaryFileIds
                     .Where( a => communicationTemplate.Attachments.All( x => x.BinaryFileId != a ) ) )
                 {
                     communicationTemplate.Attachments.Add( new CommunicationTemplateAttachment
@@ -935,6 +935,33 @@ namespace Rock.Blocks.Communication
                     } );
                 }
                 
+                var smsAttachmentBinaryFileGuid = bag.SmsAttachmentBinaryFile?.Value.AsGuidOrNull();
+                var smsBinaryFileIds = smsAttachmentBinaryFileGuid.HasValue
+                    ? binaryFileService.Queryable()
+                        .Where( b => b.Guid == smsAttachmentBinaryFileGuid.Value )
+                        .Select( b => b.Id )
+                        .ToList()
+                    : new List<int>();
+
+                // Delete any SMS attachments that are no longer included.
+                foreach ( var attachment in communicationTemplate.Attachments
+                    .Where( a => a.CommunicationType == Rock.Model.CommunicationType.SMS && !smsBinaryFileIds.Contains( a.BinaryFileId ) ).ToList() )
+                {
+                    communicationTemplate.Attachments.Remove( attachment );
+                    communicationTemplateAttachmentService.Delete( attachment );
+                }
+
+                // Add any new SMS attachments that were added.
+                foreach ( var binaryFileId in smsBinaryFileIds
+                    .Where( a => communicationTemplate.Attachments.All( x => x.BinaryFileId != a ) ) )
+                {
+                    communicationTemplate.Attachments.Add( new CommunicationTemplateAttachment
+                    {
+                        BinaryFileId = binaryFileId,
+                        CommunicationType = Rock.Model.CommunicationType.SMS
+                    } );
+                }
+
                 var newSmsFromSystemPhoneNumberGuid = bag.SmsFromSystemPhoneNumber?.Value?.AsGuidOrNull();
                 if ( communicationTemplate.SmsFromSystemPhoneNumber?.Guid != newSmsFromSystemPhoneNumberGuid )
                 {
@@ -1122,6 +1149,7 @@ namespace Rock.Blocks.Communication
             bag.EmailAttachmentBinaryFiles = communicationTemplate.Attachments.Select( a => a.BinaryFile ).ToListItemBagList();
 
             // SMS Fields
+            bag.SmsAttachmentBinaryFile = communicationTemplate.Attachments.Where( a => a.CommunicationType == Rock.Model.CommunicationType.SMS ).Select( a => a.BinaryFile ).ToListItemBagList().FirstOrDefault();
             bag.SmsFromSystemPhoneNumber = communicationTemplate.SmsFromSystemPhoneNumber.ToListItemBag();
             bag.SmsMessage = communicationTemplate.SMSMessage;
 

@@ -212,7 +212,7 @@ namespace Rock.Model
 
                 if ( instance == null )
                 {
-                    instance = CreateNewFlowInstance( communicationFlowInstanceService, communicationFlow );
+                    instance = CreateNewOnDemandCommunicationFlowInstance( communicationFlowInstanceService, communicationFlow );
                     AddFlowInstanceRecipient( communicationFlowInstanceRecipientService, instance, personAliasId.Value );
                     return;
                 }
@@ -338,13 +338,13 @@ namespace Rock.Model
                         : ( int? ) null;
         }
 
-        private CommunicationFlowInstance CreateNewFlowInstance( CommunicationFlowInstanceService communicationFlowInstanceService, CommunicationFlow communicationFlow )
+        private CommunicationFlowInstance CreateNewOnDemandCommunicationFlowInstance( CommunicationFlowInstanceService communicationFlowInstanceService, CommunicationFlow communicationFlow )
         {
             var instance = new CommunicationFlowInstance
             {
                 CommunicationFlow = communicationFlow,
                 CommunicationFlowId = communicationFlow.Id,
-                StartDate = RockDateTime.Today // TODO JMH This works for on-demand but may need to be adjusted for scheduled flows like one-time and recurring.
+                StartDate = RockDateTime.Today 
             };
 
             // Add to the service instead of the communicationFlow.CommunicationFlowInstances to avoid the DB read.

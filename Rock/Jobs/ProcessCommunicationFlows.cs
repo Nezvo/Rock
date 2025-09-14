@@ -1599,6 +1599,14 @@ namespace Rock.Jobs
                 {
                     communication = null;
                 }
+
+                foreach ( var attachment in template.Attachments.ToList() )
+                {
+                    var newAttachment = new CommunicationAttachment();
+                    newAttachment.BinaryFileId = attachment.BinaryFileId;
+                    newAttachment.CommunicationType = attachment.CommunicationType;
+                    communication.Attachments.Add( newAttachment );
+                }
                 
                 isContextDirty |= communication != null;
                 return isContextDirty;
