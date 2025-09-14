@@ -1,7 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
     <Panel v-if="hasData"
-           panelBodyCssClass="chart-container"
            title="Message Performance Over Time">
         <LineChart :series="series"
                    :labels="labels"
