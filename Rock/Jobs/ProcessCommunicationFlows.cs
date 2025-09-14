@@ -1498,7 +1498,6 @@ namespace Rock.Jobs
                 // B.1. No one left to send to.
                 if ( !activeRecipientPersonAliasIds.Any() )
                 {
-                    // TODO JMH Should this happen? What if the data view returns more people later?
                     // This flow instance should be marked complete.
                     _communicationFlowService.CompleteMessaging( instance );
                     isContextDirty = true;

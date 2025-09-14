@@ -29,6 +29,9 @@
                                           :isCharacterCountShown="true"
                                           :mergeFields="['GlobalAttribute', 'Rock.Model.Person']"
                                           rules="required"
+                                          :shortLinkCheckToken="shortLinkCheckToken"
+                                          :shortLinkGetPageId="shortLinkGetPageId"
+                                          :shortLinkSites="shortLinkSites"
                                           toolbarLabel="Message" />
 
                         <FileUploader v-model="smsAttachmentBinaryFile"
@@ -130,6 +133,21 @@
 
         disabled: {
             type: Boolean as PropType<boolean>,
+            required: true
+        },
+
+        shortLinkCheckToken: {
+            type: Function as PropType<(token: string, siteId: number) => Promise<string>>,
+            required: true
+        },
+
+        shortLinkGetPageId: {
+            type: Function as PropType<(pageGuid: string) => Promise<number | null | undefined>>,
+            required: true
+        },
+
+        shortLinkSites: {
+            type: Array as PropType<ListItemBag[]>,
             required: true
         },
 

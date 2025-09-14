@@ -118,6 +118,7 @@ namespace Rock.Blocks.Communication
                     box.IsStepIndicatorHidden = this.IsStepIndicatorHidden;
                     box.PushMobileApplications = SiteCache.GetAllActiveSites().Where( s => s.SiteType == SiteType.Mobile ).ToListItemBagList();
                     box.SecurityGrantToken = GetSecurityGrantToken( entity, currentPerson );
+                    box.ShortLinkSites = GetShortLinkEnabledSites();
                     box.SmsFromSystemPhoneNumbers = SystemPhoneNumberCache.All( false )
                         .Where( spn => spn.IsAuthorized( Authorization.VIEW, currentPerson ) )
                         .OrderBy( spn => spn.Order )
@@ -267,6 +268,47 @@ namespace Rock.Blocks.Communication
             else
             {
                 return ActionBadRequest( validationResult.ErrorMessage );
+            }
+        }
+
+        [BlockAction( "CheckShortLinkToken" )]
+        public BlockActionResult CheckShortLinkToken( CheckShortLinkTokenBag bag )
+        {
+            var pageShortLinkService = new PageShortLinkService( this.RockContext );
+            var pageShortLink = pageShortLinkService.GetByToken( bag.Token, bag.SiteId );
+
+            if ( pageShortLink == null )
+            {
+                return ActionOk( bag.Token );
+            }
+            else
+            {
+                return ActionOk( pageShortLinkService.GetUniqueToken( bag.SiteId, 7 ) );
+            }
+        }
+
+        [BlockAction( "GetShortLinkPageId" )]
+        public BlockActionResult GetShortLinkPageId( Guid pageGuid )
+        {
+            var pageId = PageCache.GetId( pageGuid );
+
+            if ( pageId.HasValue )
+            {
+                return ActionOk( pageId.Value );
+            }
+            else
+            {
+                // Get directly from the database just in case.
+                pageId = new PageService( this.RockContext ).GetId( pageGuid );
+
+                if ( pageId.HasValue )
+                {
+                    return ActionOk( pageId.Value );
+                }
+                else
+                {
+                    return ActionNotFound();
+                }
             }
         }
 
@@ -531,6 +573,22 @@ namespace Rock.Blocks.Communication
             }
 
             return previewHtml;
+        }
+
+        /// <summary>
+        /// Gets the sites enabled for shortening.
+        /// </summary>
+        private List<ListItemBag> GetShortLinkEnabledSites()
+        {
+            return SiteCache.All()
+                .Where( s => s.EnabledForShortening && s.SiteType == SiteType.Web )
+                .Select( s => new ListItemBag
+                {
+                    // Integer IDs should be passed here since they are used in Lava filters that require ints.
+                    Value = s.Id.ToString(),
+                    Text = s.Name
+                } )
+                .ToList();
         }
 
         private bool SaveCommunicationTemplate( RockContext rockContext, Person currentPerson, CommunicationFlowDetailCommunicationTemplateBag bag, out CommunicationTemplate communicationTemplate, out ValidationResult errorResult )

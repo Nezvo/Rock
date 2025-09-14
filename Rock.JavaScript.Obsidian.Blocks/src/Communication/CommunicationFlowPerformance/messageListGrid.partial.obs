@@ -164,7 +164,7 @@
             .where(g => g.any())
             .select<GridRowBag>(messagesByTemplate => {
                 const firstMessage = messagesByTemplate.first();
-                // TODO JMH - Use average rate between each instance communication since they may be aggregated. Consider unique person calculations as well.
+
                 return {
                     communicationFlowCommunicationIdKey: firstMessage.communicationFlowCommunicationIdKey,
                     communicationFlowInstanceCommunicationIdKey: firstMessage.communicationFlowInstanceCommunicationIdKey,
