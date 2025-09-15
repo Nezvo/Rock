@@ -359,6 +359,6 @@
         panelMode.value = DetailPanelMode.Add;
     }
 
-    //onConfigurationValuesChanged(useReloadBlock());
+    onConfigurationValuesChanged(useReloadBlock());
 
 </script>
