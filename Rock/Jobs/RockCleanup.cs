@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.IO;
@@ -28,9 +29,11 @@ using System.Text;
 using Humanizer;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Rock.Attribute;
+using Rock.Configuration;
 using Rock.Core;
 using Rock.Data;
 using Rock.Logging;
@@ -348,6 +351,8 @@ namespace Rock.Jobs
             RunCleanupTask( "data view persisted values", () => RemoveUnneededDataViewPersistedValues() );
 
             RunCleanupTask( "stale anonymous visitor", () => RemoveStaleAnonymousVisitorRecord() );
+
+            RunCleanupTask( "orphaned entity metadata", () => RemoveOrphanedEntityMetadata() );
 
             RunCleanupTask( "update campus tithe metric", () => UpdateCampusTitheMetric() );
 
@@ -2897,6 +2902,55 @@ WHERE [ModifiedByPersonAliasId] IS NOT NULL
             }
 
             return deleteCount;
+        }
+
+        /// <summary>
+        /// Removes the orphaned entity metadata whose entity records have been
+        /// deleted.
+        /// </summary>
+        /// <returns>The number of records deleted.</returns>
+        private int RemoveOrphanedEntityMetadata()
+        {
+            var helper = RockApp.Current.GetRequiredService<MetadataHelper>();
+            var recordsDeleted = 0;
+            List<EntityTypeCache> entityTypes;
+
+            using ( var rockContext = CreateRockContext() )
+            {
+                entityTypes = rockContext.Set<EntityMetadata>()
+                    .Select( m => m.EntityTypeId )
+                    .Distinct()
+                    .ToList()
+                    .Select( id => EntityTypeCache.Get( id, rockContext ) )
+                    .Where( et => et != null )
+                    .ToList();
+
+                foreach ( var cachedType in entityTypes )
+                {
+                    var entityType = cachedType.GetEntityType();
+                    var compiledType = cachedType?.GetEntityType();
+
+                    if ( entityType == null || !typeof( IEntity ).IsAssignableFrom( entityType ) || compiledType == null )
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        var entityTableName = compiledType.GetCustomAttribute<TableAttribute>()?.Name;
+                        if ( entityTableName.IsNotNullOrWhiteSpace() )
+                        {
+                            recordsDeleted += helper.DeleteOrphanedEntityValues( cachedType.Id, entityTableName, batchAmount, rockContext );
+                        }
+                    }
+                    catch ( Exception ex )
+                    {
+                        Logger.LogError( ex, "Error occurred trying to remove orphaned entity metadata for entity type '{entityTypeName}'.", cachedType.Name );
+                    }
+                }
+            }
+
+            return recordsDeleted;
         }
 
         private int UpdateCampusAverageWeekendAttendance()
