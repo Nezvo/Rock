@@ -24,7 +24,7 @@
         <ItemsWithPreAndPostHtml :items="prePostHtmlItems">
             <template v-for="field of sectionFields"
                       :key="field.attribute?.attributeGuid"
-                      v-slot:[field.attribute?.attributeGuid]>
+                      v-slot:[field.attribute!.attributeGuid!]>
                 <EntryFormField :field="field"
                                 :fieldValues="fieldValues"
                                 :filterContext="filterContext"
