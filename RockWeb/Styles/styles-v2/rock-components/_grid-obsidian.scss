@@ -324,11 +324,11 @@
     cursor: pointer;
 }
 
-.grid-striped .grid-row.grid-row-even {
+.grid-striped .grid-row.grid-row-even .grid-cell {
     background-color: var(--color-interface-softer);
 }
 
-.grid-hover .grid-row:hover {
+.grid-hover .grid-row:hover .grid-cell {
     background-color: var(--color-info-soft);
 }
 
