@@ -14630,7 +14630,7 @@ dl:not(.dl-horizontal) dt {
   margin: var(--spacing-xsmall) calc(var(--spacing-xsmall) * -1) calc(var(--spacing-xsmall) * -1) calc(var(--spacing-xsmall) * -1);
   font-size: var(--font-size-small);
   background-color: var(--color-interface-softest);
-  border-top: 1px solid var(--color-interface-softer);
+  border-top: 1px solid var(--color-interface-soft);
   border-radius: 0 0 var(--rounded-small) var(--rounded-small);
   gap: 0 var(--spacing-tiny);
 }
