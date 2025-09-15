@@ -15,43 +15,34 @@
 // </copyright>
 //
 
-using Rock.ViewModels.Utility;
+using System;
 using System.Collections.Generic;
 
 namespace Rock.ViewModels.Blocks.Engagement.StepProgramDetail
 {
     /// <summary>
-    /// The additional configuration options for the Step Program Detail block.
+    ///
     /// </summary>
-    public class StepProgramDetailOptionsBag
+    public class SeriesBag
     {
         /// <summary>
-        /// Gets or sets the view modes.
+        /// Gets or sets the label for the series.
         /// </summary>
-        /// <value>
-        /// The view modes.
-        /// </value>
-        public List<ListItemBag> ViewModes { get; set; }
+        public string Label { get; set; }
 
         /// <summary>
-        /// Gets or sets the trigger types.
+        /// Gets or sets the data for the series.
         /// </summary>
-        /// <value>
-        /// The trigger types.
-        /// </value>
-        public List<ListItemBag> TriggerTypes { get; set; }
+        public List<double> Data { get; set; }
 
         /// <summary>
-        /// Gets or sets the value indicating if the View Mode options will be displayed on the Edit page.
+        /// Gets or sets the color for the series.
         /// </summary>
-        public bool? AreViewDisplayOptionsVisible { get; set; }
+        public string Color { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the reorder column should be visible in the Step Attributes grid.
+        /// Gets or sets the opacity for each data point in the series.
         /// </summary>
-        /// <value>
-        /// Whether the reorder column is visible.
-        /// </value>
-        public bool? IsReOrderColumnVisible { get; set; }
+        public List<double> Opacity { get; set; }
     }
 }

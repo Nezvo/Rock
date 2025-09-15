@@ -21,19 +21,22 @@
 // </copyright>
 //
 
+import { SeriesBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepProgramDetail/seriesBag";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 
-/** The additional configuration options for the Step Program Detail block. */
-export type StepProgramDetailOptionsBag = {
-    /** Gets or sets the value indicating if the View Mode options will be displayed on the Edit page. */
-    areViewDisplayOptionsVisible?: boolean | null;
+export type ChartDataBag = {
+    /** Gets or sets the List of ListItemBags for the Campus Labels */
+    campusLabels?: ListItemBag[] | null;
 
-    /** Gets or sets a value indicating whether the reorder column should be visible in the Step Attributes grid. */
-    isReOrderColumnVisible?: boolean | null;
+    /** Gets or sets the date labels for the chart data. */
+    dateLabels?: string[] | null;
 
-    /** Gets or sets the trigger types. */
-    triggerTypes?: ListItemBag[] | null;
+    /** Gets or sets the series data for the chart. */
+    series?: SeriesBag[] | null;
 
-    /** Gets or sets the view modes. */
-    viewModes?: ListItemBag[] | null;
+    /** Gets or sets the string labels for the chart data. */
+    stringLabels?: string[] | null;
+
+    /** Gets or sets the time unit for the chart data (e.g. "day", "month", "year"). */
+    timeUnit?: string | null;
 };

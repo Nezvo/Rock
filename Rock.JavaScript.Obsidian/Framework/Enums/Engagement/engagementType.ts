@@ -21,19 +21,26 @@
 // </copyright>
 //
 
-import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+/** Represents the type of engagement for a step type. */
+export const EngagementType = {
+    /** None - No specific engagement type */
+    None: 0,
 
-/** The additional configuration options for the Step Program Detail block. */
-export type StepProgramDetailOptionsBag = {
-    /** Gets or sets the value indicating if the View Mode options will be displayed on the Edit page. */
-    areViewDisplayOptionsVisible?: boolean | null;
+    /** Milestone - A significant achievement or event that marks progress */
+    Milestone: 1,
 
-    /** Gets or sets a value indicating whether the reorder column should be visible in the Step Attributes grid. */
-    isReOrderColumnVisible?: boolean | null;
+    /** Rhythm - A recurring pattern or habit that happens over time */
+    Rhythm: 2
+} as const;
 
-    /** Gets or sets the trigger types. */
-    triggerTypes?: ListItemBag[] | null;
+/** Represents the type of engagement for a step type. */
+export const EngagementTypeDescription: Record<number, string> = {
+    0: "None",
 
-    /** Gets or sets the view modes. */
-    viewModes?: ListItemBag[] | null;
+    1: "Milestone",
+
+    2: "Rhythm"
 };
+
+/** Represents the type of engagement for a step type. */
+export type EngagementType = typeof EngagementType[keyof typeof EngagementType];

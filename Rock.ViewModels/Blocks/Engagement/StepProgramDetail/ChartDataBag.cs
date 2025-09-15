@@ -15,43 +15,41 @@
 // </copyright>
 //
 
-using Rock.ViewModels.Utility;
+using System;
 using System.Collections.Generic;
+
+using Rock.ViewModels.Utility;
 
 namespace Rock.ViewModels.Blocks.Engagement.StepProgramDetail
 {
     /// <summary>
-    /// The additional configuration options for the Step Program Detail block.
+    /// 
     /// </summary>
-    public class StepProgramDetailOptionsBag
+    public class ChartDataBag
     {
         /// <summary>
-        /// Gets or sets the view modes.
+        /// Gets or sets the date labels for the chart data.
         /// </summary>
-        /// <value>
-        /// The view modes.
-        /// </value>
-        public List<ListItemBag> ViewModes { get; set; }
+        public List<DateTime> DateLabels { get; set; }
 
         /// <summary>
-        /// Gets or sets the trigger types.
+        /// Gets or sets the time unit for the chart data (e.g. "day", "month", "year").
         /// </summary>
-        /// <value>
-        /// The trigger types.
-        /// </value>
-        public List<ListItemBag> TriggerTypes { get; set; }
+        public string TimeUnit { get; set; }
 
         /// <summary>
-        /// Gets or sets the value indicating if the View Mode options will be displayed on the Edit page.
+        /// Gets or sets the string labels for the chart data.
         /// </summary>
-        public bool? AreViewDisplayOptionsVisible { get; set; }
+        public List<string> StringLabels { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the reorder column should be visible in the Step Attributes grid.
+        /// Gets or sets the List of ListItemBags for the Campus Labels
         /// </summary>
-        /// <value>
-        /// Whether the reorder column is visible.
-        /// </value>
-        public bool? IsReOrderColumnVisible { get; set; }
+        public List<ListItemBag> CampusLabels { get; set; }
+
+        /// <summary>
+        /// Gets or sets the series data for the chart.
+        /// </summary>
+        public List<SeriesBag> Series { get; set; }
     }
 }

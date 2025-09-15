@@ -21,19 +21,16 @@
 // </copyright>
 //
 
-import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+export type SeriesBag = {
+    /** Gets or sets the color for the series. */
+    color?: string | null;
 
-/** The additional configuration options for the Step Program Detail block. */
-export type StepProgramDetailOptionsBag = {
-    /** Gets or sets the value indicating if the View Mode options will be displayed on the Edit page. */
-    areViewDisplayOptionsVisible?: boolean | null;
+    /** Gets or sets the data for the series. */
+    data?: number[] | null;
 
-    /** Gets or sets a value indicating whether the reorder column should be visible in the Step Attributes grid. */
-    isReOrderColumnVisible?: boolean | null;
+    /** Gets or sets the label for the series. */
+    label?: string | null;
 
-    /** Gets or sets the trigger types. */
-    triggerTypes?: ListItemBag[] | null;
-
-    /** Gets or sets the view modes. */
-    viewModes?: ListItemBag[] | null;
+    /** Gets or sets the opacity for each data point in the series. */
+    opacity?: number[] | null;
 };

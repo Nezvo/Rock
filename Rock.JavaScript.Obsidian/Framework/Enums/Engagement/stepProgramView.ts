@@ -21,19 +21,36 @@
 // </copyright>
 //
 
-import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+/** Defines the different views available for step charts. */
+export const StepProgramView = {
+    /** The default view showing Key Performance Indicators (KPIs). */
+    KPIs: 0,
 
-/** The additional configuration options for the Step Program Detail block. */
-export type StepProgramDetailOptionsBag = {
-    /** Gets or sets the value indicating if the View Mode options will be displayed on the Edit page. */
-    areViewDisplayOptionsVisible?: boolean | null;
+    /** The view showing trends over time. */
+    Trends: 1,
 
-    /** Gets or sets a value indicating whether the reorder column should be visible in the Step Attributes grid. */
-    isReOrderColumnVisible?: boolean | null;
+    /** The view showing totals for the steps. */
+    Totals: 2,
 
-    /** Gets or sets the trigger types. */
-    triggerTypes?: ListItemBag[] | null;
+    /** The view showing data segmented by campuses. */
+    Campuses: 3,
 
-    /** Gets or sets the view modes. */
-    viewModes?: ListItemBag[] | null;
+    /** The view showing the flow of engagement through different steps. */
+    Flow: 4
+} as const;
+
+/** Defines the different views available for step charts. */
+export const StepProgramViewDescription: Record<number, string> = {
+    0: "KPIs",
+
+    1: "Trends",
+
+    2: "Totals",
+
+    3: "Campuses",
+
+    4: "Flow"
 };
+
+/** Defines the different views available for step charts. */
+export type StepProgramView = typeof StepProgramView[keyof typeof StepProgramView];

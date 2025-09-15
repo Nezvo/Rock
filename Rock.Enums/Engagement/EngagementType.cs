@@ -1,4 +1,4 @@
-// <copyright>
+﻿// <copyright>
 // Copyright by the Spark Development Network
 //
 // Licensed under the Rock Community License (the "License");
@@ -15,10 +15,26 @@
 // </copyright>
 //
 
-export const enum NavigationUrlKey {
-    ParentPage = "ParentPage"
-}
+namespace Rock.Enums.Engagement
+{
+    /// <summary>
+    /// Represents the type of engagement for a step type.
+    /// </summary>
+    public enum EngagementType
+    {
+        /// <summary>
+        /// None - No specific engagement type
+        /// </summary>
+        None = 0,
 
-export const enum PreferenceKey {
-    IsBarChart = "is-bar-chart"
+        /// <summary>
+        /// Milestone - A significant achievement or event that marks progress
+        /// </summary>
+        Milestone = 1,
+
+        /// <summary>
+        /// Rhythm - A recurring pattern or habit that happens over time
+        /// </summary>
+        Rhythm = 2
+    }
 }
