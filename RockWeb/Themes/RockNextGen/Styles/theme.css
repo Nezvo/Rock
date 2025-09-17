@@ -13376,6 +13376,11 @@ ul.list-group-panel .list-group-item:last-child,
   background-position: 50%;
   background-size: contain;
 }
+.picker-asset .fileupload-thumbnail .file-link-default::after {
+  display: block;
+  font-family: "tabler-icons";
+  content: "﫷";
+}
 .picker-asset .fileupload-thumbnail-icon {
   background-size: 40%;
 }
@@ -13384,10 +13389,6 @@ ul.list-group-panel .list-group-item:last-child,
 }
 .picker-asset .file-link::after {
   display: none;
-}
-.picker-asset .file-link-default::after {
-  display: block;
-  content: "﫷";
 }
 .picker-asset .picker-select-none {
   position: absolute;
