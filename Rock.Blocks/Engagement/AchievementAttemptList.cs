@@ -228,7 +228,7 @@ namespace Rock.Blocks.Engagement
 
             var queryable = subQueries.Any()
                 ? subQueries.Aggregate( ( a, b ) => a.Union( b ) )
-                : new List<AchieverAttemptItem>().AsQueryable();
+                : new List<AchieverAttemptItem>().AsQueryable().Include( a => a.AchievementAttempt.AchievementType );
 
             // Filter by Achiever Name
             if ( !FilterAchieverName.IsNullOrWhiteSpace() )
