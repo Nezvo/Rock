@@ -1748,14 +1748,19 @@ WHERE
                     // so the Communication can be saved without recipients.
                     // Then we'll save the recipients using a bulk insert.
                     var communicationRecipients = communication.Recipients;
-
                     communication.Recipients = new List<CommunicationRecipient>();
+                    foreach ( var communicationRecipient in communicationRecipients )
+                    {
+                        communicationRecipient.Communication = null;
+                        _communicationService.Context.Entry( communicationRecipient ).State = EntityState.Detached;
+                    }
 
+                    // Save the communication.
                     _saveChangesService.SaveChanges();
+
                     foreach ( var communicationRecipient in communicationRecipients )
                     {
                         // Update the communication ID.
-                        communicationRecipient.Communication = communication;
                         communicationRecipient.CommunicationId = communication.Id;
                     }
 
