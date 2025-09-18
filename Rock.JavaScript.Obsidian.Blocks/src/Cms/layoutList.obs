@@ -137,7 +137,7 @@
     import { LayoutListOptionsBag } from "@Obsidian/ViewModels/Blocks/Cms/LayoutList/layoutListOptionsBag";
     import { GridDataBag } from "@Obsidian/ViewModels/Core/Grid/gridDataBag";
     import { NavigationUrlKey } from "./LayoutList/types.partial";
-    import { computed, reactive, ref } from "vue";
+    import { reactive, ref } from "vue";
 
     const config = useConfigurationValues<ListBlockBox<LayoutListOptionsBag>>();
     const invokeBlockAction = useInvokeBlockAction();
