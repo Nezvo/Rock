@@ -21,7 +21,6 @@
 // </copyright>
 //
 
-<<<<<<<< HEAD:Rock.JavaScript.Obsidian/Framework/ViewModels/Blocks/Cms/EmailForm/emailFormRequestBag.d.ts
 import { Guid } from "@Obsidian/Types";
 
 /** Bag for the Send block action request. */
@@ -31,25 +30,4 @@ export type EmailFormRequestBag = {
 
     /** Gets or sets the form fields. */
     formFields?: Record<string, string> | null;
-========
-/** Represents a single line series in a line chart, including its label, data points, color, opacity, and label configuration. */
-export type LineSeriesBag = {
-    /** Gets or sets the color of the line. */
-    color?: string | null;
-
-    /** Gets or sets the data points for the line series. */
-    data?: number[] | null;
-
-    /** Gets or sets a value indicating whether the transformation is linear. */
-    isLinear: boolean;
-
-    /** Gets or sets a value indicating whether the underside of the line has a fill. */
-    isUnfilled?: boolean | null;
-
-    /** Gets or sets the label for the line series. */
-    label?: string | null;
-
-    /** Gets or sets the style of the line used in rendering. Allowed values: "solid", "dashed", "dotted". */
-    lineStyle?: string | null;
->>>>>>>> feature-dj-insights_obsidian_conversion:Rock.JavaScript.Obsidian/Framework/ViewModels/Reporting/LineChart/lineSeriesBag.d.ts
 };
