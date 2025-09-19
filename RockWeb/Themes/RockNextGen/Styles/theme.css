@@ -8800,7 +8800,7 @@ ul.activeusers {
 
 .panel .panel-heading .panel-header-actions,
 .panel .panel-header .panel-header-actions {
-  margin-right: var(--spacing-xsmall) !important;
+  margin-right: var(--spacing-xsmall);
 }
 .panel .panel-heading .panel-title small,
 .panel .panel-header .panel-title small {
@@ -11094,6 +11094,10 @@ ul.activeusers {
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: var(--line-height-normal);
+}
+.panel-block > .panel-heading > .panel-header-actions:has(div:only-child),
+.panel-block > .panel-header > .panel-header-actions:has(div:only-child) {
+  margin-right: var(--spacing-medium);
 }
 .panel-block > .panel-body {
   -ms-flex: 1 1 auto;

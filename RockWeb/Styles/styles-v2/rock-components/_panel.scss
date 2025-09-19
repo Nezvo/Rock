@@ -199,6 +199,10 @@
       white-space:        nowrap;
       line-height:        var(--line-height-normal);
     }
+
+    > .panel-header-actions:has(div:only-child) {
+      margin-right: var(--spacing-medium);
+    }
   }
 
   > .panel-body {
