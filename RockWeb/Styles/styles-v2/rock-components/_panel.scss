@@ -198,8 +198,13 @@
       text-overflow:      ellipsis;
       white-space:        nowrap;
       line-height:        var(--line-height-normal);
+
+      .label {
+        margin-left:     var(--spacing-xsmall);
+      }
     }
 
+    // When there is only a label in the actions, add a bit more margin
     > .panel-header-actions:has(div:only-child) {
       margin-right: var(--spacing-medium);
     }

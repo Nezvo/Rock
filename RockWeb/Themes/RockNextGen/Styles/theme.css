@@ -11095,6 +11095,10 @@ ul.activeusers {
   white-space: nowrap;
   line-height: var(--line-height-normal);
 }
+.panel-block > .panel-heading .panel-title .label,
+.panel-block > .panel-header .panel-title .label {
+  margin-left: var(--spacing-xsmall);
+}
 .panel-block > .panel-heading > .panel-header-actions:has(div:only-child),
 .panel-block > .panel-header > .panel-header-actions:has(div:only-child) {
   margin-right: var(--spacing-medium);
@@ -15677,6 +15681,10 @@ textarea:focus,
 .panel.panel-flex > .panel-header > .panel-title {
   flex-grow: 1;
   padding: 0 var(--spacing-large);
+}
+.panel.panel-flex > .panel-heading > .panel-title .label,
+.panel.panel-flex > .panel-header > .panel-title .label {
+  margin-left: var(--spacing-xsmall);
 }
 .panel.panel-flex > .panel-heading > .panel-aside,
 .panel.panel-flex > .panel-header > .panel-aside {
