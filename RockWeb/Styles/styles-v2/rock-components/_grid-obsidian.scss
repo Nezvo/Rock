@@ -510,13 +510,28 @@
         background-color: transparent;
     }
     }
+
+    .grid-hover .grid-row:hover:has(.table-empty) .grid-cell {
+        background-color: transparent;
+    }
+
+
+    // If there is no footer content, round the bottom corners of the last row
+    &:has(.grid-footing:empty) .grid-row {
+        border-bottom-left-radius: var(--rounded-medium);
+        border-bottom-right-radius: var(--rounded-medium);
+
+        .grid-cell {
+            border-bottom: none;
+        }
+
+        .grid-cell:first-child,
+        .grid-cell:last-child {
+        border-bottom-left-radius: var(--rounded-medium);
+        border-bottom-right-radius: var(--rounded-medium);
+        }
+    }
 }
-
-.grid-hover .grid-row:hover:has(.table-empty) .grid-cell {
-    background-color: transparent;
-}
-
-
 
 @media (max-width: 767px) {
     .grid-obsidian > .grid-footing > .grid-paging-footer > .grid-page-picker > .page-num {
