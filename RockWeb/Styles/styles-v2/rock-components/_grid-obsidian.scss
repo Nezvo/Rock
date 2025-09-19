@@ -495,13 +495,28 @@
 
 .grid-obsidian {
     .grid-row:has(.table-empty) {
-    border-bottom: 1px solid var(--color-interface-soft);
+        border-bottom: 1px solid var(--color-interface-soft);
+        border-bottom-left-radius: var(--rounded-small);
+        border-bottom-right-radius: var(--rounded-small);
+    &:hover {
+        background-color: transparent;
+    }
     }
 
     .grid-row:has(.table-empty) .grid-cell {
-    border-bottom: none;
+        border-bottom: none;
+        border-bottom-left-radius: var(--rounded-small);
+    &:hover {
+        background-color: transparent;
+    }
     }
 }
+
+.grid-hover .grid-row:hover:has(.table-empty) .grid-cell {
+    background-color: transparent;
+}
+
+
 
 @media (max-width: 767px) {
     .grid-obsidian > .grid-footing > .grid-paging-footer > .grid-page-picker > .page-num {
