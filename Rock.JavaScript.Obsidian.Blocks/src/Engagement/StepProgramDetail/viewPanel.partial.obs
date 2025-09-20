@@ -378,7 +378,14 @@
         let filteredMeasureOptions = baseMeasureOptions;
 
         if (!props.modelValue?.hasImpactAdjustedStepTypes) {
-            filteredMeasureOptions = filteredMeasureOptions.filter(o => o.value !== StepChartMeasure.ImpactAdjustedSteps.toString() || o.value !== StepChartMeasure.TotalStepAdjustedImpact.toString());
+            const exclude = [
+                StepChartMeasure.ImpactAdjustedSteps.toString(),
+                StepChartMeasure.TotalStepAdjustedImpact.toString()
+            ];
+
+            filteredMeasureOptions = filteredMeasureOptions.filter(
+                o => !exclude.includes(o.value ?? "")
+            );
         }
         if (!props.modelValue?.hasOrganizationObjectiveSteps) {
             filteredMeasureOptions = filteredMeasureOptions.filter(o => o.value !== StepChartMeasure.OrganizationObjective.toString());

@@ -52,7 +52,6 @@
         <ContentSection title="Statuses"
                         icon="ti ti-flag">
             <ContentStack>
-                <!-- TODO - Add reorder -->
                 <Grid :data="statusesGridData"
                       keyField="key"
                       itemTerm="Page Attribute"
