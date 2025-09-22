@@ -21,7 +21,6 @@
 // </copyright>
 //
 
-/** Represents a single line series in a line chart, including its label, data points, color, opacity, and label configuration. */
 import { Guid } from "@Obsidian/Types";
 
 /** Bag for the Send block action request. */
