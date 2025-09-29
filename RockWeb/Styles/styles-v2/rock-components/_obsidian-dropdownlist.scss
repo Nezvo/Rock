@@ -68,14 +68,14 @@
 
   // Prevent text from flowing undernearth caret indicator.
   &.ant-select-multiple.form-control .ant-select-selection-overflow {
-    padding-left: var(--spacing-medium);
-    padding-right: var(--spacing-medium);
+    padding: var(--spacing-tiny) var(--spacing-small);
   }
 
   // Allow control height to grow in multi-select mode.
   &.ant-select-multiple.form-control,
   &.ant-select-multiple.form-control .ant-select-selector {
-    min-height:   38px;
+    height: auto !important;
+    min-height:   36px;
     padding: 0 0 !important;
   }
 }
