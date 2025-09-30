@@ -22,7 +22,6 @@
                                        :decimalCount="0"
                                        :minimumValue="2"
                                        rules="required"
-                                       formGroupClasses="col"
                                        label="Max Levels to Display"
                                        help="The maximum number of levels to show in the flow. It's possible that an individual could take the same level twice in the course of completing a step program." />
                         </div>
