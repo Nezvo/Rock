@@ -1675,7 +1675,7 @@ namespace Rock.Blocks.Types.Mobile.Finance
             StyleClass=""title1, text-interface-strongest, bold"" /> 
 
         <StackLayout Spacing=""8"">
-            <Label Text=""Your gift of ${{ Transaction.TotalAmount }} has been received.""
+            <Label Text=""Your gift of {{ Transaction.TotalAmount | FormatAsCurrency }} has been received.""
                 HorizontalTextAlignment=""Center""
                 HorizontalOptions=""Center""
                 StyleClass=""text-interface-strong, body"" />
