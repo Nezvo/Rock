@@ -397,30 +397,9 @@ namespace Rock.Blocks.Types.Mobile.Finance
         protected DefinedValueCache AddressType => DefinedValueCache.Get( GetAttributeValue( AttributeKey.AddressType ).AsGuidOrNull() ?? Rock.SystemGuid.DefinedValue.GROUP_LOCATION_TYPE_HOME.AsGuid() );
 
         /// <summary>
-        /// The receipt email to use.
+        /// Gets the configured receipt email system communication identifier.
         /// </summary>
-        private DefinedValueCache _receiptEmail;
-
-        /// <summary>
-        /// Gets the receipt email to use.
-        /// </summary>
-        protected DefinedValueCache ReceiptEmail
-        {
-            get
-            {
-                if ( _receiptEmail == null )
-                {
-                    var receiptEmailDefinedValueGuid = GetAttributeValue( AttributeKey.ReceiptEmail ).AsGuidOrNull();
-
-                    if ( receiptEmailDefinedValueGuid.HasValue )
-                    {
-                        _receiptEmail = DefinedValueCache.Get( receiptEmailDefinedValueGuid.Value );
-                    }
-                }
-
-                return _receiptEmail;
-            }
-        }
+        protected Guid? ReceiptEmailSystemCommunicationGuid => GetAttributeValue( AttributeKey.ReceiptEmail ).AsGuidOrNull();
 
         /// <summary>
         /// The success template to use.
@@ -1321,12 +1300,12 @@ namespace Rock.Blocks.Types.Mobile.Finance
         /// <param name="transactionId">The processed transaction.</param>
         private void SendReceipt( int transactionId )
         {
-            if ( ReceiptEmail != null )
+            if ( ReceiptEmailSystemCommunicationGuid != null )
             {
                 // Queue a bus message to send receipts
                 var sendPaymentReceiptsTask = new ProcessSendPaymentReceiptEmails.Message
                 {
-                    SystemEmailGuid = ReceiptEmail.Guid,
+                    SystemEmailGuid = ReceiptEmailSystemCommunicationGuid.Value,
                     TransactionId = transactionId
                 };
 
