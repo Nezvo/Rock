@@ -36,11 +36,6 @@
     top: 0;
 }
 
-.grid-obsidian .grid-column-header-container {
-    border-top-left-radius: var(--rounded-medium);
-    border-top-right-radius: var(--rounded-medium);
-}
-
 .grid-obsidian .grid-content-container .grid-column-header-container.sticky-column-header {
     position: sticky;
     z-index: 1;
@@ -172,12 +167,6 @@
     display: flex;
     font-weight: 500;
     color: var(--color-interface-strong);
-    .grid-column-header:first-child {
-        border-top-left-radius: var(--rounded-medium);
-    }
-    .grid-column-header:last-child {
-        border-top-right-radius: var(--rounded-medium);
-    }
 }
 
 .grid-column-header {
