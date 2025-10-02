@@ -16020,11 +16020,6 @@ textarea:focus,
   top: var(--sticky-element-offset);
 }
 
-.communication-detail-recipient-details > .grid-obsidian > .grid-header {
-  position: sticky;
-  top: 0;
-}
-
 .grid-obsidian .grid-content-container .grid-column-header-container.sticky-column-header {
   position: sticky;
   z-index: 1;
@@ -22331,6 +22326,24 @@ iframe.email-body {
 .emaileditor-propertypanels .propertypanel-title {
   margin-top: 0;
   font-weight: 600;
+}
+
+.communication-detail-recipient-details > .grid-obsidian > .grid-header {
+  position: sticky;
+  top: -20px;
+}
+
+.communication-detail-recipient-details .sticky-column-header {
+  top: 37px;
+}
+
+.panel-worksurface .panel-scrollable-content:has(.communication-detail-recipient-details) {
+  overflow: unset;
+  flex-grow: 0;
+}
+
+.page-fullscreen-capable .panel.panel-block.panel-flex > .panel-body:has(.communication-detail-recipient-details) {
+  overflow: auto;
 }
 
 .not-me {

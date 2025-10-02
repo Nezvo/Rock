@@ -31,11 +31,6 @@
     top: var(--sticky-element-offset);
 }
 
-.communication-detail-recipient-details > .grid-obsidian > .grid-header {
-    position: sticky;
-    top: 0;
-}
-
 .grid-obsidian .grid-content-container .grid-column-header-container.sticky-column-header {
     position: sticky;
     z-index: 1;
