@@ -35,7 +35,6 @@ using Rock.Common.Mobile.Blocks.Finance.Giving;
 using Rock.Common.Mobile.ViewModel;
 using Rock.Web.UI;
 using Rock.ViewModels.Finance;
-using Newtonsoft.Json;
 
 namespace Rock.Blocks.Types.Mobile.Finance
 {
