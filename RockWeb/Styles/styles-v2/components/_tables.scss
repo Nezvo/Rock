@@ -876,6 +876,9 @@ td.grid-col-actions {
 td.grid-actions {
   padding: 0 !important;
   font-size: 1em;
+  .form-control {
+    border-bottom-left-radius: var(--rounded-medium); // If there's a dropdown in the action column, make sure the corners are rounded
+  }
 }
 
 // If the grid has a filter, make sure there's space for the filter toggle

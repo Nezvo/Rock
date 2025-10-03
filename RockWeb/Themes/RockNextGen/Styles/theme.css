@@ -6804,6 +6804,9 @@ td.grid-actions {
   padding: 0 !important;
   font-size: 1em;
 }
+td.grid-actions .form-control {
+  border-bottom-left-radius: var(--rounded-medium);
+}
 
 .grid-filter + .table-responsive .grid-actions:empty {
   height: 28px;
