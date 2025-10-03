@@ -52,38 +52,45 @@ namespace Rock.Blocks.Types.Mobile.Finance
 
     // Transaction Settings
 
+    [CustomDropdownListField( "Financial Gateway",
+        IsRequired = true,
+        Description = "Select the MyWell gateway to use for processing transactions.",
+        ListSource = "SELECT fg.[Guid] AS [Value], fg.[Name] AS [Text] FROM [FinancialGateway] fg INNER JOIN [EntityType] et ON et.Id = fg.EntityTypeId WHERE et.Guid = '18EA0FAF-6546-45BE-906A-1897C24ECA8D' ORDER BY fg.[Name]",
+        Key = AttributeKey.FinancialGateway,
+        Order = 0 )]
+
     [BooleanField(
         "Enable ACH",
         Description = "Determines if adding an ACH payment method and processing a transaction with an ACH payment method is enabled.",
         Key = AttributeKey.EnableACH,
-        Order = 0 )]
+        Order = 1 )]
 
     [BooleanField(
         "Enable Credit Card",
         Description = "Determines if adding a credit card payment method and processing a transaction with a credit card payment method is enabled.",
         Key = AttributeKey.EnableCreditCard,
         DefaultBooleanValue = true,
-        Order = 1 )]
+        Order = 2 )]
 
     [BooleanField(
         "Enable Fee Coverage",
         Description = "Determines if the fee coverage feature is enabled or not.",
         Key = AttributeKey.EnableFeeCoverage,
         DefaultBooleanValue = false,
-        Order = 2 )]
+        Order = 3 )]
 
     [AccountsField(
         "Accounts",
         Key = AttributeKey.Accounts,
         Description = "The accounts to display.",
-        Order = 3 )]
+        Order = 4 )]
 
     [BooleanField(
         "Enable Multi-Account",
         Key = AttributeKey.EnableMultiAccount,
         Description = "Should the person be able specify amounts for more than one account?",
         DefaultBooleanValue = true,
-        Order = 4 )]
+        Order = 5 )]
 
     [BooleanField( "Scheduled Transactions",
         Key = AttributeKey.AllowScheduled,
@@ -91,25 +98,25 @@ namespace Rock.Blocks.Types.Mobile.Finance
         TrueText = "Allow",
         FalseText = "Don't Allow",
         DefaultBooleanValue = true,
-        Order = 5 )]
+        Order = 6 )]
 
     [LinkedPage( "Transaction List Page",
         Description = "The page to link to when an individual wants to view their transaction history.",
         Key = AttributeKey.TransactionListPage,
         IsRequired = false,
-        Order = 6 )]
+        Order = 7 )]
 
     [LinkedPage( "Scheduled Transaction List Page",
         Description = "The page to link to when an individual wants to view their scheduled transactions.",
         Key = AttributeKey.ScheduledTransactionListPage,
         IsRequired = false,
-        Order = 7 )]
+        Order = 8 )]
 
     [LinkedPage( "Saved Account List Page",
         Description = "The page to link to when an individual wants to view their payment methods.",
         Key = AttributeKey.SavedAccountListPage,
         IsRequired = false,
-        Order = 8 )]
+        Order = 9 )]
 
     // Person Settings
 
@@ -252,6 +259,7 @@ namespace Rock.Blocks.Types.Mobile.Finance
         /// </summary>
         private static class AttributeKey
         {
+            public const string FinancialGateway = "FinancialGateway";
             public const string Accounts = "Accounts";
             public const string EnableACH = "EnableACH";
             public const string EnableCreditCard = "EnableCreditCard";
@@ -278,6 +286,7 @@ namespace Rock.Blocks.Types.Mobile.Finance
         /// <summary>
         /// The gateways that are supported in Rock Mobile.
         /// </summary>
+        [Obsolete( "We now have a setting to pick the gateway. This is invalid since there may be more than one MyWell gateway." )]
         private static class MobileSupportedGateway
         {
             public const string MyWell = "C55F91AC-07F6-484B-B2FF-6EE7D82D7E93";
@@ -296,7 +305,19 @@ namespace Rock.Blocks.Types.Mobile.Finance
             {
                 if ( _myWellGateway == null )
                 {
-                    _myWellGateway = new FinancialGatewayService( RockContext ).Get( MobileSupportedGateway.MyWell, false );
+                    var selectedGateway = GetAttributeValue( AttributeKey.FinancialGateway ).AsGuidOrNull();
+
+                    if ( selectedGateway.HasValue )
+                    {
+                        _myWellGateway = new FinancialGatewayService( RockContext ).Get( selectedGateway.Value );
+                    }
+                    // Fallback: If no gateway is selected, get the hardcoded MyWell gateway for backwards compatibility.
+                    else
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        _myWellGateway = new FinancialGatewayService( RockContext ).Get( MobileSupportedGateway.MyWell, false );
+#pragma warning restore CS0618 // Type or member is obsolete
+                    }
                 }
 
                 return _myWellGateway;
