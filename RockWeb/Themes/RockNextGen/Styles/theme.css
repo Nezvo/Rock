@@ -18606,6 +18606,10 @@ iframe.file-browser {
 .note-editor:has(.tox.tox-tinymce) {
   border: 0 !important;
 }
+.note-editor:has(.tox.tox-tinymce):focus-within {
+  border: var(--focus-state-border) !important;
+  border-radius: var(--rounded-tiny) !important;
+}
 
 .tox:not(.tox-tinymce-inline) .tox-editor-header,
 .tox.tox-tinymce-inline .tox-editor-header {
