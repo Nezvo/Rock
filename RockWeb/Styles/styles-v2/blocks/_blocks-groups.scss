@@ -40,6 +40,14 @@
 }
 // ====================== END GROUP VIEWER ======================
 
+// ====================== GROUP MAP ======================
+
+.group-map .panel-body > .form-inline > .pull-left > .form-group > .checkbox:first-child {
+  padding-left:            0;
+}
+
+// ====================== END GROUP MAP ======================
+
 
 // ======================== GROUP SCHEDULER ========================
 .group-scheduler-v2 {

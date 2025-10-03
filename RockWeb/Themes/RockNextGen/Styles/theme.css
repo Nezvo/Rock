@@ -20965,6 +20965,10 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   }
 }
 
+.group-map .panel-body > .form-inline > .pull-left > .form-group > .checkbox:first-child {
+  padding-left: 0;
+}
+
 .group-scheduler-v2 .panel-toolbar {
   position: sticky;
   top: 0;
