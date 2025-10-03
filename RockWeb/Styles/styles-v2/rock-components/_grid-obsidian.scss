@@ -521,22 +521,21 @@
 
         .grid-cell {
             border-bottom: none;
-
             &:hover {
                 background-color: transparent;
             }
         }
     }
 
-        @media (max-width: 767px) {
-            .grid-obsidian > .grid-footing > .grid-paging-footer > .grid-page-picker > .page-num {
-                display: none;
-            }
-        }
-
-        @media (max-width:992px) {
-            .grid-obsidian.grid-sticky .sticky-column-header {
-                top: calc(var(--sticky-element-offset) + 114px);
-            }
+    @media (max-width: 767px) {
+        .grid-obsidian > .grid-footing > .grid-paging-footer > .grid-page-picker > .page-num {
+            display: none;
         }
     }
+}
+
+@media (max-width:$screen-medium) {
+    .grid-obsidian.grid-sticky .sticky-column-header {
+        top: calc(var(--sticky-element-offset) + 114px);
+    }
+}

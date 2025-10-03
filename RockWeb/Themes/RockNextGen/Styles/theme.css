@@ -16509,12 +16509,12 @@ textarea:focus,
     display: none;
   }
 }
+
 @media (max-width: 992px) {
-  .grid-obsidian .grid-obsidian.grid-sticky .sticky-column-header {
+  .grid-obsidian.grid-sticky .sticky-column-header {
     top: calc(var(--sticky-element-offset) + 114px);
   }
 }
-
 .html-editor-container.loading {
   box-sizing: content-box;
   padding: 0 0 calc(var(--spacing-xlarge) + 10);
