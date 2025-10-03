@@ -3,7 +3,7 @@
     <Grid :data="gridData"
           light
           keyField="guid"
-          itemTerm="filter"
+          itemTerm="Geolocation"
           @addItem="onAdd">
         <TextColumn name="locationComponent" title="Location Component" field="locationComponent" />
         <TextColumn name="matchType" title="Match Type" field="comparisonName" />
@@ -49,7 +49,9 @@
             <div class="col">
                 <div class="form-group">
                     <TextBox :modelValue="theFilter.value ?? ''"
-                             @update:modelValue="val => theFilter.value = val" />
+                             @update:modelValue="val => theFilter.value = val"
+                             rules="required"
+                             validationTitle="Value" />
                 </div>
             </div>
         </div>
@@ -69,6 +71,7 @@
     import { GeolocationLocationComponentDescription } from "@Obsidian/Enums/Cms/Personalization/PersonalizationRequestFilters/geolocationLocationComponent";
     import { enumToListItemBag } from "@Obsidian/Utility/enumUtils";
     import { GeolocationRequestFilterBag } from "@Obsidian/ViewModels/Blocks/Cms/RequestFilterDetail/geolocationRequestFilterBag";
+    import { ComparisonType } from "@Obsidian/Enums/Reporting/comparisonType";
 
     const props = defineProps({
         modelValue: {
@@ -86,7 +89,11 @@
     const theFilter = ref<GeolocationRequestFilterBag>({} as GeolocationRequestFilterBag);
 
     const locationComponents = enumToListItemBag(GeolocationLocationComponentDescription);
-    const comparisonTypes = (getFilteredComparisonTypeOptions(stringComparisonTypes));
+
+    const excludedComparisonValues = [ComparisonType.IsBlank, ComparisonType.IsNotBlank].map(v => v.toString());
+    const comparisonTypes = (getFilteredComparisonTypeOptions(stringComparisonTypes))
+        .filter(ct => !excludedComparisonValues.includes(ct.value ?? ""));
+
     const isModalVisible = ref(false);
     const isEditing = ref(false);
 

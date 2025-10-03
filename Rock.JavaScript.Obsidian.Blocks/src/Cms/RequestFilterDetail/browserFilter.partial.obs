@@ -3,7 +3,7 @@
     <Grid :data="gridData"
           light
           keyField="guid"
-          itemTerm="filter"
+          itemTerm="Browser"
           @addItem="onAdd">
         <TextColumn name="family" title="Family" field="familyName" />
         <TextColumn name="comparison" title="Comparison" field="comparisonName" />
@@ -48,7 +48,7 @@
             </div>
             <div class="col">
                 <div class="form-group">
-                    <NumberBox v-model="theFilter.majorVersion" />
+                    <NumberBox v-model="theFilter.majorVersion" rules="required" validationTitle="Major Version" />
                 </div>
             </div>
         </div>
@@ -68,6 +68,7 @@
     import type { IBrowserRequestFilter } from "./types.partial";
     import { BrowserFamilyDescription } from "@Obsidian/Enums/Cms/Personalization/PersonalizationRequestFilters/browserFamily";
     import { BrowserRequestFilterBag } from "@Obsidian/ViewModels/Blocks/Cms/RequestFilterDetail/browserRequestFilterBag";
+    import { ComparisonType } from "@Obsidian/Enums/Reporting/comparisonType";
 
     const props = defineProps({
         modelValue: {
@@ -85,7 +86,11 @@
     const theFilter = ref<BrowserRequestFilterBag>({} as BrowserRequestFilterBag);
 
     const browserFamilies = enumToListItemBag(BrowserFamilyDescription);
-    const comparisonTypes = (getFilteredComparisonTypeOptions(numericComparisonTypes));
+
+    const excludedComparisonValues = [ComparisonType.IsBlank, ComparisonType.IsNotBlank].map(v => v.toString());
+    const comparisonTypes = (getFilteredComparisonTypeOptions(numericComparisonTypes))
+        .filter(ct => !excludedComparisonValues.includes(ct.value ?? ""));
+
     const isModalVisible = ref(false);
     const isEditing = ref(false);
 

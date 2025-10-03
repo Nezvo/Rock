@@ -3,7 +3,7 @@
     <Grid :data="gridData"
           light
           keyField="guid"
-          itemTerm="filter"
+          itemTerm="IP Address"
           @addItem="onAdd">
         <TextColumn name="beginningAddress" title="Beginning Address" field="beginningIPAddress" />
         <TextColumn name="endingAddress" title="Ending Address" field="endingIPAddress" />
@@ -33,13 +33,17 @@
             <div class="col col-xs-12 col-sm">
                 <div class="form-group">
                     <TextBox :modelValue="theFilter.beginningIPAddress ?? ''"
-                             @update:modelValue="val => theFilter.beginningIPAddress = val" />
+                             @update:modelValue="val => theFilter.beginningIPAddress = val"
+                             rules="required"
+                             validationTitle="Beginning IP Address" />
                 </div>
             </div>
             <div class="col col-xs-12 col-sm">
                 <div class="form-group">
                     <TextBox :modelValue="theFilter.endingIPAddress ?? ''"
-                             @update:modelValue="val => theFilter.endingIPAddress = val" />
+                             @update:modelValue="val => theFilter.endingIPAddress = val"
+                             rules="required"
+                             validationTitle="Ending IP Address" />
                 </div>
             </div>
         </div>

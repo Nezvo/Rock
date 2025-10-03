@@ -3,7 +3,7 @@
     <Grid :data="gridData"
           light
           keyField="guid"
-          itemTerm="filter"
+          itemTerm="Cookie"
           @addItem="onAdd">
         <TextColumn name="key" title="Key" field="key" />
         <TextColumn name="matchType" title="Match Type" field="comparisonName" />
@@ -35,7 +35,9 @@
             <div class="col">
                 <div class="form-group">
                     <TextBox :modelValue="theFilter.key ?? ''"
-                             @update:modelValue="val => theFilter.key = val" />
+                             @update:modelValue="val => theFilter.key = val"
+                             rules="required"
+                             validationTitle="Key" />
                 </div>
             </div>
             <div class="col flex-grow-0">
@@ -58,7 +60,9 @@
             <div class="col">
                 <div class="form-group">
                     <TextBox :modelValue="theFilter.comparisonValue ?? ''"
-                             @update:modelValue="val => theFilter.comparisonValue = val" />
+                             @update:modelValue="val => theFilter.comparisonValue = val"
+                             rules="required"
+                             validationTitle="Value" />
                 </div>
             </div>
         </div>
@@ -78,6 +82,7 @@
     import type { ICookieRequestFilter } from "./types.partial";
     import { FilterExpressionType } from "@Obsidian/Enums/Reporting/filterExpressionType";
     import { CookieRequestFilterBag } from "@Obsidian/ViewModels/Blocks/Cms/RequestFilterDetail/cookieRequestFilterBag";
+    import { ComparisonType } from "@Obsidian/Enums/Reporting/comparisonType";
 
     const props = defineProps({
         modelValue: {
@@ -94,7 +99,10 @@
 
     const theFilter = ref<CookieRequestFilterBag>({} as CookieRequestFilterBag);
 
-    const comparisonTypes = (getFilteredComparisonTypeOptions(stringComparisonTypes));
+    const excludedComparisonValues = [ComparisonType.IsBlank, ComparisonType.IsNotBlank].map(v => v.toString());
+    const comparisonTypes = (getFilteredComparisonTypeOptions(stringComparisonTypes))
+        .filter(ct => !excludedComparisonValues.includes(ct.value ?? ""));
+
     const isModalVisible = ref(false);
     const isEditing = ref(false);
 
