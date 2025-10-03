@@ -581,6 +581,43 @@ namespace Rock.Blocks.CheckIn.Configuration
             }
         }
 
+        /// <summary>
+        /// Duplicates the specified check-in label and returns a link to edit
+        /// the new label.
+        /// </summary>
+        /// <param name="key">The key that identifies the label to copy.</param>
+        /// <returns>The result of the operation.</returns>
+        [BlockAction]
+        public BlockActionResult Copy( string key )
+        {
+            var entityService = new CheckInLabelService( RockContext );
+
+            if ( !TryGetEntityForEditAction( key, out var entity, out var actionError ) )
+            {
+                return actionError;
+            }
+
+            var copiedEntity = new CheckInLabel
+            {
+                Description = entity.Description,
+                IsActive = entity.IsActive,
+                LabelFormat = entity.LabelFormat,
+                LabelType = entity.LabelType,
+                Content = entity.Content,
+                Name = $"Copy of {entity.Name}",
+                PreviewImage = entity.PreviewImage,
+            };
+
+            entityService.Add( copiedEntity );
+
+            RockContext.SaveChanges();
+
+            return ActionContent( System.Net.HttpStatusCode.Created, this.GetCurrentPageUrl( new Dictionary<string, string>
+            {
+                [PageParameterKey.CheckInLabelId] = copiedEntity.IdKey
+            } ) );
+        }
+
         #endregion
     }
 }
