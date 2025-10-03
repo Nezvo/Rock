@@ -2461,7 +2461,8 @@ AND Attendance.Id != @FirstTimeRecordId
                         var hasViewPermission = attribute.Value.IsAuthorized( Rock.Security.Authorization.VIEW, currentPerson )
                                                 || grantPermissionForAllAttributes;
 
-                        AddGroupMemberProperty( "gm_attr_" + attribute.Key, attribute.Value.Name, groupMember, value, formattedValue, hasViewPermission, selected: false, attribute: attribute.Value );
+                        var theKey = $"gm_{groupMember.GroupId}_attr_{attribute.Key}";
+                        AddGroupMemberProperty( theKey, attribute.Value.Name, groupMember, value, formattedValue, hasViewPermission, selected: false, attribute: attribute.Value );
                     }
                 }
             }
