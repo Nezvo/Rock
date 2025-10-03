@@ -9,7 +9,9 @@
 //  + Communication Detail
 //  + Communication List
 //  + Communication Wizard
+//  + Email Builder
 //  + Legacy Email Editor
+//  + Communication History
 // =============================================================
 
 
@@ -131,6 +133,16 @@ iframe.email-body {
 
 // ====================== END COMMUNICATION WIZARD ======================
 
+// ======================== EMAIL BUILDER ========================
+
+.communication-entry-wizard .email-editor .side-panel .flat-panel-body .alert {
+  margin:               var(--spacing-xsmall);
+  .btn {
+    margin-top:         var(--spacing-xsmall);
+  }
+}
+
+// ======================== END EMAIL BUILDER ======================
 
 // ====================== LEGACY EMAIL EDITOR ======================
 

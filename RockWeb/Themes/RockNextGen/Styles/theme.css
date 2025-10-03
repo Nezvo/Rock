@@ -22265,6 +22265,13 @@ iframe.email-body {
   margin-top: 0;
 }
 
+.communication-entry-wizard .email-editor .side-panel .flat-panel-body .alert {
+  margin: var(--spacing-xsmall);
+}
+.communication-entry-wizard .email-editor .side-panel .flat-panel-body .alert .btn {
+  margin-top: var(--spacing-xsmall);
+}
+
 #emaileditor,
 .panel-fill-body {
   height: calc(100vh - var(--email-editor-offset, 360px));
