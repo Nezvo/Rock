@@ -109,10 +109,6 @@ namespace Rock.Blocks.Engagement
 
         #region Fields
 
-        /// <summary>
-        /// The StepType attributes that are configured to show on the grid.
-        /// </summary>
-
         private PersonPreferenceCollection _personPreferences;
 
         #endregion Fields

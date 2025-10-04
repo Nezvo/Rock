@@ -308,7 +308,6 @@
 
     /**
     * Called when the grid setting icon is clicked, displays the block filters.
-    *
     */
     function onGridSettingsClick(): void {
         isGridSettingsVisible.value = true;
