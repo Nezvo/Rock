@@ -6989,6 +6989,18 @@ td.grid-actions .form-control {
     display: none;
   }
 }
+table tbody tr td .required-indicator::after {
+  margin-left: var(--spacing-tiny);
+  background-color: var(--color-danger-strong);
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+  border-radius: 50%;
+  content: "";
+  position: relative;
+  transform: translateY(-30%);
+}
+
 .input-group {
   position: relative;
   display: table;

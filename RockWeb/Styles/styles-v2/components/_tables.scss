@@ -9,6 +9,7 @@
 //  + Table Grid
 //  + Table States
 //  + Print Style (Obsidian)
+//  + Misc
 // =============================================================
 
 
@@ -75,6 +76,8 @@ th {
       content:        "\f111";
     }
   }
+
+
 
   tbody > tr > td {
     color: var(--color-interface-strong);
@@ -1125,3 +1128,17 @@ td.grid-actions {
   }
 }
 // ===================== END PRINT STYLES (OBSIDIAN) =====================
+
+// ======================= MISC =======================
+
+table tbody tr td .required-indicator::after {
+  margin-left: var(--spacing-tiny);
+  background-color: var(--color-danger-strong);
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+  border-radius: 50%;
+  content: "";
+  position: relative;
+  transform: translateY(-30%);
+}
