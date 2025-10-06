@@ -24382,7 +24382,7 @@ body.rock-modal-page {
 }
 
 .sms-conversations-container .conversation-list .recipient-row {
-  padding: 14px 16px 16px;
+  padding: var(--spacing-small) var(--spacing-medium) var(--spacing-medium);
   display: flex;
   flex: 1 1 auto;
   align-items: center;
@@ -24397,7 +24397,7 @@ body.rock-modal-page {
   box-sizing: border-box;
   -webkit-flex: 1 0 auto;
   flex: 1 0 auto;
-  font-size: 13px;
+  font-size: var(--font-size-xsmall);
   line-height: 24px;
   color: var(--color-interface-strong);
   text-align: right;
@@ -24406,7 +24406,7 @@ body.rock-modal-page {
 }
 
 .sms-conversations-container .conversation-list .selected {
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--color-info-soft);
 }
 
 .sms-conversations-container .conversation-list .unread {
@@ -24427,12 +24427,12 @@ body.rock-modal-page {
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 15px;
+  padding: var(--spacing-medium);
   overflow-y: scroll;
 }
 
 .sms-conversations-container .note-editor {
-  padding: 26px 15px;
+  padding: var(--spacing-large) var(--spacing-medium);
   border-bottom: 1px solid var(--color-interface-soft);
 }
 
@@ -24444,9 +24444,10 @@ body.rock-modal-page {
 }
 
 .sms-conversations-container .footer .control-wrapper .form-control {
-  padding: 18px 162px 18px 62px;
+  padding: var(--spacing-medium) 162px var(--spacing-medium) 62px;
   resize: none;
   border: 0;
+  border-radius: 0;
 }
 
 .sms-conversations-container .footer .message-actions-prepend {
@@ -24490,7 +24491,7 @@ body.rock-modal-page {
   bottom: -1px;
   width: 220px;
   max-width: 100%;
-  padding: 8px;
+  padding: var(--spacing-xsmall);
   margin: 0;
   background: var(--color-interface-softer);
   border: 1px solid var(--color-interface-soft);
@@ -24510,12 +24511,12 @@ body.rock-modal-page {
   min-width: 100%;
   height: 100%;
   min-height: 300px;
-  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  border-right: 1px solid var(--color-interface-soft);
 }
 
 .sms-conversations-container .conversation-list .header {
-  padding: 7px 16px;
-  font-weight: 400;
+  padding: var(--spacing-small) var(--spacing-medium);
+  font-weight: var(--font-weight-regular);
   background-color: var(--color-interface-softer);
 }
 
@@ -24527,9 +24528,13 @@ body.rock-modal-page {
 }
 
 .sms-conversations-container .conversation-list .sms-name {
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-regular);
   color: var(--color-interface-stronger);
+}
+
+.sms-conversations-container .conversation-list .recipient-row.selected .sms-name {
+  font-weight: var(--font-weight-bold);
 }
 
 .sms-conversations-container .conversation-list .layout-row {
@@ -24578,7 +24583,7 @@ body.rock-modal-page {
 
 .sms-conversations-container .message-truncate {
   color: var(--color-interface-strong);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   /* line-clamp is not fully supported yet so we need to keep -webkit-line-clamp */
@@ -24619,7 +24624,7 @@ body.rock-modal-page {
     z-index: 21;
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: var(--color-interface-softest);
     -webkit-transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1);
     transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1);
     -webkit-transform: translateX(103%);
@@ -24640,7 +24645,7 @@ body.rock-modal-page {
 }
 
 .no-recipients-container {
-  padding: 14px 16px 16px;
+  padding: var(--spacing-small) var(--spacing-medium) var(--spacing-medium);
 }
 
 .status-dot {
