@@ -10226,7 +10226,7 @@ ul.activeusers {
   vertical-align: text-top;
   cursor: pointer;
   border-radius: var(--rounded-small);
-  box-shadow: rgba(0, 0, 0, 0.15) 0 0 0 1px inset;
+  border: 1px solid var(--color-interface-soft);
 }
 .colorpicker-element .input-group-addon i::before,
 .colorpicker-element .add-on i::before {
@@ -10239,7 +10239,6 @@ ul.activeusers {
   background-image: linear-gradient(45deg, var(--color-interface-softer) 30%, transparent 25%, transparent 75%, var(--color-interface-softer) 75%, var(--color-interface-softer)), linear-gradient(45deg, var(--color-interface-softer) 25%, transparent 25%, transparent 75%, var(--color-interface-softer) 75%, var(--color-interface-softer));
   background-position: 0 0, 30px 30px;
   background-size: 12px 12px;
-  box-shadow: rgba(0, 0, 0, 0.15) 0 0 0 1px inset;
 }
 
 .colorpicker.colorpicker-inline {
