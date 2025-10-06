@@ -162,7 +162,6 @@ namespace Rock.Blocks.Group
                     {
                         NickName = a.ArchivedByPersonAlias.Person.NickName,
                         LastName = a.ArchivedByPersonAlias.Person.LastName,
-                        SuffixValueId = a.ArchivedByPersonAlias.Person.SuffixValueId,
                         PhotoId = a.ArchivedByPersonAlias.Person.PhotoId,
                         Age = a.ArchivedByPersonAlias.Person.Age,
                         Gender = a.ArchivedByPersonAlias.Person.Gender,
@@ -189,29 +188,32 @@ namespace Rock.Blocks.Group
 
             foreach ( var archivedGroup in archivedGroups )
             {
-                archivedGroup.Person = new PersonFieldBag
+                if ( archivedGroup.PersonProjection.Id.HasValue )
                 {
-                    IdKey = IdHasher.Instance.GetHash( archivedGroup.PersonProjection.Id ),
-                    NickName = archivedGroup.PersonProjection.NickName,
-                    LastName = archivedGroup.PersonProjection.LastName
-                };
-
-                var initials = $"{archivedGroup.Person.NickName.Truncate( 1, false )}{archivedGroup.Person.LastName.Truncate( 1, false )}";
-                archivedGroup.Person.PhotoUrl = Rock.Model.Person.GetPersonPhotoUrl(
-                    initials,
-                    archivedGroup.PersonProjection.PhotoId,
-                    archivedGroup.PersonProjection.Age,
-                    archivedGroup.PersonProjection.Gender,
-                    archivedGroup.PersonProjection.RecordTypeValueId,
-                    archivedGroup.PersonProjection.AgeClassification
-                );
-
-                if ( archivedGroup.PersonProjection.ConnectionStatusValueId.HasValue )
-                {
-                    var connectionStatusValue = DefinedValueCache.Get( archivedGroup.PersonProjection.ConnectionStatusValueId.Value );
-                    if ( connectionStatusValue != null )
+                    archivedGroup.Person = new PersonFieldBag
                     {
-                        archivedGroup.Person.ConnectionStatus = connectionStatusValue.Value;
+                        IdKey = IdHasher.Instance.GetHash( archivedGroup.PersonProjection.Id.Value ),
+                        NickName = archivedGroup.PersonProjection.NickName,
+                        LastName = archivedGroup.PersonProjection.LastName
+                    };
+
+                    var initials = $"{archivedGroup.Person.NickName.Truncate( 1, false )}{archivedGroup.Person.LastName.Truncate( 1, false )}";
+                    archivedGroup.Person.PhotoUrl = Rock.Model.Person.GetPersonPhotoUrl(
+                        initials,
+                        archivedGroup.PersonProjection.PhotoId,
+                        archivedGroup.PersonProjection.Age,
+                        archivedGroup.PersonProjection.Gender ?? Gender.Unknown,
+                        archivedGroup.PersonProjection.RecordTypeValueId,
+                        archivedGroup.PersonProjection.AgeClassification
+                    );
+
+                    if ( archivedGroup.PersonProjection.ConnectionStatusValueId.HasValue )
+                    {
+                        var connectionStatusValue = DefinedValueCache.Get( archivedGroup.PersonProjection.ConnectionStatusValueId.Value );
+                        if ( connectionStatusValue != null )
+                        {
+                            archivedGroup.Person.ConnectionStatus = connectionStatusValue.Value;
+                        }
                     }
                 }
             }
@@ -319,21 +321,19 @@ namespace Rock.Blocks.Group
 
             public string LastName { get; set; }
 
-            public int? SuffixValueId { get; set; }
-
             public int? PhotoId { get; set; }
 
             public int? Age { get; set; }
 
-            public Gender Gender { get; set; }
+            public Gender? Gender { get; set; }
 
             public int? RecordTypeValueId { get; set; }
 
-            public AgeClassification AgeClassification { get; set; }
+            public AgeClassification? AgeClassification { get; set; }
 
             public int? ConnectionStatusValueId { get; set; }
 
-            public int Id { get; set; }
+            public int? Id { get; set; }
         }
 
         #endregion
