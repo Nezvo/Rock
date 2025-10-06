@@ -209,7 +209,7 @@
     import { BtnType } from "@Obsidian/Enums/Controls/btnType";
     import { useStore } from "@Obsidian/PageState";
     import { onConfigurationValuesChanged, useConfigurationValues, useInvokeBlockAction, useReloadBlock, usePersonPreferences } from "@Obsidian/Utility/block";
-    import { asBoolean, asTrueOrFalseString } from "@Obsidian/Utility/booleanUtils";
+    import { asBooleanOrNull, asTrueOrFalseString } from "@Obsidian/Utility/booleanUtils";
     import { alert } from "@Obsidian/Utility/dialogs";
     import { asFormattedString, toNumberOrNull } from "@Obsidian/Utility/numberUtils";
     import { parseSlidingDateRangeString, RangeType, SlidingDateRange, slidingDateRangeToString, TimeUnit } from "@Obsidian/Utility/slidingDateRange";
@@ -251,7 +251,7 @@
     const isGridSettingsVisible = ref(false);
     const gridSettings = ref<GridSettingsOptions>({
         sentBy: JSON.parse(preferences.getValue(PreferenceKey.FilterSentBy) || "{}"),
-        hideDrafts: asBoolean(preferences.getValue(PreferenceKey.FilterHideDrafts)),
+        hideDrafts: asBooleanOrNull(preferences.getValue(PreferenceKey.FilterHideDrafts)) ?? true,
         slidingDateRange: parseSlidingDateRangeString(preferences.getValue(PreferenceKey.FilterSendDateRange)) ?? defaultSlidingDateRange,
         recipientCountRange: {
             lower: toNumberOrNull(preferences.getValue(PreferenceKey.FilterRecipientCountLower)),
