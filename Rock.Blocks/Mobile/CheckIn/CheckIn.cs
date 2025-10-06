@@ -490,6 +490,17 @@ namespace Rock.Blocks.Mobile.CheckIn
                     PerformedByPersonId = RequestContext.CurrentPerson?.IdKey
                 };
 
+                // If there was a provided attendance source, use that.
+                if ( options.Session.SourceValueId.IsNotNullOrWhiteSpace() )
+                {
+                    var attendanceSource = DefinedValueCache.Get( options.Session.SourceValueId, false )?.Id;
+
+                    if ( attendanceSource.HasValue )
+                    {
+                        session.AttendanceSourceValueId = attendanceSource.Value;
+                    }
+                }
+
                 // Default to mobile attendance if not specified.
                 if ( !session.AttendanceSourceValueId.HasValue )
                 {
