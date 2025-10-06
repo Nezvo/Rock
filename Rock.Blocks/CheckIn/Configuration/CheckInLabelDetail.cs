@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Rock.Attribute;
 using Rock.CheckIn.v2;
@@ -112,6 +113,14 @@ namespace Rock.Blocks.CheckIn.Configuration
                 options.FamilyLabelFilterSources = FieldSourceHelper.GetFamilyLabelFilterSources();
                 options.PersonLabelFilterSources = FieldSourceHelper.GetPersonLabelFilterSources();
                 options.PersonLocationLabelFilterSources = FieldSourceHelper.GetPersonLocationLabelFilterSources();
+
+                var printerDeviceTypeValueId = DefinedValueCache.Get( Rock.SystemGuid.DefinedValue.DEVICE_TYPE_PRINTER.AsGuid(), RockContext )?.Id;
+                options.Printers = DeviceCache.All( RockContext )
+                    .Where( d => d.DeviceTypeValueId == printerDeviceTypeValueId
+                        && d.IPAddress.IsNotNullOrWhiteSpace() )
+                    .OrderBy( d => d.Name )
+                    .ToListItemBagList();
+
             }
 
             return options;
@@ -579,6 +588,32 @@ namespace Rock.Blocks.CheckIn.Configuration
                     Duration = sw.ElapsedMilliseconds
                 } );
             }
+        }
+
+        /// <summary>
+        /// Print the preview content to the specified printer.
+        /// </summary>
+        /// <param name="key">The key that identifies the label to preview.</param>
+        /// <param name="content">The content of the label to be printed.</param>
+        /// <param name="printerKey">The encoded identifier of the printer to send the content to.</param>
+        /// <returns>The result of the operation.</returns>
+        [BlockAction]
+        public async Task<BlockActionResult> PrintPreview( string key, string content, string printerKey )
+        {
+            var entityService = new CheckInLabelService( RockContext );
+            var checkInLabel = entityService.Get( key, !PageCache.Layout.Site.DisablePredictableIds );
+
+            if ( checkInLabel == null )
+            {
+                return ActionBadRequest( $"{CheckInLabel.FriendlyTypeName} not found." );
+            }
+
+            if ( !BlockCache.IsAuthorized( Authorization.EDIT, RequestContext.CurrentPerson ) )
+            {
+                return ActionBadRequest( $"Not authorized to edit ${CheckInLabel.FriendlyTypeName}." );
+            }
+
+            return await LabelDesigner.PrintPreviewLabelAsync( checkInLabel, printerKey, content, RockContext );
         }
 
         /// <summary>
