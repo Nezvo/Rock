@@ -57,7 +57,8 @@
                               :help="impactWeightHelpText"
                               :items="impactWeightOptions"
                               :inputClasses="'input-width-lg'" />
-                <CheckBoxList v-model="preRequisites"
+                <CheckBoxList v-if="availablePreRequisites.length > 0"
+                              v-model="preRequisites"
                               :items="availablePreRequisites"
                               label="Prerequisite Steps"
                               help="The steps that must be completed prior to this step."
