@@ -22118,6 +22118,9 @@ span.data-view-filter-label {
   margin-bottom: var(--spacing-small);
   border: 2px solid var(--color-interface-soft);
 }
+.transaction-image img {
+  width: 100%;
+}
 .transaction-image .fluidbox-ghost {
   cursor: -webkit-zoom-in;
   cursor: -moz-zoom-in;
