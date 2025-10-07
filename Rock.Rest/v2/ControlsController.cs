@@ -1921,8 +1921,8 @@ namespace Rock.Rest.v2
         /// <returns>True if the folder at the given path should be hidden from the file manager, otherwise false.</returns>
         private bool IsHiddenFolder( string localPathName )
         {
-            var HiddenFolders = new List<string> { "Content\\ASM_Thumbnails" };
-            return HiddenFolders.Any( a => localPathName.IndexOf( a, StringComparison.OrdinalIgnoreCase ) > -1 );
+            var hiddenFolders = new List<string> { "Content\\ASM_Thumbnails" };
+            return hiddenFolders.Any( a => localPathName.IndexOf( a, StringComparison.OrdinalIgnoreCase ) > -1 );
         }
 
         /// <summary>
@@ -5316,14 +5316,14 @@ namespace Rock.Rest.v2
         public IActionResult GeoPickerGetGoogleMapSettings( [FromBody] GeoPickerGetGoogleMapSettingsOptionsBag options )
         {
             // Map Styles
-            Guid MapStyleValueGuid = options.MapStyleValueGuid == null || options.MapStyleValueGuid.IsEmpty() ? Rock.SystemGuid.DefinedValue.MAP_STYLE_ROCK.AsGuid() : options.MapStyleValueGuid;
+            Guid mapStyleValueGuid = options.MapStyleValueGuid == null || options.MapStyleValueGuid.IsEmpty() ? Rock.SystemGuid.DefinedValue.MAP_STYLE_ROCK.AsGuid() : options.MapStyleValueGuid;
             string mapStyle = "null";
             string markerColor = "";
             string mapId = string.Empty;
 
             try
             {
-                DefinedValueCache dvcMapStyle = DefinedValueCache.Get( MapStyleValueGuid );
+                DefinedValueCache dvcMapStyle = DefinedValueCache.Get( mapStyleValueGuid );
                 if ( dvcMapStyle != null )
                 {
                     var dynamicMapStyle = dvcMapStyle.GetAttributeValue( "DynamicMapStyle" );
@@ -5534,7 +5534,7 @@ namespace Rock.Rest.v2
                     return NotFound();
                 }
 
-                var LabelKey = new
+                var labelKey = new
                 {
                     RequirementMet = " Requirement Met",
                     RequirementNotMet = " Requirement Not Met",
@@ -5612,13 +5612,13 @@ namespace Rock.Rest.v2
                 switch ( options.MeetsGroupRequirement )
                 {
                     case MeetsGroupRequirement.Meets:
-                        results.Message = groupRequirementType.PositiveLabel.IsNotNullOrWhiteSpace() ? groupRequirementType.PositiveLabel : LabelKey.RequirementMet;
+                        results.Message = groupRequirementType.PositiveLabel.IsNotNullOrWhiteSpace() ? groupRequirementType.PositiveLabel : labelKey.RequirementMet;
                         break;
                     case MeetsGroupRequirement.NotMet:
-                        results.Message = groupRequirementType.NegativeLabel.IsNotNullOrWhiteSpace() ? groupRequirementType.NegativeLabel : LabelKey.RequirementNotMet;
+                        results.Message = groupRequirementType.NegativeLabel.IsNotNullOrWhiteSpace() ? groupRequirementType.NegativeLabel : labelKey.RequirementNotMet;
                         break;
                     case MeetsGroupRequirement.MeetsWithWarning:
-                        results.Message = groupRequirementType.WarningLabel.IsNotNullOrWhiteSpace() ? groupRequirementType.WarningLabel : LabelKey.RequirementMetWithWarning;
+                        results.Message = groupRequirementType.WarningLabel.IsNotNullOrWhiteSpace() ? groupRequirementType.WarningLabel : labelKey.RequirementMetWithWarning;
                         break;
                 }
 
