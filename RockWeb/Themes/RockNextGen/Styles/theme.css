@@ -5611,6 +5611,9 @@ select.form-control:focus::-ms-value {
 .form-inline .date-range-picker .input-group {
   margin-bottom: 0;
 }
+.form-inline .form-group.entity-type-picker > .control-label {
+  margin-right: var(--spacing-xsmall);
+}
 
 .form-inline-all .form-control {
   display: inline-block;
@@ -7344,11 +7347,11 @@ table tbody tr td .required-indicator::after {
   cursor: pointer;
 }
 .chosen-container-single .chosen-single abbr::before {
-  font-family: "FontAwesome";
+  font-family: "tabler-icons";
   font-size: var(--font-size-regular);
   font-weight: var(--font-weight-black);
   color: var(--color-interface-strong);
-  content: "\f00d";
+  content: "\eb55";
 }
 .chosen-container-single .chosen-single abbr:hover::before {
   color: var(--color-interface-strong);
@@ -7391,12 +7394,12 @@ table tbody tr td .required-indicator::after {
   position: relative;
   left: -28px;
   display: inline-block;
-  font-family: "FontAwesome";
+  font-family: "tabler-icons";
   font-size: var(--font-size-regular);
   font-weight: var(--font-weight-black);
   color: var(--color-interface-strong);
   pointer-events: none;
-  content: "\f002";
+  content: "\eb1c";
 }
 .chosen-container-single .chosen-search .chosen-search-input {
   width: 100%;
@@ -7479,12 +7482,12 @@ table tbody tr td .required-indicator::after {
   display: inline-block;
   width: 16px;
   height: 16px;
-  font-family: "FontAwesome";
+  font-family: "tabler-icons";
   font-size: var(--font-size-regular);
   font-weight: var(--font-weight-black);
   color: var(--color-interface-strong);
   cursor: pointer;
-  content: "\f00d";
+  content: "\eb55";
 }
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close:hover::after {
   color: var(--color-interface-strong);

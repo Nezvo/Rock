@@ -237,6 +237,7 @@ iframe.email-body {
     overflow: auto;
 }
 
+// Had to refactor the padding here because of the grid header sticky positioning.
 .panel-body:has(.communication-detail-recipient-details) {
     padding: 0 var(--spacing-medium) var(--spacing-medium) var(--spacing-medium);
 }
