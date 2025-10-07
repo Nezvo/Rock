@@ -354,8 +354,8 @@
 
 .grid-obsidian .grid-select-field:first-child {
     align-items: center;
-    padding-right: calc(var(--table-cell-padding-x) / 2);
-    flex: 0 0 calc(var(--table-cell-padding-x) + 20px) !important;
+    justify-content: center;
+    padding: var(--spacing-medium) 0 var(--spacing-medium) var(--spacing-medium);
 }
 
 .grid-obsidian .grid-columncommand {
