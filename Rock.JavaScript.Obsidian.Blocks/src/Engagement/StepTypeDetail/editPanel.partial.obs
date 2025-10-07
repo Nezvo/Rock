@@ -89,10 +89,10 @@
                              help="The text shown on the action button (e.g., “Join Now” or “Start Step”). Keep it short, clear, and action-oriented to encourage engagement." />
                     <TextBox v-model="callToActionLink"
                              label="Call To Action Link"
-                             help="A brief message explaining what the action is and why it matters. Helps individuals understand the purpose and importance of the next step." />
+                             help="The URL where the individual takes the next step. This can point to a form, page, or resource—wherever the action happens." />
                     <TextBox v-model="callToActionDescription"
                              label="Call To Action Description"
-                             help="The URL where the individual takes the next step. This can point to a form, page, or resource—wherever the action happens." />
+                             help="A brief message explaining what the action is and why it matters. Helps individuals understand the purpose and importance of the next step." />
                 </div>
             </ContentStack>
         </ContentSection>
