@@ -48,7 +48,7 @@
             </div>
             <div class="col">
                 <div class="form-group">
-                    <NumberBox v-model="theFilter.majorVersion" rules="required" validationTitle="Major Version" :maximumValue="100" />
+                    <NumberBox v-model="theFilter.majorVersion" rules="required" validationTitle="Major Version" :maxLength="9" />
                 </div>
             </div>
         </div>
