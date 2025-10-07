@@ -200,6 +200,11 @@
 </template>
 
 <style scoped>
+
+.communication-detail-recipient-details {
+    padding-top: var(--spacing-medium);
+}
+
 .communication-detail-grid-cell-failure {
     color: var(--color-danger-strong);
 }
