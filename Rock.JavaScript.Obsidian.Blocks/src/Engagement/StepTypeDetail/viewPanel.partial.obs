@@ -102,6 +102,8 @@
     const invokeBlockAction = useInvokeBlockAction();
     const browserBus = useBlockBrowserBus();
 
+    let fetchStepTYpeDetailsCts: CancellationTokenSource | null = null;
+
     browserBus.subscribe(PageMessages.ContextEntityChanged, async (message: Message<ContextEntityChangedData>) => {
         if (areEqual(message.data.entityTypeGuid, EntityType.Campus)) {
             fetchStepTYpeDetailsCts?.cancel();
@@ -109,8 +111,6 @@
             fetchStepTypeDetails(fetchStepTYpeDetailsCts.token);
         }
     });
-
-    let fetchStepTYpeDetailsCts: CancellationTokenSource | null = null;
 
     // #endregion
 

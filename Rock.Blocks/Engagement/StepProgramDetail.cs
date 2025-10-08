@@ -1898,7 +1898,7 @@ namespace Rock.Blocks.Engagement
                         g.Key.CampusGuid,
                         g.Key.CampusName,
                         g.Key.CampusOrder,
-                        Count = Math.Round( ( double ) g.Count() / g.Key.AvgCampusAttendance, 2 )
+                        Count = Math.Round( ( double ) g.Count() / g.Key.AvgCampusAttendance, 0 )
                     } )
                     .ToList();
 

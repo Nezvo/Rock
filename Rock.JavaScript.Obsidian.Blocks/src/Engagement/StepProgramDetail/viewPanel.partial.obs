@@ -21,7 +21,7 @@
         <ContentSection v-if="selectedStepProgramViewEnum !== StepProgramView.KPIs" class="mb-sm">
             <ContentStack>
                 <div v-if="selectedStepProgramViewEnum === StepProgramView.Flow" class="row">
-                    <RockForm @submit="fetchStepFlowData" ref="flowForm">
+                    <RockForm @submit="handleFlowDataFilterChange" ref="flowForm">
                         <div class="col-md-3">
                             <NumberBox v-model="maxLevels"
                                        :decimalCount="0"
@@ -129,6 +129,10 @@
     font-size: 1.5em !important;
 }
 
+:deep(.contentsection-body) {
+    padding: var(--spacing-small)
+}
+
 .mt-sm {
     margin-top: var(--spacing-small);
 }
@@ -181,6 +185,7 @@
     import { ChartDataBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepProgramDetail/chartDataBag";
     import { StepFlowGetDataBag } from "@Obsidian/ViewModels/Blocks/Engagement/Steps/stepFlowGetDataBag";
     import { SankeyDiagramSettingsBag } from "@Obsidian/ViewModels/Controls/sankeyDiagramSettingsBag";
+    import { CancellationTokenSource, ICancellationToken } from "@Obsidian/Utility/cancellation";
     import { BarChartClickEvent, BarSeries, LineSeries } from "@Obsidian/Core/Controls/chart";
     import { SankeyDiagramNodeBag } from "@Obsidian/ViewModels/Controls/sankeyDiagramNodeBag";
     import { SankeyDiagramEdgeBag } from "@Obsidian/ViewModels/Controls/sankeyDiagramEdgeBag";
@@ -215,6 +220,7 @@
     import SlidingDateRangePicker from "@Obsidian/Controls/slidingDateRangePicker.obs";
     import AttributeValuesContainer from "@Obsidian/Controls/attributeValuesContainer.obs";
     import SankeyDiagram from "@Obsidian/Controls/internal/SankeyDiagram/sankeyDiagram.obs";
+    import { SeriesBag } from "@Obsidian/ViewModels/Blocks/Engagement/StepProgramDetail/seriesBag";
 
     const props = defineProps({
         modelValue: {
@@ -235,6 +241,8 @@
     const contextEntities = useContextEntities();
     const preferences = usePersonPreferences().blockPreferences;
 
+    let fetchStepAnalyticsCts: CancellationTokenSource | null = null;
+
     browserBus.subscribe(PageMessages.ContextEntityChanged, async (message: Message<ContextEntityChangedData>) => {
         if (areEqual(message.data.entityTypeGuid, EntityType.Campus)) {
             handleCampusContextChanged(message.data);
@@ -244,12 +252,12 @@
     const stepProgramViewOptions = enumToStandardListItemBagList(StepProgramViewDescription);
 
     const programViewStateFlags: Record<number, boolean> = {};
-    const fetchByStepProgramView: Record<number, () => Promise<void>> = {
-        [StepProgramView.KPIs]: () => fetchKPIData(),
-        [StepProgramView.Trends]: () => fetchChartData(),
-        [StepProgramView.Totals]: () => fetchChartData(),
-        [StepProgramView.Campuses]: () => fetchChartData(),
-        [StepProgramView.Flow]: () => fetchStepFlowData()
+    const fetchByStepProgramView: Record<number, (cancellationToken: ICancellationToken) => Promise<void>> = {
+        [StepProgramView.KPIs]: (cancellationToken) => fetchKPIData(cancellationToken),
+        [StepProgramView.Trends]: (cancellationToken) => fetchChartData(cancellationToken),
+        [StepProgramView.Totals]: (cancellationToken) => fetchChartData(cancellationToken),
+        [StepProgramView.Campuses]: (cancellationToken) => fetchChartData(cancellationToken),
+        [StepProgramView.Flow]: (cancellationToken) => fetchStepFlowData(cancellationToken)
     };
     const chartViewData: Record<number, ChartDataBag | null> = {
         [StepProgramView.Trends]: null,
@@ -298,7 +306,7 @@
     const maxLevels = ref(4);
 
     // Chart refs
-    const chartSeries = ref<LineSeries[] | BarSeries[]>([]);
+    const chartSeries = ref<SeriesBag[]>([]);
     const chartLabels = ref<string[]>([]);
     const selectedMeasure = ref("");
     const selectedStatusFilter = ref(statusOptions[0].value ?? "All");
@@ -337,9 +345,9 @@
             || selectedMeasureEnum.value === StepChartMeasure.AvgTotalStepsPerWeekendAttendee;
     });
 
-    const lineSeries = computed(() => chartSeries.value as LineSeries[]);
+    const lineSeries = computed(() => convertToLineSeries(chartSeries.value));
 
-    const barSeries = computed(() => chartSeries.value as BarSeries[]);
+    const barSeries = computed(() => convertToBarSeries(chartSeries.value));
 
     const isStacked = computed<boolean>(() => {
         if (selectedStepProgramViewEnum.value === StepProgramView.Totals) {
@@ -475,6 +483,23 @@
 
     // #region Functions
 
+    function convertToLineSeries(seriesBags: SeriesBag[]): LineSeries[] {
+        return seriesBags.map<LineSeries>(bag => ({
+            label: bag.label ?? "",
+            data: bag.data ?? [],
+            color: bag.color ?? undefined
+        }));
+    }
+
+    function convertToBarSeries(seriesBags: SeriesBag[]): BarSeries[] {
+        return seriesBags.map<BarSeries>(bag => ({
+            label: bag.label ?? "",
+            data: bag.data ?? [],
+            color: bag.color ?? undefined,
+            opacity: bag.opacity ?? undefined
+        }));
+    }
+
     /**
      * Resets all state flags to the given initial value.
      * @param initialValue The value to assign to each state flag (default: false).
@@ -501,7 +526,9 @@
     function handleChartFilterChanged(): void {
         resetChartStateFlags();
 
-        fetchByStepProgramView[selectedStepProgramViewEnum.value]();
+        fetchStepAnalyticsCts?.cancel();
+        fetchStepAnalyticsCts = new CancellationTokenSource();
+        fetchByStepProgramView[selectedStepProgramViewEnum.value](fetchStepAnalyticsCts.token);
     }
 
     /**
@@ -527,7 +554,7 @@
             if (!campusItemBag?.text) {
                 chartSeries.value = chartSeries.value.map(s => ({
                     ...s,
-                    opacity: 1
+                    opacity: s.data?.map(() => 1) ?? []
                 }));
 
                 return;
@@ -537,7 +564,7 @@
 
             chartSeries.value = chartSeries.value.map(s => ({
                 ...s,
-                opacity: s.data.map((_: number, i: number) => (i === selectedIndex ? 1 : 0.25))
+                opacity: s.data?.map((_: number, i: number) => (i === selectedIndex ? 1 : 0.25))
             }));
         }
         else {
@@ -620,8 +647,8 @@
      * @param chartData The chart data bag used to populate the chart.
      */
     function updateChartForView(chartData: ChartDataBag): void {
-        chartLabels.value = chartData.dateLabels ?? chartData.stringLabels ?? chartData?.campusLabels?.map(c => c.text) as string[] ?? [];
-        chartSeries.value = (chartData.series ?? []) as LineSeries[] | BarSeries[];
+        chartLabels.value = chartData.dateLabels ?? chartData.stringLabels ?? chartData?.campusLabels?.map(c => c.text ?? "") ?? [];
+        chartSeries.value = chartData.series ?? [];
 
         if (selectedStepProgramViewEnum.value === StepProgramView.Trends) {
             updateDateUnit(chartData);
@@ -629,6 +656,15 @@
         else {
             dateUnit.value = undefined;
         }
+    }
+
+    /**
+     * Fetches step flow data when its filters change
+     */
+    function handleFlowDataFilterChange(): void {
+        fetchStepAnalyticsCts?.cancel();
+        fetchStepAnalyticsCts = new CancellationTokenSource();
+        fetchStepFlowData(fetchStepAnalyticsCts.token);
     }
 
     // #endregion
@@ -666,9 +702,8 @@
     /**
      * Fetches chart data based on filter date, program view, selected measure, and selected status filter.
      */
-    async function fetchChartData(): Promise<void> {
-        if (isLoading.value) {
-            // Still Loading Previous Request. Don't want to start another one.
+    async function fetchChartData(cancellationToken: ICancellationToken): Promise<void> {
+        if (cancellationToken.isCancellationRequested) {
             return;
         }
 
@@ -693,6 +728,10 @@
             selectedStatusFilter: selectedStatusFilter.value
         });
 
+        if (cancellationToken.isCancellationRequested) {
+            return;
+        }
+
         isLoading.value = false;
 
         if (result.isSuccess && result.data) {
@@ -709,9 +748,8 @@
     /**
      * Fetches KPI data based on filter date.
      */
-    async function fetchKPIData(): Promise<void> {
-        if (isLoading.value) {
-            // Still Loading Previous Request. Don't want to start another one.
+    async function fetchKPIData(cancellationToken: ICancellationToken): Promise<void> {
+        if (cancellationToken.isCancellationRequested) {
             return;
         }
 
@@ -720,6 +758,10 @@
         const result = await invokeBlockAction<string>("GetKPIData", {
             dateRange: filterDate.value ? slidingDateRangeToString(filterDate.value as SlidingDateRange) : "DateRange||||"
         });
+
+        if (cancellationToken.isCancellationRequested) {
+            return;
+        }
 
         if (result.isSuccess && result.data) {
             kpi.value = result.data ?? "";
@@ -736,9 +778,8 @@
     /**
      * Fetches Step Flow Data based on filter date, max levels, and starting step types.
      */
-    async function fetchStepFlowData(): Promise<void> {
-        if (isLoading.value) {
-            // Still Loading Previous Request. Don't want to start another one.
+    async function fetchStepFlowData(cancellationToken: ICancellationToken): Promise<void> {
+        if (cancellationToken.isCancellationRequested) {
             return;
         }
 
@@ -769,6 +810,10 @@
         };
 
         const response = await invokeBlockAction<StepFlowGetDataBag>("GetStepFlowData", request);
+
+        if (cancellationToken.isCancellationRequested) {
+            return;
+        }
 
         isLoading.value = false;
 
@@ -825,7 +870,9 @@
         }
         else {
             // Chart state is dirty so fetch from server.
-            fetchByStepProgramView[selectedStepProgramViewEnum.value]();
+            fetchStepAnalyticsCts?.cancel();
+            fetchStepAnalyticsCts = new CancellationTokenSource();
+            fetchByStepProgramView[selectedStepProgramViewEnum.value](fetchStepAnalyticsCts.token);
         }
     });
 
@@ -833,7 +880,9 @@
         updateDateRangeText();
         resetAllStateFlags();
 
-        fetchByStepProgramView[selectedStepProgramViewEnum.value]();
+        fetchStepAnalyticsCts?.cancel();
+        fetchStepAnalyticsCts = new CancellationTokenSource();
+        fetchByStepProgramView[selectedStepProgramViewEnum.value](fetchStepAnalyticsCts.token);
     });
 
     watch([maxLevels, startingStepTypes], () => {
