@@ -211,16 +211,18 @@
         </ContentSection>
 
         <ContentSection title="Advanced Settings" icon="ti ti-adjustments-cog">
-            <ContentStack>
+            <ContentStack title="Advanced Settings" description="Configure advanced features for this Step Type. Use these settings to define how step data is auto-completed, customize the display content with Lava templates, and control whether manual edits are allowed.">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-3">
+                        <DataViewPicker v-model="autoCompleteDataView"
+                                        label="Auto-Complete Data View"
+                                        help="A Data View that returns a list of people who should be regarded as having completed this step." />
+                    </div>
+                    <div class="col-md-3">
                         <DataViewPicker v-if="audienceDataView.value"
                                         v-model="audienceDataView"
                                         label="Audience Data View"
                                         help="A Data View that returns a list of people who are eligible to take this step." />
-                        <DataViewPicker v-model="autoCompleteDataView"
-                                        label="Auto-Complete Data View"
-                                        help="A Data View that returns a list of people who should be regarded as having completed this step." />
                     </div>
                 </div>
                 <div class="row">
