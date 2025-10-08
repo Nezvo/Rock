@@ -20057,7 +20057,6 @@ canvas.decorationsOverviewRuler {
 }
 .rock-fullscreen-toggle::before {
   font-family: "tabler-icons";
-  font-weight: var(--font-weight-black);
   text-align: center;
   content: "\eaea";
 }
