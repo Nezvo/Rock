@@ -509,7 +509,7 @@ namespace Rock.Tests.CheckIn.v2
             // added so we can update the other tests to check for those
             // properties.
             var type = typeof( TemplateConfigurationData );
-            var expectedPropertyCount = 79;
+            var expectedPropertyCount = 80;
 
             var propertyCount = type.GetProperties().Length;
 
