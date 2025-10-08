@@ -97,7 +97,17 @@
                                         Help="Should people be prevented from checking into a specifice service time (schedule) more than once?" />
 
                                     <Rock:RockCheckBox ID="cbEnableProximityCheckIn" runat="server" Label="Enable Proximity Check-in"
-                                        Help="Makes this check-in configuration and all areas and groups available for proximity check-in with a native Rock Mobile application." />
+                                        Help="Makes this check-in configuration and all areas and groups available for proximity check-in with a native Rock Mobile application."
+                                        OnCheckedChanged="cbEnableProximityCheckIn_CheckedChanged"
+                                        AutoPostBack="true" />
+
+                                    <div class="well well-conditional" id="proximityAttendanceConfiguration" runat="server">
+                                     <Rock:CodeEditor ID="ceCheckInNotificationTemplate" runat="server" Label="Notification Lava Template"
+                                        Help="The lava template that will be parsed to deliver a push notification when a person checks in through proximity attendance."
+                                        EditorMode="Lava"
+                                        Rows="3" />
+                                    </div>
+
                                 </div>
                             </div>
 

@@ -678,6 +678,16 @@ Mode: Trailblazer
 
 Help: Makes this check-in configuration and all areas and groups available for proximity check-in with a native Rock Mobile application.
 
+#### Check-in Notification Template
+
+Type: Text Input
+Depends On: Enable Proximity Check-in == True
+Mode: Trailblazer
+
+Help: The Lava template used to generate the push notification message when an individual is successfully checked in via proximity. This message will be sent to the associated device. Only used when proximity check-in is enabled.
+
+Developer Note: The text input should be a Code Editor with Editor Mode set to Lava.
+
 #### Hide Inactive People
 
 Type: Checkbox

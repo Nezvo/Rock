@@ -199,6 +199,13 @@ namespace Rock.CheckIn.v2
         public virtual bool IsProximityEnabled { get; }
 
         /// <summary>
+        /// Gets a value indicating the lava template that will be used to
+        /// send a push notification to the mobile device when a person is
+        /// checked in via the proximity system.
+        /// </summary>
+        public virtual string ProximityAttendanceNotificationTemplate { get; }
+
+        /// <summary>
         /// Gets a value indicating whether removing people with a "can check-in"
         /// relationship from the family is allowed. This does not allow
         /// full family members to be removed.
@@ -652,6 +659,7 @@ namespace Rock.CheckIn.v2
             IsPhotoHidden = groupTypeCache.GetAttributeValue( "core_checkin_HidePhotos" ).AsBoolean( true );
             IsPresenceEnabled = groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_GROUPTYPE_ENABLE_PRESENCE ).AsBoolean();
             IsProximityEnabled = groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_GROUPTYPE_ENABLE_PROXIMITY_CHECKIN ).AsBoolean();
+            ProximityAttendanceNotificationTemplate = templateSettings.ProximityAttendanceNotificationTemplate;
             IsRemoveFromFamilyAtKioskAllowed = groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_GROUPTYPE_ALLOW_REMOVE_FROM_FAMILY_KIOSK ).AsBoolean();
             IsSameCodeUsedForFamily = groupTypeCache.GetAttributeValue( "core_checkin_ReuseSameCode" ).AsBoolean( false );
             IsSameOptionUsed = groupTypeCache.GetAttributeValue( "core_checkin_UseSameOptions" ).AsBoolean( false );
