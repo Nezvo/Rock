@@ -175,7 +175,7 @@ namespace Rock.Blocks.Communication
         /// </summary>
         private Guid? FilterTopicValueGuid => BlockPersonPreferences
             .GetValue( PersonPreferenceKey.FilterTopic )
-            .FromJsonOrNull<ListItemBag>()?.Value?.AsGuidOrNull();
+            .AsGuidOrNull();
 
         /// <summary>
         /// Gets the name by which to filter the results.
@@ -506,12 +506,19 @@ WHERE (@RecipientCountLower IS NULL OR counts.[RecipientCount] >= @RecipientCoun
         /// <returns>The options that provide additional details to the block.</returns>
         private CommunicationListOptionsBag GetBoxOptions()
         {
+            var topicItems = DefinedTypeCache.Get( SystemGuid.DefinedType.COMMUNICATION_TOPIC )
+                .DefinedValues
+                .OrderBy( dv => dv.Order )
+                .ThenBy( dv => dv.Value )
+                .ToListItemBagList();
+
             var options = new CommunicationListOptionsBag
             {
                 ShowSentByFilter = CanApprove,
                 HasActiveEmailTransport = MediumContainer.HasActiveEmailTransport(),
                 HasActiveSmsTransport = MediumContainer.HasActiveSmsTransport(),
-                HasActivePushTransport = MediumContainer.HasActivePushTransport()
+                HasActivePushTransport = MediumContainer.HasActivePushTransport(),
+                TopicItems = topicItems
             };
 
             return options;
