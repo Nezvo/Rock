@@ -20962,6 +20962,14 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   color: var(--color-interface-strong) !important;
 }
 
+.reminder-list a.success-on-hover {
+  color: var(--color-interface-strong);
+  transition: 0.2s color;
+}
+.reminder-list a.success-on-hover:hover {
+  color: var(--color-success-strong);
+}
+
 .group-location-map {
   margin-bottom: var(--spacing-large);
 }
