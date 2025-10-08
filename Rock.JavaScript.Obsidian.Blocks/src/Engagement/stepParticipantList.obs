@@ -196,12 +196,7 @@
      * Called when the grid is requesting the row data be loaded.
      */
     async function loadGridData(): Promise<GridDataBag> {
-        const start = performance.now(); // high-resolution timer
-
         const result = await invokeBlockAction<GridDataBag>("GetGridData");
-
-        const end = performance.now();
-        console.log(`loadGridData took ${(end - start).toFixed(2)} ms`);
 
         if (result.isSuccess && result.data) {
             gridData = reactive(result.data);

@@ -1,6 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <ContentSectionContainer :sidebar="false">
+    <ContentSectionContainer sidebar>
         <ContentSection light>
             <ContentStack>
                 <div class="row">
