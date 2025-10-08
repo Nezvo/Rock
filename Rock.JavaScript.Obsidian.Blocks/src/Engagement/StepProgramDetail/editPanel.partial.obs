@@ -139,7 +139,7 @@
             </ContentStack>
 
             <Modal v-model="isAttributeModalOpen"
-                   title="Step Participant Attributes">
+                   title="Step Type Attributes">
 
                 <RockForm v-model:submit="saveAttribute"
                           @submit="onSaveAttribute">

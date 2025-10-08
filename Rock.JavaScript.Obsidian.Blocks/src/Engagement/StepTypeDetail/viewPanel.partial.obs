@@ -28,7 +28,10 @@
                     <LineChart :series="chartSeries"
                                :labels="chartLabels"
                                :labelDateFormat="dateUnit"
-                               :valueSuggestedMin="0" />
+                               :valueSuggestedMin="0"
+                               :valueSuggestedMax="3"
+                               :valuePrecision="0"
+                               categoryShowGridLines />
                 </div>
             </div>
         </div>

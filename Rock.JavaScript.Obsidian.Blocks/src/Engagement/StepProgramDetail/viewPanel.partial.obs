@@ -2,11 +2,16 @@
 <template>
     <fieldset>
         <div class="d-flex justify-content-between align-items-center mb-sm">
-            <SlidingDateRangePicker v-model="filterDate"
-                                    :enabledSlidingDateRangeUnits="[RangeType.Previous, RangeType.Last, RangeType.Current, RangeType.DateRange]"
-                                    :enabledTimeUnits="[TimeUnit.Week, TimeUnit.Month, TimeUnit.Year, TimeUnit.Day, TimeUnit.Hour]"
-                                    :isRangeClearable="false"
-                                    previewLocation="None" />
+            <div class="d-flex align-items-center">
+                <SlidingDateRangePicker v-model="filterDate"
+                                        :enabledSlidingDateRangeUnits="[RangeType.Previous, RangeType.Last, RangeType.Current, RangeType.DateRange]"
+                                        :enabledTimeUnits="[TimeUnit.Week, TimeUnit.Month, TimeUnit.Year, TimeUnit.Day, TimeUnit.Hour]"
+                                        :isRangeClearable="false"
+                                        previewLocation="None" />
+                <div v-show="isLoading">
+                    <Loading :isLoading="isLoading" />
+                </div>
+            </div>
 
             <ButtonGroup v-model="selectedStepProgramView"
                          :btnSize="BtnSize.Default"
@@ -67,10 +72,7 @@
             </ContentStack>
         </ContentSection>
 
-        <div v-if="isLoading">
-            <Loading :isLoading="isLoading" />
-        </div>
-        <div v-else-if="notificationMessage">
+        <div v-if="notificationMessage">
             <NotificationBox alertType="warning"
                              class="mt-sm">
                 {{ notificationMessage }}
@@ -95,6 +97,8 @@
                            :labelDateFormat="dateUnit"
                            :hideLegend="isLegendHidden"
                            :valueSuggestedMin="0"
+                           :valueSuggestedMax="3"
+                           :valuePrecision="0"
                            categoryShowGridLines />
 
                 <BarChart v-else
@@ -105,6 +109,8 @@
                           :horizontal="isHorizontal"
                           :hideLegend="isLegendHidden"
                           :valueSuggestedMin="0"
+                          :valueSuggestedMax="3"
+                          :valuePrecision="0"
                           categoryShowAllTicks
                           @click="onBarChartClicked" />
 
@@ -118,6 +124,11 @@
 </template>
 
 <style scoped>
+/* Overrides the font-size set on the loading indicator because it was affecting the height of the flex row its in. */
+:deep(.ti-2x) {
+    font-size: 1.5em !important;
+}
+
 .mt-sm {
     margin-top: var(--spacing-small);
 }
@@ -232,7 +243,7 @@
 
     const stepProgramViewOptions = enumToStandardListItemBagList(StepProgramViewDescription);
 
-    const chartStateFlags: Record<number, boolean> = {};
+    const programViewStateFlags: Record<number, boolean> = {};
     const fetchByStepProgramView: Record<number, () => Promise<void>> = {
         [StepProgramView.KPIs]: () => fetchKPIData(),
         [StepProgramView.Trends]: () => fetchChartData(),
@@ -240,7 +251,7 @@
         [StepProgramView.Campuses]: () => fetchChartData(),
         [StepProgramView.Flow]: () => fetchStepFlowData()
     };
-    const stepProgramViewData: Record<number, ChartDataBag | null> = {
+    const chartViewData: Record<number, ChartDataBag | null> = {
         [StepProgramView.Trends]: null,
         [StepProgramView.Totals]: null,
         [StepProgramView.Campuses]: null,
@@ -471,7 +482,7 @@
     function resetAllStateFlags(initialValue = false): void {
         for (const key in StepProgramView) {
             const value = StepProgramView[key as keyof typeof StepProgramView];
-            chartStateFlags[value] = initialValue;
+            programViewStateFlags[value] = initialValue;
         }
     }
 
@@ -479,9 +490,9 @@
      * Resets all chart state flags.
      */
     function resetChartStateFlags(): void {
-        chartStateFlags[StepProgramView.Trends] = false;
-        chartStateFlags[StepProgramView.Totals] = false;
-        chartStateFlags[StepProgramView.Campuses] = false;
+        programViewStateFlags[StepProgramView.Trends] = false;
+        programViewStateFlags[StepProgramView.Totals] = false;
+        programViewStateFlags[StepProgramView.Campuses] = false;
     }
 
     /**
@@ -549,7 +560,7 @@
             return;
         }
 
-        const chartData = stepProgramViewData[selectedStepProgramViewEnum.value];
+        const chartData = chartViewData[selectedStepProgramViewEnum.value];
 
         if (!chartData?.campusLabels) {
             return;
@@ -685,8 +696,8 @@
         isLoading.value = false;
 
         if (result.isSuccess && result.data) {
-            chartStateFlags[selectedStepProgramViewEnum.value] = true;
-            stepProgramViewData[selectedStepProgramViewEnum.value] = result.data;
+            programViewStateFlags[selectedStepProgramViewEnum.value] = true;
+            chartViewData[selectedStepProgramViewEnum.value] = result.data;
 
             updateChartForView(result.data);
         }
@@ -713,7 +724,7 @@
         if (result.isSuccess && result.data) {
             kpi.value = result.data ?? "";
 
-            chartStateFlags[StepProgramView.KPIs] = true;
+            programViewStateFlags[StepProgramView.KPIs] = true;
         }
         else {
             notificationMessage.value = result.errorMessage ?? "Unknown error while trying to fetch KPI data.";
@@ -766,7 +777,7 @@
             flowNodes.value = response.data.nodes ?? [];
 
             // State is up-to-date.
-            chartStateFlags[StepProgramView.Flow] = true;
+            programViewStateFlags[StepProgramView.Flow] = true;
         }
         else {
             throw new Error(response.errorMessage || "An error occurred");
@@ -786,6 +797,11 @@
             maxLevels.value = 4;
         }
 
+        // If our program view state is clean and we are not viewing a chart then we can escape the function.
+        if (programViewStateFlags[selectedStepProgramViewEnum.value] && (selectedStepProgramViewEnum.value === StepProgramView.KPIs || selectedStepProgramViewEnum.value === StepProgramView.Flow)) {
+            return;
+        }
+
         // Setting default measure values.
         if (selectedMeasure.value === "") {
             if (selectedStepProgramViewEnum.value === StepProgramView.Campuses) {
@@ -803,12 +819,12 @@
             resetChartStateFlags();
         }
 
-        // If our chart state is clean and we have data for the selected view than update chart from state.
-        if (chartStateFlags[selectedStepProgramViewEnum.value] && stepProgramViewData[selectedStepProgramViewEnum.value]) {
-            updateChartForView(stepProgramViewData[selectedStepProgramViewEnum.value]!);
+        // If our program view state is clean and we have data for the selected view than update chart from state.
+        if (programViewStateFlags[selectedStepProgramViewEnum.value] && chartViewData[selectedStepProgramViewEnum.value]) {
+            updateChartForView(chartViewData[selectedStepProgramViewEnum.value]!);
         }
         else {
-            // Chart state is dirty so feth from server.
+            // Chart state is dirty so fetch from server.
             fetchByStepProgramView[selectedStepProgramViewEnum.value]();
         }
     });
@@ -821,7 +837,7 @@
     });
 
     watch([maxLevels, startingStepTypes], () => {
-        chartStateFlags[StepProgramView.Flow] = false;
+        programViewStateFlags[StepProgramView.Flow] = false;
         nextTick(() => {
             // Performs validation rules on the Max Levels Number Box everytime its data is changed.
             if (flowForm.value) {
@@ -840,6 +856,6 @@
         updateDateRangeText();
         resetAllStateFlags();
         // KPIs are populated off of the Block Initialization so its state is valid.
-        chartStateFlags[StepProgramView.KPIs] = true;
+        programViewStateFlags[StepProgramView.KPIs] = true;
     });
 </script>
