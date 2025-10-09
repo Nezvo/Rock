@@ -247,3 +247,13 @@
 }
 
 // ======================== END DISPLAY CARD CONTAINER ========================
+
+// ======================= MOBILE ADJUSTMENTS =======================
+
+@media (max-width: 390px) {
+    .displaycard {
+        padding: var(--spacing-medium);
+    }
+}
+
+// ========================= END MOBILE ADJUSTMENTS =======================
