@@ -1883,31 +1883,7 @@ Obsidian.init({{ debug: true, fingerprint: ""v={_obsidianFingerprint}"" }});
                     Page.Form.Controls.Add( new Literal
                     {
                         ID = _obsidianPageTimingControlId,
-                        Text = $@"
-<span>
-    <style>
-        .debug-timestamp {{
-            text-align: right;
-        }}
-
-        .debug-waterfall {{
-            width: 40%;
-            position: relative;
-            vertical-align: middle !important;
-            padding: 0 !important;
-        }}
-
-        .debug-chart-bar {{
-            position: absolute;
-            display: block;
-            min-width: 1px;
-            height: 1.125em;
-            background: #009ce3;
-            margin-top: -0.5625em;
-        }}
-    </style>
-    <div id=""{_obsidianPageTimingControlId}""></div>
-</span>"
+                        Text = $"<div id=\"{_obsidianPageTimingControlId}\"></div>"
                     } );
                 }
             }
