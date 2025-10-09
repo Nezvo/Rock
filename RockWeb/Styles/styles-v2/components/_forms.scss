@@ -548,7 +548,7 @@ a.help {
 }
 
 a.help i {
-  font-size: 15px;
+  font-size: var(--font-size-small);
 }
 
 a.warning {
