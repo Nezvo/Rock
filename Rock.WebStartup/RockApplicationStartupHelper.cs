@@ -31,6 +31,7 @@ using System.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
+using Rock.AI.Agent;
 using Rock.Blocks;
 using Rock.Bus;
 using Rock.Communication.Chat;
@@ -101,10 +102,10 @@ namespace Rock.WebStartup
         {
             LogStartupMessage( "Application Starting" );
 
+            AppDomain.CurrentDomain.AssemblyResolve += AppDomain_AssemblyResolve;
+
             InitializeRockApp();
             Rock.JsonExtensions.ReferenceEqualityComparer = new Rock.Utility.EntityReferenceEqualityComparer();
-
-            AppDomain.CurrentDomain.AssemblyResolve += AppDomain_AssemblyResolve;
 
             // Indicate to always log to file during initialization.
             ExceptionLogService.AlwaysLogToFile = true;
@@ -292,10 +293,18 @@ namespace Rock.WebStartup
             Rock.Transactions.RockQueue.StartFastQueue();
             ShowDebugTimingMessage( "Rock Fast Queue" );
 
+            // Register all the AI skills into the database.
+            LogStartupMessage( "Registering AI Skills" );
+            AISkillService.RegisterSkills();
+            ShowDebugTimingMessage( "AI Skills" );
+
             // Start the Automation system.
             LogStartupMessage( "Starting the Automation System" );
-            AutomationTriggerCache.CreateAllMonitors();
-            AutomationEventCache.CreateAllExecutors();
+            using ( var scope = RockApp.Current.CreateScope() )
+            {
+                AutomationTriggerCache.CreateAllMonitors( scope.ServiceProvider.GetRequiredService<Core.Automation.AutomationTriggerContainer>() );
+                AutomationEventCache.CreateAllExecutors( scope.ServiceProvider.GetRequiredService<Core.Automation.AutomationEventContainer>() );
+            }
             ShowDebugTimingMessage( "Automation System" );
 
             bool anyThemesUpdated = UpdateThemes();
@@ -317,6 +326,7 @@ namespace Rock.WebStartup
         {
             var sc = new ServiceCollection();
 
+            // Register basic hosting services.
             sc.AddSingleton<IConnectionStringProvider, WebFormsConnectionStringProvider>();
             sc.AddSingleton<IInitializationSettings, WebFormsInitializationSettings>();
             sc.AddSingleton<IDatabaseConfiguration, DatabaseConfiguration>();
@@ -327,8 +337,6 @@ namespace Rock.WebStartup
             {
                 WebRootPath = AppDomain.CurrentDomain.BaseDirectory
             } );
-            sc.AddSingleton<Core.Automation.AutomationTriggerContainer>();
-            sc.AddSingleton<Core.Automation.AutomationEventContainer>();
             sc.AddSingleton<MetadataHelper>();
 
             sc.AddScoped<RockContext>();
@@ -340,7 +348,39 @@ namespace Rock.WebStartup
             // source.
             sc.AddTransient<InitializationSettings, WebFormsInitializationSettings>();
 
-            RockApp.Current = new RockApp( sc.BuildServiceProvider() );
+            // Register Light Containers.
+            sc.AddSingleton( typeof( Extension.LightComponentLoader<> ), typeof( Extension.LightComponentLoader<> ) );
+            sc.AddScoped<Core.Automation.AutomationTriggerContainer>();
+            sc.AddScoped<Core.Automation.AutomationEventContainer>();
+            sc.AddScoped<AI.Agent.AgentSkillContainer>();
+
+            sc.AddSingleton<IRockContextFactory, RockContextFactory>();
+
+            foreach ( var configurationType in Rock.Reflection.FindTypes( typeof( Plugin.IConfigureServices ) ) )
+            {
+                try
+                {
+                    var configurationInstance = Activator.CreateInstance( configurationType.Value ) as Plugin.IConfigureServices;
+                    configurationInstance.ConfigureServices( sc );
+
+                }
+                catch ( Exception ex )
+                {
+                    // We are too early in the startup to use any meaningful
+                    // logging. So just write it to the debug console for now.
+                    Debug.WriteLine( $"Error configuring services for {configurationType.Value.FullName}: {ex.Message}" );
+                }
+            }
+
+            // If we are running under Visual Studio then turn on scope validation
+            // to help catch misconfigurations.
+            var serviceOptions = new ServiceProviderOptions
+            {
+                ValidateOnBuild = System.Web.Hosting.HostingEnvironment.IsDevelopmentEnvironment,
+                ValidateScopes = System.Web.Hosting.HostingEnvironment.IsDevelopmentEnvironment
+            };
+
+            RockApp.Current = new RockApp( sc.BuildServiceProvider( serviceOptions ) );
         }
 
         /// <summary>
@@ -1054,6 +1094,9 @@ AS
     [E].[Id] AS [EntityId],
     [A].[Id] AS [AttributeId],
     [A].[Key],
+    [A].[Name],
+    [A].[IsPublic],
+    [A].[IsGridColumn],
     CASE WHEN ISNULL([AV].[Value], '') != '' THEN [AV].[Value] ELSE ISNULL([A].[DefaultValue], '') END AS [Value],
     CASE WHEN ISNULL([AV].[Value], '') != '' THEN [AV].[PersistedTextValue] ELSE [A].[DefaultPersistedTextValue] END AS [PersistedTextValue],
     CASE WHEN ISNULL([AV].[Value], '') != '' THEN [AV].[PersistedHtmlValue] ELSE [A].[DefaultPersistedHtmlValue] END AS [PersistedHtmlValue],
