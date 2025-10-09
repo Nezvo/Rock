@@ -16545,6 +16545,10 @@ textarea:focus,
   justify-content: center;
 }
 
+.grid-obsidian .grid-column-header-boolean:has(.btn-grid-column-filter) .grid-column-title {
+  padding-left: 26px;
+}
+
 .grid-obsidian .grid-cell-number,
 .grid-obsidian .grid-cell-currency,
 .grid-obsidian .grid-column-header-number,

@@ -468,6 +468,11 @@
     justify-content: center;
 }
 
+// Offset the title when there is a filter button
+.grid-obsidian .grid-column-header-boolean:has(.btn-grid-column-filter) .grid-column-title {
+    padding-left: 26px; // button width
+}
+
 .grid-obsidian .grid-cell-number,
 .grid-obsidian .grid-cell-currency,
 .grid-obsidian .grid-column-header-number,
