@@ -510,6 +510,7 @@
 
             .grid-cell {
                 border-bottom: none;
+                background-color: transparent;
             }
 
             .grid-cell:first-child,
@@ -529,6 +530,10 @@
             &:hover {
                 background-color: transparent;
             }
+        }
+
+        &:hover .grid-cell {
+            background-color: transparent;
         }
     }
 
