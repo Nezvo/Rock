@@ -23,32 +23,23 @@
 
 import { Guid } from "@Obsidian/Types";
 
-/**
- * The options that can be passed to the GetChildren API action of
- * the RegistrationTemplatePicker control.
- */
-export type SchedulePickerGetChildrenOptionsBag = {
-    /**
-     * The category unique identifier to filter schedules by.
-     * If null then schedules from all categories are included.
-     */
-    includeCategoryGuids?: Guid[] | null;
+/** Bag that represents a session count segment filter configuration. */
+export type SessionCountSegmentFilterBag = {
+    /** Gets or sets the comparison type. */
+    comparisonType: number;
 
-    /** Whether to include schedules marked as inactive in the results. */
-    includeInactiveItems: boolean;
+    /** Gets or sets the comparison value. */
+    comparisonValue: number;
 
-    /** Whether to include schedules marked as private in the results. */
-    includePublicItemsOnly: boolean;
+    /** Gets or sets the human-readable description. */
+    description?: string | null;
 
-    /**
-     * The parent unique identifier whose children are to
-     * be retrieved. If null then the root items are being requested.
-     */
-    parentGuid?: Guid | null;
+    /** Gets or sets the unique identifier for this filter configuration. */
+    guid: Guid;
 
-    /**
-     * Gets or sets the security grant token to use when performing
-     * authorization checks.
-     */
-    securityGrantToken?: string | null;
+    /** Gets or sets the sites to include. */
+    siteGuids?: Guid[] | null;
+
+    /** Gets or sets the sliding date range values. */
+    slidingDateRangeDelimitedValues?: string | null;
 };

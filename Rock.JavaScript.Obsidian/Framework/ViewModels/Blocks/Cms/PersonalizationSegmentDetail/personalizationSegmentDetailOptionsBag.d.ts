@@ -21,34 +21,10 @@
 // </copyright>
 //
 
-import { Guid } from "@Obsidian/Types";
+import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 
-/**
- * The options that can be passed to the GetChildren API action of
- * the RegistrationTemplatePicker control.
- */
-export type SchedulePickerGetChildrenOptionsBag = {
-    /**
-     * The category unique identifier to filter schedules by.
-     * If null then schedules from all categories are included.
-     */
-    includeCategoryGuids?: Guid[] | null;
-
-    /** Whether to include schedules marked as inactive in the results. */
-    includeInactiveItems: boolean;
-
-    /** Whether to include schedules marked as private in the results. */
-    includePublicItemsOnly: boolean;
-
-    /**
-     * The parent unique identifier whose children are to
-     * be retrieved. If null then the root items are being requested.
-     */
-    parentGuid?: Guid | null;
-
-    /**
-     * Gets or sets the security grant token to use when performing
-     * authorization checks.
-     */
-    securityGrantToken?: string | null;
+/** The additional configuration options for the Personalization Segment Detail block. */
+export type PersonalizationSegmentDetailOptionsBag = {
+    /** Gets or sets the options for available sites. */
+    sites?: ListItemBag[] | null;
 };
