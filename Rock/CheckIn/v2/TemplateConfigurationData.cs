@@ -705,7 +705,7 @@ namespace Rock.CheckIn.v2
             CanCheckInKnownRelationshipRoleGuids = GetRelationshipRoleGuids( groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_REGISTRATION_CANCHECKINKNOWNRELATIONSHIPTYPES ), rockContext );
             DefaultPersonConnectionStatusGuid = groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_REGISTRATION_DEFAULTPERSONCONNECTIONSTATUS ).AsGuidOrNull() ?? SystemGuid.DefinedValue.PERSON_CONNECTION_STATUS_VISITOR.AsGuid();
             DefaultPersonRecordSourceGuid = groupTypeCache.GroupMemberRecordSourceValueId.HasValue
-                ? DefinedValueCache.GetGuid( groupTypeCache.GroupMemberRecordSourceValueId.Value ).Value
+                ? DefinedValueCache.Get( groupTypeCache.GroupMemberRecordSourceValueId.Value, rockContext ).Guid
                 : SystemGuid.DefinedValue.RECORD_SOURCE_TYPE_CHECK_IN.AsGuid();
             DisplayBirthdateForAdults = GetRequirementLevel( groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_REGISTRATION_DISPLAYBIRTHDATEONADULTS ) );
             DisplayBirthdateForChildren = GetRequirementLevel( groupTypeCache.GetAttributeValue( GroupTypeAttributeKey.CHECKIN_REGISTRATION_DISPLAYBIRTHDATEONCHILDREN ) );
