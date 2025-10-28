@@ -276,7 +276,7 @@ namespace Rock.Blocks.Engagement
                 queryable = queryable.Where( s => s.Step.CampusId == campusContext.Id );
             }
 
-            queryable = FilterByCreatedDate( queryable );
+            queryable = FilterByDate( queryable );
 
             return queryable;
         }
@@ -330,7 +330,7 @@ namespace Rock.Blocks.Engagement
                 .AddTextField( "note", a => a.Step.Note )
                 .AddTextField( "signalMarkup", a => Rock.Model.Person.GetSignalMarkup( a.Person.TopSignalColor, a.Person.TopSignalIconCssClass ) )
                 .AddField( "isDeceased", a => a.Person.IsDeceased )
-                .AddField( "isInactive", a => a.Person.RecordStatusValueId == inactiveStatus.Id )
+                .AddField( "isActive", a => a.Person.RecordStatusValueId != inactiveStatus.Id )
                 .AddField( "id", a => a.Step.Id )
                 .AddField( "personId", a => a.Person.Id )
                 .AddField( "stepStatusId", a => a.Step.StepStatusId )
@@ -375,7 +375,7 @@ namespace Rock.Blocks.Engagement
         /// </summary>
         /// <param name="queryable">The <see cref="StepParticipantRow"/> queryable</param>
         /// <returns></returns>
-        private IQueryable<StepParticipantRow> FilterByCreatedDate( IQueryable<StepParticipantRow> queryable )
+        private IQueryable<StepParticipantRow> FilterByDate( IQueryable<StepParticipantRow> queryable )
         {
             // Default to the last 180 days if a null/invalid range was selected.
             var defaultSlidingDateRange = new SlidingDateRangeBag
@@ -391,8 +391,19 @@ namespace Rock.Blocks.Engagement
 
             queryable = queryable
                 .Where( c =>
-                    c.Step.CreatedDateTime >= dateTimeStart &&
-                    c.Step.CreatedDateTime <= dateTimeEnd );
+                    (
+                        c.Step.CreatedDateTime ??
+                        c.Step.StartDateTime ??
+                        c.Step.CompletedDateTime ??
+                        c.Step.EndDateTime
+                    ) >= dateTimeStart &&
+                    (
+                        c.Step.CreatedDateTime ??
+                        c.Step.StartDateTime ??
+                        c.Step.CompletedDateTime ??
+                        c.Step.EndDateTime
+                    ) <= dateTimeEnd );
+
 
             return queryable;
         }
