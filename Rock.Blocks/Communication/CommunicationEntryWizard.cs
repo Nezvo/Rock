@@ -1486,7 +1486,12 @@ namespace Rock.Blocks.Communication
                 if ( c.Status == CommunicationStatus.Transient )
                 {
                     var bulkEmailThreshold = GetBulkEmailThreshold();
-                    var isBulkCommunicationForced = bulkEmailThreshold.HasValue && ( communication?.Recipients?.Count ?? 0 ) > bulkEmailThreshold.Value;
+                    var recipientCount = new CommunicationRecipientService( rockContext )
+                        .Queryable()
+                        .Where( cr => cr.CommunicationId == c.Id )
+                        .Count();
+
+                    var isBulkCommunicationForced = bulkEmailThreshold.HasValue && recipientCount > bulkEmailThreshold.Value;
 
                     return isBulkCommunicationForced || GetAttributeValue( AttributeKey.DefaultAsBulk ).AsBoolean();
                 }
@@ -2489,12 +2494,19 @@ namespace Rock.Blocks.Communication
                             testCommunication.Attachments.Add( cloneAttachment );
                         }
 
-                        // for the test email, just use the current person as the recipient, but copy/paste the AdditionalMergeValuesJson to our test recipient so it has the same as the real recipients
+                        // For the test email, just use the current person as the recipient,
+                        // but copy/paste the AdditionalMergeValuesJson to our test recipient
+                        // so it has the same as the real recipients
                         var testRecipient = new CommunicationRecipient();
-                        if ( communication.Recipients.Any() )
+                        var firstRecipient = new CommunicationRecipientService( rockContext )
+                            .Queryable()
+                            .AsNoTracking()
+                            .Where( cr => cr.CommunicationId == communication.Id )
+                            .FirstOrDefault();
+
+                        if ( firstRecipient != null )
                         {
-                            var recipient = communication.Recipients.First();
-                            testRecipient.AdditionalMergeValuesJson = recipient.AdditionalMergeValuesJson;
+                            testRecipient.AdditionalMergeValuesJson = firstRecipient.AdditionalMergeValuesJson;
                         }
 
                         testRecipient.Status = CommunicationRecipientStatus.Pending;
@@ -2868,12 +2880,43 @@ namespace Rock.Blocks.Communication
                     }
                 }
 
-                if ( communication.Recipients.Any() )
+                if ( communication.ListGroupId.HasValue )
                 {
-                    // Use the first recipient.
-                    result.CommunicationRecipient = communication.Recipients.First();
+                    // Return the first person from the communication list.
+                    var firstCommunicationListMemberPersonAlias = new GroupMemberService( rockContext )
+                        .Queryable()
+                        .Where( gm => !gm.IsArchived && gm.GroupMemberStatus == GroupMemberStatus.Active && gm.GroupId == communication.ListGroupId.Value )
+                        .Select( gm => gm.Person.Aliases.Where( pa => pa.AliasPersonId == gm.Person.Id ).FirstOrDefault() )
+                        .FirstOrDefault();
 
-                    return result;
+                    if ( firstCommunicationListMemberPersonAlias != null )
+                    {
+                        result.CommunicationRecipient = new CommunicationRecipient
+                        {
+                            PersonAlias = firstCommunicationListMemberPersonAlias,
+                            Communication = communication
+                        };
+                        result.WasRequestedPersonFound = true;
+
+                        return result;
+                    }
+                }
+                else
+                {
+                    var firstRecipient = new CommunicationRecipientService( rockContext )
+                        .Queryable()
+                        .AsNoTracking()
+                        .Where( cr => cr.CommunicationId == communication.Id )
+                        .FirstOrDefault();
+
+                    if ( firstRecipient != null )
+                    {
+                        // Use the first recipient.
+                        result.CommunicationRecipient = firstRecipient;
+                        result.WasRequestedPersonFound = true;
+
+                        return result;
+                    }
                 }
 
                 // Use the logged in person.
@@ -2951,7 +2994,11 @@ namespace Rock.Blocks.Communication
 
                     var maxRecipients = GetAttributeValue( AttributeKey.MaximumRecipients ).AsIntegerOrNull() ?? int.MaxValue;
                     var userCanApprove = this.BlockCache.IsAuthorized( "Approve", currentPerson );
-                    var recipientCount = communication.Recipients.Count();
+                    var recipientCount = new CommunicationRecipientService( rockContext )
+                        .Queryable()
+                        .Where( cr => cr.Id == communication.Id )
+                        .Count();
+
                     if ( recipientCount > maxRecipients && !userCanApprove )
                     {
                         communication.Status = CommunicationStatus.PendingApproval;
@@ -3079,7 +3126,13 @@ namespace Rock.Blocks.Communication
             using ( var activity = ObservabilityHelper.StartActivity( "COMMUNICATION: Entry Wizard > Save As Draft" ) )
             {
                 var communication = SaveCommunication( rockContext, bag );
-                UpdateCommunicationRecipients( rockContext, bag, communication );
+
+                if ( bag.IndividualRecipientPersonAliasGuids?.Any() == true )
+                {
+                    // Manual recipients list - always save recipients if they are from a manual list;
+                    // recipients from a communication list will only be saved when the communication is sent/scheduled.
+                    UpdateCommunicationRecipients( rockContext, bag, communication );
+                }
 
                 communication.Status = CommunicationStatus.Draft;
                 rockContext.SaveChanges();
@@ -3242,11 +3295,22 @@ namespace Rock.Blocks.Communication
             {
                 progressReporter?.UpdateTaskProgress( new TaskActivityProgressUpdateBag { CompletionPercentage = 3m, Message = "Initializing recipient update..." } );
 
-                var updatedCommunicationRecipients = GetUpdatedCommunicationRecipients( rockContext, bag );
+                if ( bag.IndividualRecipientPersonAliasGuids?.Any() == true )
+                {
+                    // Manual recipient list - refresh using block logic.
+                    var communicationOperationService = new CommunicationOperationsService();
 
-                var operationsService = new CommunicationOperationsService();
-                operationsService.UpdateCommunicationRecipients( rockContext, communication, updatedCommunicationRecipients, progressReporter );
-
+                    var updatedCommunicationRecipients = GetUpdatedCommunicationRecipients( rockContext, bag );
+                    communicationOperationService.UpdateCommunicationRecipients( rockContext, communication, updatedCommunicationRecipients, progressReporter );
+                }
+                else
+                {
+                    // Communication list - refresh using communication logic.
+                    communication.RefreshCommunicationRecipientListInternal( rockContext );
+                }
+                
+                progressReporter?.UpdateTaskProgress( new TaskActivityProgressUpdateBag { CompletionPercentage = 20m, Message = "Updated recipients..." } );
+                
                 // rockContext.SaveChanges() is called deep within the UpdateCommunicationRecipients() call above,
                 // so wait until we get back from that method to add the ID tag.
                 activity?.AddTag( "rock.communication.id", communication.Id );
@@ -3542,7 +3606,6 @@ namespace Rock.Blocks.Communication
                 if ( settings.CommunicationId.GetValueOrDefault( 0 ) > 0 )
                 {
                     communication = communicationService.Queryable()
-                        .Include( c => c.Recipients )
                         .Include( c => c.CommunicationTemplate )
                         .Include( c => c.ListGroup )
                         .FirstOrDefault( c => c.Id == settings.CommunicationId.Value );
@@ -3550,7 +3613,6 @@ namespace Rock.Blocks.Communication
                 else if ( !settings.CommunicationGuid.IsEmpty() )
                 {
                     communication = communicationService.Queryable()
-                        .Include( c => c.Recipients )
                         .Include( c => c.CommunicationTemplate )
                         .Include( c => c.ListGroup )
                         .FirstOrDefault( c => c.Guid == settings.CommunicationGuid );
