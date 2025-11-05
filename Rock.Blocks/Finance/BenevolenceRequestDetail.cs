@@ -109,7 +109,8 @@ namespace Rock.Blocks.Finance
     #endregion
 
     [Rock.SystemGuid.EntityTypeGuid( "9B1BE948-F14A-4889-981D-75B86E6D458D" )]
-    [Rock.SystemGuid.BlockTypeGuid( "5CA8DF26-D85C-4D70-822A-15D4B1021FBC" )]
+    // was [Rock.SystemGuid.BlockTypeGuid( "5CA8DF26-D85C-4D70-822A-15D4B1021FBC" )]
+    [Rock.SystemGuid.BlockTypeGuid( "34275D0E-BC7E-4A9C-913E-623D086159A1" )]
     public class BenevolenceRequestDetail : RockEntityDetailBlockType<BenevolenceRequest, BenevolenceRequestBag>
     {
         #region Fields
