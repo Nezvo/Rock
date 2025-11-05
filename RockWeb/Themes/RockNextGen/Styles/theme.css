@@ -11597,6 +11597,7 @@ ul.rocklist .rocklist-item.selected {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  gap: var(--spacing-tiny) var(--spacing-xsmall);
 }
 .tagsInput input,
 .tagsinput input {
@@ -14471,7 +14472,7 @@ body.rock-modal .modal-content {
 .modal-content.rock-modal .modal-header small,
 .rock-modal .modal-content .modal-header small {
   display: block;
-  margin-top: var(--spacing-xsmall);
+  margin-top: var(--spacing-small);
   color: var(--base-interface-softest);
 }
 @media screen and (min-width: 768px) {
@@ -17557,12 +17558,68 @@ iframe.file-browser {
   content: "Deceased";
 }
 
-.card-profile-bio-condensed .person-name {
+.card-profile-bio.card-profile-bio-condensed {
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+  margin: 0;
+}
+.card-profile-bio.card-profile-bio-condensed .protection-profile {
+  padding: 14px 18px;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-image {
+  position: relative;
+  flex-shrink: 0;
+  width: 25%;
+  height: 100%;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-image img {
+  border-radius: var(--rounded-normal) 0 0 var(--rounded-normal);
+}
+.card-profile-bio.card-profile-bio-condensed .profile-data {
+  width: 75%;
+  padding: 14px 18px;
+}
+.card-profile-bio.card-profile-bio-condensed .person-name {
+  margin: 0;
   overflow: hidden;
   font-size: 24px;
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.card-profile-bio.card-profile-bio-condensed .dropdown {
+  padding-right: 32px;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-toggle {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-tiny);
+  color: var(--color-interface-stronger) !important;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-toggle::after {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  z-index: -1;
+  content: "";
+  background: var(--color-interface-soft);
+  border-radius: 4px;
+  opacity: 0;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-toggle .person-name {
+  flex: 1 1 auto;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-toggle .dropdown-icon {
+  margin: 0 4px 0 12px;
+}
+.card-profile-bio.card-profile-bio-condensed .profile-toggle:hover::after,
+.card-profile-bio.card-profile-bio-condensed .open .profile-toggle::after {
+  opacity: 1;
 }
 
 .profile-toggle {
@@ -17575,7 +17632,7 @@ iframe.file-browser {
 
 .profile-toggle:hover {
   color: var(--color-interface-strong);
-  background: #eee;
+  background-color: var(--color-interface-softer);
 }
 
 .rockbadge-assessment a {
@@ -17728,13 +17785,13 @@ iframe.file-browser {
 }
 .horizontal-dl dt,
 .horizontal-dl dt a {
-  color: #212529 !important;
+  color: var(--color-interface-stronger) !important;
 }
 .horizontal-dl dt strong {
   font-weight: 400;
 }
 .horizontal-dl dd {
-  color: #adb5bd;
+  color: var(--color-interface-medium);
 }
 
 .main-content #page-content {
@@ -33587,65 +33644,6 @@ body.navbar-side-open {
 .panel .panel-heading .panel-options button {
   background-color: transparent;
   box-shadow: none;
-}
-
-.card-profile-bio-condensed {
-  flex-direction: row;
-  align-items: center;
-  height: 100%;
-  margin: 0;
-}
-.card-profile-bio-condensed .protection-profile {
-  padding: 14px 18px;
-}
-.card-profile-bio-condensed .profile-image {
-  position: relative;
-  flex-shrink: 0;
-  width: 25%;
-  height: 100%;
-}
-.card-profile-bio-condensed .profile-image img {
-  border-radius: var(--rounded-normal) 0 0 var(--rounded-normal);
-}
-.card-profile-bio-condensed .profile-data {
-  width: 75%;
-  padding: 14px 18px;
-}
-.card-profile-bio-condensed .person-name {
-  margin: 0;
-}
-.card-profile-bio-condensed .dropdown {
-  padding-right: 32px;
-}
-.card-profile-bio-condensed .profile-toggle {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  padding: 0;
-  color: var(--color-interface-stronger) !important;
-}
-.card-profile-bio-condensed .profile-toggle::after {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  bottom: -4px;
-  left: -4px;
-  z-index: -1;
-  content: "";
-  background: #eee;
-  border-radius: 4px;
-  opacity: 0;
-}
-.card-profile-bio-condensed .profile-toggle .person-name {
-  flex: 1 1 auto;
-}
-.card-profile-bio-condensed .profile-toggle .dropdown-icon {
-  margin: 0 4px 0 12px;
-}
-.card-profile-bio-condensed .profile-toggle:hover::after,
-.card-profile-bio-condensed .open .profile-toggle::after {
-  opacity: 1;
 }
 
 @media (max-width: 992px) {
