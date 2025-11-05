@@ -14472,7 +14472,7 @@ body.rock-modal .modal-content {
 .modal-content.rock-modal .modal-header small,
 .rock-modal .modal-content .modal-header small {
   display: block;
-  margin-top: var(--spacing-xsmall);
+  margin-top: var(--spacing-small);
   color: var(--base-interface-softest);
 }
 @media screen and (min-width: 768px) {
