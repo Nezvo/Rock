@@ -194,12 +194,12 @@
 
     /** The requester's photo URL or a default image if none exists. */
     const requesterPhotoUrl = isNotNullish(entity.requester?.photoUrl) && entity.requester?.photoUrl !== ""
-        ? entity.requester?.photoUrl
+        ? entity.requester!.photoUrl
         : "/Assets/Images/person-no-photo-unknown.svg";
 
     /** The case worker's photo URL or a default image if none exists. */
     const caseWorkerPhotoUrl = isNotNullish(entity.caseWorker?.photoUrl) && entity.caseWorker?.photoUrl !== ""
-        ? entity.caseWorker?.photoUrl
+        ? entity.caseWorker!.photoUrl
         : "/Assets/Images/person-no-photo-unknown.svg";
 
     /** The display name of the requester using nickname if available. */
