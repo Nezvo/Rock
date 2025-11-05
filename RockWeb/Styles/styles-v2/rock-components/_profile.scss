@@ -848,7 +848,7 @@ background: currentColor;
 
     &,
     a {
-      color: #212529 !important;
+      color: var(--color-interface-stronger) !important;
     }
 
     strong {
@@ -857,6 +857,6 @@ background: currentColor;
   }
 
   dd {
-    color: #adb5bd;
+    color: var(--color-interface-medium);
   }
 }

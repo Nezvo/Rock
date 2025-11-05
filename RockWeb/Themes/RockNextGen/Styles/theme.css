@@ -17729,13 +17729,13 @@ iframe.file-browser {
 }
 .horizontal-dl dt,
 .horizontal-dl dt a {
-  color: #212529 !important;
+  color: var(--color-interface-stronger) !important;
 }
 .horizontal-dl dt strong {
   font-weight: 400;
 }
 .horizontal-dl dd {
-  color: #adb5bd;
+  color: var(--color-interface-medium);
 }
 
 .main-content #page-content {
