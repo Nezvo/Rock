@@ -11597,6 +11597,7 @@ ul.rocklist .rocklist-item.selected {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  gap: var(--spacing-tiny) var(--spacing-xsmall);
 }
 .tagsInput input,
 .tagsinput input {
