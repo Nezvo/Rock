@@ -7,7 +7,7 @@
             <div class="row">
                 <div class="d-flex flex-fill align-items-center">
                     <PersonAvatar :photoUrl="requesterPhotoUrl"
-                                  :personIdKey="entity.requester?.personId?.toString() ?? ''"
+                                  :personIdKey="requesterAvatarId"
                                   :photoSize="60"
                                   marginRight="3"
                                   :enableHoverInfo="!!entity.requester?.personId" />
@@ -25,7 +25,7 @@
                         <div class="control-wrapper">
                             <div class="d-flex flex-fill align-items-center">
                                 <PersonAvatar :photoUrl="caseWorkerPhotoUrl"
-                                              :personIdKey="entity.caseWorker?.personId?.toString() ?? ''"
+                                              :personIdKey="caseWorkerAvatarId"
                                               :photoSize="30"
                                               marginRight="3"
                                               :enableHoverInfo="!!entity.caseWorker?.personId" />
@@ -250,6 +250,15 @@
     // #region Computed Values
 
     /** Whether or not the requester has at least one email or phone number. */
+
+    const requesterAvatarId = computed((): string => {
+        return entity.requester?.personId?.toString() ?? "";
+    });
+
+    const caseWorkerAvatarId = computed((): string => {
+        return entity.caseWorker?.personId?.toString() ?? "";
+    });
+
     const hasEmailOrPhone = computed((): boolean => {
         if (entity.requester == null || entity.requester === undefined) {
             return false;
