@@ -63,7 +63,7 @@
          */
         showPopup: {
             type: Boolean
-        }
+        },
     });
 
     const emit = defineEmits<{
