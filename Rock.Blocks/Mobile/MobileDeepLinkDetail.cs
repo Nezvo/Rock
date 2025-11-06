@@ -42,8 +42,10 @@ namespace Rock.Blocks.Mobile
     [Description( "Edits and configures the settings of mobile deep-link routes." )]
     [IconCssClass( "ti ti-question-mark" )]
     [SupportedSiteTypes( SiteType.Web )]
+
     [SystemGuid.EntityTypeGuid( "4C323181-AAEC-423F-8679-5280F9C9B168" )]
-    [SystemGuid.BlockTypeGuid( "DB6CFD8E-9FC3-40AE-B570-4863853BBEB0" )]
+    // was [SystemGuid.BlockTypeGuid( "DB6CFD8E-9FC3-40AE-B570-4863853BBEB0" )]
+    [Rock.SystemGuid.BlockTypeGuid( "5C157EBD-2482-4393-A309-A872F774E19F" )]
     public class MobileDeepLinkDetail : RockDetailBlockType
     {
         #region Fields
