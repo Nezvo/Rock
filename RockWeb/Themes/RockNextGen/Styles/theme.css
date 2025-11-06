@@ -20530,7 +20530,7 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   border-bottom: 0;
 }
 .group-scheduler-v2 .panel-toolbar-mobile {
-  padding: var(--spacing-tiny) var(--spacing-medium);
+  padding: var(--spacing-small) var(--spacing-medium);
 }
 .group-scheduler-v2 .panel-body {
   padding: 0;
@@ -20543,12 +20543,17 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   flex: 1 1 auto;
   width: 100%;
   min-height: 100%;
-  padding: var(--spacing-medium) 0 var(--spacing-large);
+  padding: 0 0 var(--spacing-large);
   overflow: auto;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+}
+@media (min-width: 992px) {
+  .group-scheduler-v2 .snap-container {
+    scroll-snap-type: x mandatory;
+  }
 }
 .group-scheduler-v2 .occurrence-date {
   position: relative;
@@ -20574,6 +20579,15 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   padding-right: 0;
   border-right: none;
 }
+.group-scheduler-v2 .occurrence-date-title-container {
+  height: var(--spacing-xlarge);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  background-color: var(--color-interface-softest);
+}
 .group-scheduler-v2 .occurrence-date-title {
   position: sticky;
   left: 12px;
@@ -20589,7 +20603,7 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
 .group-scheduler-v2 .schedule-column {
   scroll-snap-align: start;
   width: calc(100% / var(--schedule-count));
-  padding: 0 var(--spacing-column);
+  padding: 0 var(--spacing-medium);
 }
 @media (min-width: 992px) {
   .group-scheduler-v2 .schedule-column {
@@ -20695,6 +20709,12 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   width: 24px;
   height: 24px;
 }
+.group-scheduler-v2 .schedule-header-container {
+  position: sticky;
+  top: var(--spacing-xlarge);
+  z-index: 1;
+  background-color: var(--color-interface-softest);
+}
 .group-scheduler-v2 .schedule-header {
   position: relative;
   display: flex;
@@ -20760,11 +20780,6 @@ body.hide-block-role-secondary .block-instance.block-role-secondary:not(.block-r
   margin-top: var(--spacing-xsmall);
 }
 
-@media screen and (max-width: 991px) {
-  .featured-content .group-scheduler-v2 .panel.panel-block {
-    height: auto;
-  }
-}
 .featured-content .group-scheduler-v2 .panel-body {
   position: relative;
   display: flex;
