@@ -374,7 +374,8 @@ export class PageTreeItemProvider implements ITreeItemProvider {
     public siteType?: SiteType | null;
 
     /**
-     * The root page GUID to limit the results to child pages of the specified page.
+     * The unique identifier of the root page whose
+     * children are to be enumerated.
      */
     public rootPageGuid?: Guid | null;
 

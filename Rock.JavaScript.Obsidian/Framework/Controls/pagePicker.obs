@@ -103,7 +103,8 @@
         },
 
         /**
-         * The root page GUID to limit the results to child pages of the specified page.
+         * The unique identifier of the root page whose
+         * children are to be enumerated.
          */
         rootPageGuid: {
             type: String as PropType<Guid | null>,
