@@ -3259,9 +3259,16 @@ namespace Rock.Blocks.Communication
         /// </summary>
         private List<CommunicationEntryWizardRecipientPersonInfo> GetUpdatedCommunicationRecipients( RockContext rockContext, CommunicationEntryWizardCommunicationBag bag )
         {
+            var communicationType = ( CommunicationType ) bag.CommunicationType;
+            List<CommunicationEntryWizardRecipientPersonInfo> communicationRecipientInfoList = new List<CommunicationEntryWizardRecipientPersonInfo>();
+
+            var emailMediumEntityTypeId = EntityTypeCache.Get( SystemGuid.EntityType.COMMUNICATION_MEDIUM_EMAIL.AsGuid() ).Id;
+            var smsMediumEntityTypeId = EntityTypeCache.Get( SystemGuid.EntityType.COMMUNICATION_MEDIUM_SMS.AsGuid() ).Id;
+            var pushMediumEntityTypeId = EntityTypeCache.Get( SystemGuid.EntityType.COMMUNICATION_MEDIUM_PUSH_NOTIFICATION.AsGuid() ).Id;
+
             if ( bag.IndividualRecipientPersonAliasGuids?.Any() == true )
             {
-                return new PersonAliasService( rockContext )
+                communicationRecipientInfoList = new PersonAliasService( rockContext )
                     .GetByGuids( bag.IndividualRecipientPersonAliasGuids )
                     .Include( pa => pa.Person )
                     .Select( pa => new CommunicationEntryWizardRecipientPersonInfo
@@ -3284,7 +3291,7 @@ namespace Rock.Blocks.Communication
                         .Include( pa => pa.Person )
                         .ToList();
 
-                    return personAliases
+                    communicationRecipientInfoList = personAliases
                         .Select( pa => new CommunicationEntryWizardRecipientPersonInfo
                         {
                             PersonAlias = pa,
@@ -3292,11 +3299,23 @@ namespace Rock.Blocks.Communication
                         } )
                         .ToList();
                 }
-                else
-                {
-                    return new List<CommunicationEntryWizardRecipientPersonInfo>();
-                }
             }
+
+            foreach ( var communicationRecipientInfo in communicationRecipientInfoList )
+            {
+                var groupMemberPreference = communicationRecipientInfo.GroupMemberCommunicationPreference ?? CommunicationType.RecipientPreference;
+                var recipientPreference = communicationRecipientInfo.PersonAlias.Person.CommunicationPreference;
+
+                communicationRecipientInfo.MediumEntityTypeId = Rock.Model.Communication.DetermineMediumEntityTypeId(
+                    emailMediumEntityTypeId,
+                    smsMediumEntityTypeId,
+                    pushMediumEntityTypeId,
+                    communicationType,
+                    groupMemberPreference,
+                    recipientPreference );
+            }
+
+            return communicationRecipientInfoList;
         }
 
         #endregion Methods
@@ -3506,6 +3525,7 @@ namespace Rock.Blocks.Communication
         {
             public PersonAlias PersonAlias { get; set; }
             public CommunicationType? GroupMemberCommunicationPreference { get; set; }
+            public int? MediumEntityTypeId { get; set; }
         }
 
         #endregion Helper Types
@@ -3715,6 +3735,29 @@ namespace Rock.Blocks.Communication
                     .Collection( c => c.Recipients )
                     .Load();
 
+                // Ensure all recipients have a medium entity type id.
+                if ( communication.Recipients.Any( cr => !cr.MediumEntityTypeId.HasValue ) )
+                {
+                    var lookupByPersonAliasId = updatedCommunicationRecipients
+                        .Where( i => i.MediumEntityTypeId.HasValue )
+                        .ToDictionary( r => r.PersonAlias.Id, r => r.MediumEntityTypeId.Value );
+                    var hasChanges = false;
+
+                    foreach ( var cr in communication.Recipients.Where( cr => cr.PersonAliasId.HasValue && !cr.MediumEntityTypeId.HasValue ) )
+                    {
+                        if ( lookupByPersonAliasId.ContainsKey( cr.PersonAliasId.Value ) )
+                        {
+                            cr.MediumEntityTypeId = lookupByPersonAliasId[cr.PersonAliasId.Value];
+                            hasChanges = true;
+                        }
+                    }
+
+                    if ( hasChanges )
+                    {
+                        rockContext.SaveChanges();
+                    }
+                }
+
                 return communication;
             }
 
@@ -3801,19 +3844,25 @@ namespace Rock.Blocks.Communication
                 var newCommunicationRecipients = updatedCommunicationRecipientPersonAliases
                     .Where( r => !existingCommunicationRecipientPersonAliasIds.Contains( r.PersonAlias.Id ) )
                     .Select(
-                        r => new CommunicationRecipient
+                        r =>
                         {
-                            PersonAlias = r.PersonAlias,
-                            PersonAliasId = r.PersonAlias.Id,
-                            Communication = communication,
-                            CommunicationId = communication.Id,
-                            MediumEntityTypeId = Rock.Model.Communication.DetermineMediumEntityTypeId(
-                                emailMediumEntityTypeId,
-                                smsMediumEntityTypeId,
-                                pushMediumEntityTypeId,
-                                communication.CommunicationType,
-                                r.GroupMemberCommunicationPreference ?? default,
-                                r.PersonAlias.Person.CommunicationPreference )
+                            var groupMemberPreference = r.GroupMemberCommunicationPreference ?? CommunicationType.RecipientPreference;
+                            var recipientPreference = r.PersonAlias.Person.CommunicationPreference;
+
+                            return new CommunicationRecipient
+                            {
+                                PersonAlias = r.PersonAlias,
+                                PersonAliasId = r.PersonAlias.Id,
+                                Communication = communication,
+                                CommunicationId = communication.Id,
+                                MediumEntityTypeId = Rock.Model.Communication.DetermineMediumEntityTypeId(
+                                    emailMediumEntityTypeId,
+                                    smsMediumEntityTypeId,
+                                    pushMediumEntityTypeId,
+                                    communication.CommunicationType,
+                                    groupMemberPreference,
+                                    recipientPreference )
+                            };
                         } )
                     .ToList();
 
