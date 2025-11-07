@@ -220,24 +220,6 @@ body.navbar-side-open {
   }
 }
 
-$navbarside-width: 80px;
-$navbar-top-height: 80px;
-$navbar-element-height: 40px;
-
-.page-wrapper {
-  // Moved from theme.less and refactor from having its own class to joining this class
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  // =============
-
-  @media (min-width: $screen-medium) {
-    margin-top: $navbar-top-height;
-    height: calc(100vh - 80px);
-  }
-
-}
-
 // Nav
 .rock-top-header {
   display: flex;
