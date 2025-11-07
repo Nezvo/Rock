@@ -2198,6 +2198,18 @@ iframe {
     border: 1px solid #ddd !important;
   }
 }
+.page-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 992px) {
+  .page-wrapper {
+    padding-top: 80px;
+    height: 100vh;
+  }
+}
+
 /*
     Used to manage styles related to Rock's internal scrollbar
 
@@ -33015,18 +33027,6 @@ body.navbar-side-open {
     display: block;
   }
 }
-.page-wrapper {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-@media (min-width: 992px) {
-  .page-wrapper {
-    margin-top: 80px;
-    height: calc(100vh - 80px);
-  }
-}
-
 .rock-top-header {
   display: flex;
   margin-bottom: 0;
