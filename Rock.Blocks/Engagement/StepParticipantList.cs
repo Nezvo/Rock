@@ -24,6 +24,7 @@ using System.Linq;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Enums.Controls;
+using Rock.Lava;
 using Rock.Model;
 using Rock.Obsidian.UI;
 using Rock.Security;
@@ -65,7 +66,7 @@ namespace Rock.Blocks.Engagement
     [Rock.SystemGuid.EntityTypeGuid( "e7eb8f39-ae85-4f9c-8afb-18b3e3c6c570" )]
     // Was [Rock.SystemGuid.BlockTypeGuid( "272b2236-fccc-49b4-b914-20893f5e746d" )]
     [Rock.SystemGuid.BlockTypeGuid( "2E4A1578-145E-4052-9B56-1739F7366827" )]
-    [CustomizedGrid]
+    [CustomizedGrid( CustomColumnMessage = "To access the entity, prefix your property names with <code>Row.Step</code> (e.g. <code>{{ Row.Step.Id }}</code>)." )]
     public class StepParticipantList : RockListBlockType<StepParticipantList.StepParticipantRow>
     {
         #region Keys
@@ -495,7 +496,7 @@ namespace Rock.Blocks.Engagement
 
         #region Helper Classes
 
-        public class StepParticipantRow
+        public class StepParticipantRow : LavaDataObject
         {
             public Step Step { get; set; }
 
