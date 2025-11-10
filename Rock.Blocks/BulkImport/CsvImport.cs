@@ -47,7 +47,7 @@ namespace Rock.Blocks.BulkImport
     [Description( "Block to import data into Rock using CSV files." )]
     [IconCssClass( "ti ti-file-type-csv" )]
     [SupportedSiteTypes( Model.SiteType.Web )]
-    [Rock.SystemGuid.BlockTypeGuid( "02AAEE07-0E6B-4A85-9CE3-D59ADC71DCF8" )]
+    [Rock.SystemGuid.BlockTypeGuid( "362C679C-9A7F-4A2B-9BB0-8683824BE892" )]
     [Rock.SystemGuid.EntityTypeGuid( "3E6B0AB8-182B-4C16-9E32-BAC0E02F1A43" )]
     public class CsvImport : RockBlockType
     {
