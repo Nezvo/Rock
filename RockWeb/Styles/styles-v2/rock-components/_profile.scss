@@ -796,7 +796,7 @@ background: currentColor;
 
 @media (max-width: ($screen-medium - 2)) {
   .person-profile-ext {
-    overflow-x: hidden;
+    overflow-x: clip;
     margin-left: 0;
     margin-right: 0;
 
