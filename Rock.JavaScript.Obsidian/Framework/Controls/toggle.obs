@@ -10,8 +10,7 @@
                     <div :class="getButtonGroupClass">
                         <JavaScriptAnchor :class="modelValue ? unselectedClasses : offButtonSelectedClasses"
                                           @click="onClick(false)">
-                            <slot name="off"
-                                  :disabled="disabled">{{ falseText }}</slot>
+                            <slot name="off" :disabled="disabled">{{ falseText }}</slot>
                         </JavaScriptAnchor>
                         <JavaScriptAnchor :class="modelValue ? onButtonSelectedClasses : unselectedClasses"
                                           @click="onClick(true)">
