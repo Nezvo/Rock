@@ -21,14 +21,31 @@
 // </copyright>
 //
 
-export const Person = {
-    /** The Guid of the 'Anonymous Visitor' person that ships with core. This is used by Visitor Tracking. */
-    AnonymousVisitor: "7EBC167B-512D-4683-9D80-98B6BB02E1B9",
-    /** The Guid of the 'Giver Anonymous' person that ships with core */
-    GiverAnonymous: "802235DC-3CA5-94B0-4326-AACE71180F48",
-    /**
-     * The guid of the 'System Sender' person that ships with core. This is used as the 'from' person when sending
-     * automated communications.
-     */
-    SystemSender: "817E7C25-6CB1-4ED0-B224-FF3C4DA0B716",
+/** The type of attachment being sent in a chat message. */
+export const ChatAttachmentType = {
+    /** Image Attachment. */
+    Image: 0,
+
+    /** File Attachment. */
+    File: 1,
+
+    /** Audio Attachment. */
+    Audio: 2,
+
+    /** Video Attachment. */
+    Video: 3
+} as const;
+
+/** The type of attachment being sent in a chat message. */
+export const ChatAttachmentTypeDescription: Record<number, string> = {
+    0: "image",
+
+    1: "file",
+
+    2: "audio",
+
+    3: "video"
 };
+
+/** The type of attachment being sent in a chat message. */
+export type ChatAttachmentType = typeof ChatAttachmentType[keyof typeof ChatAttachmentType];
