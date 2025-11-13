@@ -37,6 +37,7 @@ using Rock.ViewModels.Rest.Controls;
 using Rock.ViewModels.Workflow;
 using Rock.Web;
 using Rock.Web.Cache;
+using Rock.Web.UI.Controls;
 using Rock.Workflow;
 
 namespace Rock.Blocks.Workflow
@@ -119,7 +120,7 @@ namespace Rock.Blocks.Workflow
 
     [BooleanField(
         "Disable Captcha Support",
-        Description = "If set to 'Yes' the CAPTCHA verification step will not be performed.",
+        Description = "If set to 'Yes' the CAPTCHA verification will be skipped. \n\nNote: If the CAPTCHA site key and/or secret key are not configured in the system settings, this option will be forced as 'Yes', even if 'No' is visually selected.",
         DefaultBooleanValue = false,
         SiteTypes = SiteTypeFlags.Web,
         Key = AttributeKey.DisableCaptchaSupport,
@@ -375,7 +376,7 @@ namespace Rock.Blocks.Workflow
 
             return new WorkflowEntryOptionsBag
             {
-                IsCaptchaEnabled = !GetAttributeValue( AttributeKey.DisableCaptchaSupport ).AsBoolean(),
+                IsCaptchaEnabled = !Captcha.CaptchaService.ShouldDisableCaptcha( GetAttributeValue( AttributeKey.DisableCaptchaSupport ).AsBoolean() ),
                 InitialAction = initialAction
             };
         }
@@ -1251,7 +1252,7 @@ namespace Rock.Blocks.Workflow
             }
 
             // Admin doesn't want to use captcha on the site.
-            if ( GetAttributeValue( AttributeKey.DisableCaptchaSupport ).AsBoolean() )
+            if ( Captcha.CaptchaService.ShouldDisableCaptcha( GetAttributeValue( AttributeKey.DisableCaptchaSupport ).AsBoolean() ) )
             {
                 return true;
             }
