@@ -17698,7 +17698,7 @@ iframe.file-browser {
 
 @media (max-width: 990px) {
   .person-profile-ext {
-    overflow-x: hidden;
+    overflow-x: clip;
     margin-left: 0;
     margin-right: 0;
   }
