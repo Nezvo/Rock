@@ -19098,6 +19098,7 @@ iframe.file-browser {
 
 .contentstack-body {
   flex: 1 1 80%;
+  max-width: 100%;
 }
 
 .contentstack > .contentstack-sidebar {
