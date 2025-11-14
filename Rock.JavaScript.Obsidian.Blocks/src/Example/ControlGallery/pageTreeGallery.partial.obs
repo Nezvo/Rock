@@ -7,7 +7,7 @@
 
         <PageTree v-model="value"
                   :rules="isRequired ? 'required' : undefined"
-                  :rootPageGuid="rootPageGuid?.page?.value"
+                  :rootPageGuid="rootPageGuid?.page?.value ?? undefined"
                   :siteType="siteType"
                   :multiple="multiple"
                   :disableParentPageSelection="disableParentPageSelection"
