@@ -572,6 +572,62 @@ WELCOME TO THE LAVA TAG
 
             TestHelper.AssertTemplateOutput( typeof( FluidEngine ), expectedOutput, template, ignoreWhitespace: true );
         }
+
+        /// <summary>
+        /// Verify that Rock's custom "elseif" works inside a {% lava %} {% liquid %} tag.
+        /// </summary>
+        [TestMethod]
+        public void LavaTag_WithInnerIfElseIfTag_IsProcessedCorrectly()
+        {
+            var person = new LavaUnitTestHelper.TestPerson { FirstName = "Theodore", NickName = "Ted", LastName = "Decker", Id = 1 };
+
+            var mergeValues = new LavaDataDictionary { { "CurrentPerson", TestHelper.GetTestPersonTedDecker() } };
+
+            var template = @"
+{% liquid
+
+    assign lastName = CurrentPerson.LastName
+    if lastName == ''
+        assign result = 'nope'
+    else
+        if CurrentPerson.NickName == 'Cindy'
+            assign result = 'female'
+        elsif CurrentPerson.NickName == 'Ted'
+            assign result = 'male'
+        else
+            assign result = 'unknown'
+        endif
+    endif
+
+    echo result
+%}
+";
+            var expectedOutput = @"male";
+
+            TestHelper.AssertTemplateOutput( expectedOutput, template, mergeValues );
+        }
+
+        [TestMethod]
+        public void LavaTag_WithInnerIfTagAndBlockComment_SpanningMultipleLines_IsProcessedCorrectly()
+        {
+            var input = @"
+{% liquid
+    assign isTest = true
+    /- This is a block comment...
+   ... spanning multiple lines. -/
+    if isTest
+        
+        assign isTest = false
+        
+    endif
+    echo isTest
+%}
+";
+
+            var expectedOutput = @"false";
+
+            TestHelper.AssertTemplateOutput( expectedOutput, input );
+        }
         #endregion
 
         #region Raw Tag
