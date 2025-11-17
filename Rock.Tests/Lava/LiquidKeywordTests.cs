@@ -102,7 +102,7 @@ First Case matched. Second Case matched.
                 CommunicationPreference = CommunicationPreference.Email
             };
 
-            Assert.That.AreEqual( 1, (int)CommunicationPreference.Email );
+            Assert.AreEqual( 1, (int)CommunicationPreference.Email );
 
             var template = @"
 {{ person.NickName }}, your communication preference is:
@@ -127,7 +127,7 @@ Ted, your communication preference is: Email
                 CommunicationPreference = CommunicationPreference.Email
             };
 
-            Assert.That.AreEqual( 1, ( int ) CommunicationPreference.Email );
+            Assert.AreEqual( 1, ( int ) CommunicationPreference.Email );
 
             var template = @"
 {{ person.NickName }}, your communication preference is:
@@ -152,7 +152,7 @@ Ted, your communication preference is: Email
                 CommunicationPreference = CommunicationPreference.Email
             };
 
-            Assert.That.AreEqual( 1, ( int ) CommunicationPreference.Email );
+            Assert.AreEqual( 1, ( int ) CommunicationPreference.Email );
 
             var template = @"
 {{ person.NickName }}, your communication preference is:

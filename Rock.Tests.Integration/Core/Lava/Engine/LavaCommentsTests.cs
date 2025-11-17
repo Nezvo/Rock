@@ -204,7 +204,7 @@ or ''
 
             TestHelper.Execute( input, new LavaTestRenderOptions { IgnoreWhiteSpace = false }, output =>
             {
-                Assert.That.AreEqual( expectedOutput, output.Replace( "\r\n", "\n" ) );
+                Assert.AreEqual( expectedOutput, output.Replace( "\r\n", "\n" ) );
             } );
         }
 
