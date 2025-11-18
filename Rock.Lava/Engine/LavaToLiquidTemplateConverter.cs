@@ -44,8 +44,6 @@ namespace Rock.Lava
             string liquidTemplateText;
 
             liquidTemplateText = RemoveLavaComments( lavaTemplateText );
-
-            liquidTemplateText = ReplaceTemplateShortcodes( liquidTemplateText );
             liquidTemplateText = ReplaceElseIfKeyword( liquidTemplateText );
 
             return liquidTemplateText;

@@ -12,7 +12,7 @@ namespace Rock.Tests.Performance.Benchmarks.Security
     /// Performs some basic performance tests on the...
     /// class. TL;DR; It's fast.
     /// </summary>
-    [MemoryDiagnoser( false )]
+    [MemoryDiagnoser( true )]
     [Attributes.OperationsPerSecondColumn]
     [GroupBenchmarksBy( BenchmarkLogicalGroupRule.ByCategory )]
     [CategoriesColumn]
@@ -22,7 +22,7 @@ namespace Rock.Tests.Performance.Benchmarks.Security
 
         #region Test Data
 
-        private readonly string _template = @"
+        private readonly string _templateIfElseIf = @"
 {% liquid
 
     assign NickName = 'Ted'
@@ -43,10 +43,24 @@ namespace Rock.Tests.Performance.Benchmarks.Security
     echo result
 %}
 ";
-        private readonly string _expectedOutput = "male";
+        private readonly string _expectedOutputIfElseIf = "male";
 
+        private readonly string _templateWithComments = @"
+{% liquid
+
+    //- Comment level one
+    assign isTest = true
+    if isTest
+        
+        //- Comment level two
+        assign isTest = false
+        
+    endif
+    echo isTest
+%}
+";
+        private readonly string _expectedOutputWithComments = "false";
         #endregion
-
 
         [GlobalSetup]
         public void Setup()
@@ -59,25 +73,39 @@ namespace Rock.Tests.Performance.Benchmarks.Security
             fluidEngine.Initialize( engineOptions );
             fluidEngine.RegisterFilters( typeof( Rock.Lava.Filters.TemplateFilters ) );
 
-            // Verify that it's working as expected.
-            var output = fluidEngine.ParseTemplate( _template );
+            // Verify both templates are working as expected.
+            var output = fluidEngine.ParseTemplate( _templateIfElseIf );
             if ( output.HasErrors != false )
             {
                 throw new System.Exception( "Lava engine setup failed: the template has errors." );
             }
 
             var renderResult = fluidEngine.RenderTemplate( output.Template, new LavaRenderParameters() );
-            if ( output == null || renderResult.Text.Trim() != _expectedOutput )
+            if ( output == null || renderResult.Text.Trim() != _expectedOutputIfElseIf )
             {
-                throw new System.Exception( "Lava engine setup failed: unexpected output." );
+                throw new System.Exception( $"Lava engine setup failed: unexpected _expectedOutputIfElseIf output (was {renderResult.Text.Trim()})" );
+            }
+
+            output = fluidEngine.ParseTemplate( _templateWithComments );
+            renderResult = fluidEngine.RenderTemplate( output.Template, new LavaRenderParameters() );
+            if ( output == null || renderResult.Text.Trim() != _expectedOutputWithComments )
+            {
+                throw new System.Exception( $"Lava engine setup failed: unexpected _expectedOutputWithComments output (was {renderResult.Text.Trim()})." );
             }
         }
 
         [Benchmark]
-        [BenchmarkCategory( "Lava" )]
+        [BenchmarkCategory( "Lava ElseIf" )]
         public LavaParseResult ParseLavaIfElseIfTemplate()
         {
-            return fluidEngine.ParseTemplate( _template );
+            return fluidEngine.ParseTemplate( _templateIfElseIf );
+        }
+
+        [Benchmark]
+        [BenchmarkCategory( "Lava Comments" )]
+        public LavaParseResult ParseLavaTemplateWithComments()
+        {
+            return fluidEngine.ParseTemplate( _templateWithComments );
         }
 
     }
