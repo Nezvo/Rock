@@ -997,5 +997,26 @@ namespace Rock.Plugin.HotFixes {
                         "s", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CREATE PROCEDURE [dbo].[spCrm_FamilyAnalyticsGiving]
+        ///	
+        ///AS
+        ///BEGIN
+        ///	
+        ///	-- configuration of the duration in weeks
+        ///	DECLARE @GivingDurationLongWeeks int = 52
+        ///	DECLARE @GivingDurationShortWeeks int = 6
+        ///	
+        ///	DECLARE @cACTIVE_RECORD_STATUS_VALUE_GUID uniqueidentifier = &apos;618F906C-C33D-4FA3-8AEF-E58CB7B63F1E&apos;
+        ///	DECLARE @cPERSON_RECORD_TYPE_VALUE_GUID uniqueidentifier = &apos;36CF10D6-C695-413D-8E7C-4546EFEF385E&apos;
+        ///	DECLARE @cFAMILY_GROUPTYPE_GUID uniqueidentifier = &apos;790E3215-3B10-442B-AF69-616C0DCB998E&apos;
+        ///	DECLARE @cA [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string _267_UpdateFamilyAnalyticsStoredProcedure_spCrm_FamilyAnalyticsGiving {
+            get {
+                return ResourceManager.GetString("_267_UpdateFamilyAnalyticsStoredProcedure_spCrm_FamilyAnalyticsGiving", resourceCulture);
+            }
+        }
     }
 }
