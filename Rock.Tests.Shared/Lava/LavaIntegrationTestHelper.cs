@@ -756,6 +756,11 @@ namespace Rock.Tests.Shared.Lava
                     outputCompareText = Regex.Replace( outputCompareText, @"\s*", string.Empty );
                 }
 
+                if ( options.NormalizeNewLine )
+                {
+                    outputCompareText = Regex.Replace( outputCompareText, @"\r\n", "\n" );
+                }
+
                 if ( options.IgnoreCase )
                 {
                     outputCompareText = outputCompareText.ToLower();
