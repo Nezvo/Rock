@@ -423,13 +423,9 @@ namespace Rock.ClientService.Core.Category
                         }
                         categoryItem.Children.AddRange( childItems );
                     }
+                }
 
-                    categoryItem.HasChildren = categoryItem.Children.Any();
-                }
-                else
-                {
-                    categoryItem.HasChildren = DoesCategoryHaveChildren( options, categoryService, serviceInstance, categoryItem.Value );
-                }
+                categoryItem.HasChildren = categoryItem.Children?.Any() ?? false;
             }
 
             return categoryItem;
