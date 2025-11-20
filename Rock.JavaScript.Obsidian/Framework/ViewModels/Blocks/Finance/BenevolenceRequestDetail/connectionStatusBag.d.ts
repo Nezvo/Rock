@@ -21,27 +21,16 @@
 // </copyright>
 //
 
-/**
- * Represents a collection of properties related to a phone number,
- * including the country code, the number itself, and the type of
- * phone number that are relevevant in the context of a benevolence request..
- */
-export type PhoneNumberBag = {
-    /**
-     * Gets or sets the country code for the phone number.
-     * This is typically the international dialing code (e.g., 1 for USA/Canada).
-     */
-    countryCode?: string | null;
+import { Guid } from "@Obsidian/Types";
 
-    /** Gets or sets a value indicating whether the phone number was obtained from the person's record. */
-    isNumberFromPersonRecord: boolean;
+/** Represents the connection status information for a benevolence request. */
+export type ConnectionStatusBag = {
+    /** Gets or sets the unique identifier (GUID) of the connection status. */
+    connectionStatusGuid: Guid;
 
-    /**
-     * Gets or sets the phone number.
-     * This should be the local portion of the phone number, excluding the country code.
-     */
-    number?: string | null;
+    /** Gets or sets the name of the connection status. */
+    connectionStatusName?: string | null;
 
-    /** Gets or sets the formatted representation of the phone number, exluding the country code. */
-    numberFormatted?: string | null;
+    /** Gets or sets the identifier of the connection status value. */
+    connectionStatusValueId?: number | null;
 };
