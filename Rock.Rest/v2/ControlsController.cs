@@ -389,6 +389,84 @@ namespace Rock.Rest.v2
 
         #endregion
 
+        #region Adaptive Message Picker
+
+        /// <summary>
+        /// Gets the adaptive messages and their categories that match the options sent in the request body.
+        /// This endpoint returns items formatted for use in a tree view control.
+        /// </summary>
+        /// <param name="options">The options that describe which data views to load.</param>
+        /// <returns>A collection of <see cref="TreeItemBag"/> objects that represent a tree of adaptive messages.</returns>
+        [HttpPost]
+        [Route( "AdaptiveMessagePickerGetAdaptiveMessages" )]
+        [Authenticate]
+        [ExcludeSecurityActions( Security.Authorization.EXECUTE_READ, Security.Authorization.EXECUTE_WRITE, Security.Authorization.EXECUTE_UNRESTRICTED_READ, Security.Authorization.EXECUTE_UNRESTRICTED_WRITE )]
+        [ProducesResponse( HttpStatusCode.OK, Type = typeof( List<TreeItemBag> ) )]
+        [Rock.SystemGuid.RestActionGuid( "3484A62B-8A52-423A-8154-909D9176E4B6" )]
+        public IActionResult AdaptiveMessagePickerGetAdaptiveMessages( [FromBody] UniversalItemTreePickerOptionsBag options )
+        {
+            using ( var rockContext = new RockContext() )
+            {
+                var ccService = new CategoryClientService( rockContext, GetPerson( rockContext ) );
+                var amcService = new AdaptiveMessageCategoryService( rockContext );
+                var grant = SecurityGrant.FromToken( options.SecurityGrantToken );
+                var items = GetAdaptiveMessageChildren( options.ParentValue.AsGuidOrNull(), ccService, amcService, grant );
+
+                return Ok( items );
+            }
+        }
+
+        private List<TreeItemBag> GetAdaptiveMessageChildren( Guid? parent, CategoryClientService ccService, AdaptiveMessageCategoryService amcService, SecurityGrant grant )
+        {
+            var items = ccService.GetCategorizedTreeItems( new CategoryItemTreeOptions
+            {
+                ParentGuid = parent,
+                GetCategorizedItems = true,
+                EntityTypeGuid = EntityTypeCache.Get<Rock.Model.AdaptiveMessageCategory>().Guid,
+                IncludeUnnamedEntityItems = true,
+                IncludeCategoriesWithoutChildren = false,
+                DefaultIconCssClass = "ti ti-list-numbers",
+                LazyLoad = true,
+                SecurityGrant = grant
+            } );
+
+            var messages = new List<TreeItemBag>();
+
+            // Not a folder, so is actually an AdaptiveMessage, except it was loaded as an
+            // AdaptiveMessageCategory so we need to get the Guid of the actual AdaptiveMessage
+            foreach ( var item in items )
+            {
+                if ( !item.IsFolder )
+                {
+                    item.Type = "Item";
+                    // Load the AdaptiveMessageCategory.
+                    var category = amcService.Get( item.Value.AsGuid() );
+                    if ( category != null )
+                    {
+                        // Swap the Guid to the AdaptiveMessage Guid
+                        item.Value = category.AdaptiveMessage.Guid.ToString();
+                    }
+                }
+                else
+                {
+                    item.Type = "Category";
+                }
+
+                // Get Children
+                if ( item.HasChildren )
+                {
+                    item.Children = new List<TreeItemBag>();
+                    item.Children.AddRange( GetAdaptiveMessageChildren( item.Value.AsGuid(), ccService, amcService, grant ) );
+                }
+
+                messages.Add( item );
+            }
+
+            return messages;
+        }
+
+        #endregion
+
         #region Address Control
 
         /// <summary>
