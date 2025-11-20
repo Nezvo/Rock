@@ -203,7 +203,7 @@ Did you see those comments ^^^
             var options = new LavaTestRenderOptions() { EnabledCommands = "WorkflowActivate" };
 
             _TestHelper.AssertTemplateOutput( expectedOutput, input, options );
-		}
+        }
 
         /// <summary>
         /// Verifies the resolution of a specific Issue.
