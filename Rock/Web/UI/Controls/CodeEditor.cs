@@ -321,7 +321,7 @@ namespace Rock.Web.UI.Controls
         DefaultValue( "" ),
         Description( "The theme of the editor" )
         ]
-        [RockObsolete( "18.1" )]
+        [RockObsolete( "19.0" )]
         [Obsolete( "The editor theme is now set by Rock and cannot be changed." )]
         public CodeEditorTheme EditorTheme
         {
@@ -766,7 +766,7 @@ namespace Rock.Web.UI.Controls
     /// <summary>
     /// The CodeEditor Theme
     /// </summary>
-    [RockObsolete( "18.1" )]
+    [RockObsolete( "19.0" )]
     [Obsolete( "The editor theme is now set by Rock and cannot be changed." )]
     public enum CodeEditorTheme
     {

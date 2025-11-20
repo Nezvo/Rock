@@ -8782,7 +8782,7 @@ namespace Rock.Rest.v2
         /// <summary>
         /// Gets the items that should be automatically expanded based on the selected values.
         /// </summary>
-        /// <param name="selectedValues">The currently selected values in the picker.
+        /// <param name="selectedValues">The currently selected values in the picker.</param>
         /// <returns>A list of unique identifiers for the items that should be eager loaded.</returns>
         private List<Guid> PagePickerGetAutoExpandGuids( List<string> selectedValues )
         {
