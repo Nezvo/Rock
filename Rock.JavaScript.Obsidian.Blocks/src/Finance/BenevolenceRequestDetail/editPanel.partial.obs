@@ -676,7 +676,7 @@
     const requesterConnectionStatusValueIdString = computed({
         get() {
             return isNotNullish(requester.value.connectionStatus?.connectionStatusValueId)
-                ? requester.value.connectionStatus.connectionStatusValueId.toString()
+                ? requester.value.connectionStatus!.connectionStatusValueId.toString()
                 : "";
         },
         set(val: string) {
@@ -947,7 +947,7 @@
             createRecordError.value = "Cannot create a person record without a benevolence request.";
             return;
         }
-        if (isNullish(requester.value.connectionStatus?.connectionStatusValueId) || requester.value.connectionStatus.connectionStatusValueId === 0) {
+        if (isNullish(requester.value.connectionStatus?.connectionStatusValueId) || requester.value.connectionStatus?.connectionStatusValueId === 0) {
             createRecordError.value = "A Connection Status is required to create a person record.";
             return;
         }
