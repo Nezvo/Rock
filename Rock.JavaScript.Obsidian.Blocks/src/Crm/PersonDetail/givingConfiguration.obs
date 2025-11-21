@@ -247,23 +247,12 @@
 </template>
 
 <style scoped>
-.panel-heading {
-    background-color: #f5f5f5;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.panel-title {
-    font-size: 1.25em;
-    margin: 0;
-}
-
 .rollover-container-nested {
     transition: background-color 0.3s;
 }
 
 .rollover-container-nested:hover {
-    background-color: #ffffff;
+    background-color: var(--color-interface-lightest);
 }
 
 .btn-link:hover {
@@ -271,9 +260,9 @@
 }
 
 .showinactive {
-    background-color: white;
+    background-color: var(--color-interface-lightest);
     border: none;
-    color: #006dcc;
+    color: var(--color-link);
 }
 
 .separator {
