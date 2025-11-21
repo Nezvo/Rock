@@ -380,7 +380,7 @@ namespace Rock.Blocks.Communication
                     // Only include non-legacy templates or the template associated with the current communication.
                     communicationTemplateQuery => communicationTemplateQuery.Where( ct => ( ct.Version != CommunicationTemplateVersion.Legacy && ct.UsageType == null ) || ( communicationTemplateId.HasValue && ct.Id == communicationTemplateId.Value ) )
                 );
-                var communicationTemplateDetailBag = GetCommunicationTemplateDetailBag( communication, communicationTemplateInfoList, currentPerson );
+                var communicationTemplateDetailBag = GetCommunicationTemplateDetailBag( communication, communicationTemplateInfoList, currentPerson, out var shouldApplyTemplateToCommunication );
                 var communicationBag = GetCommunicationBag( this.RockContext, communication, communicationTemplateDetailBag?.Guid, currentPerson );
                 var mediumBags = GetCommunicationMediumBags( currentPerson );
 
@@ -390,6 +390,7 @@ namespace Rock.Blocks.Communication
                 box.HasDetailBlockOnCurrentPage = this.PageCache.Blocks.Any( a => a.BlockType.Guid == SystemGuid.BlockType.COMMUNICATION_DETAIL.AsGuid() );
                 box.ImageComponentBinaryFileTypeGuid = this.ImageBinaryFileTypeGuid;
                 box.IsAddingIndividualsToRecipientListsDisabled = this.DisableAddingIndividualsToRecipientLists;
+                box.ShouldApplyTemplateToCommunication = shouldApplyTemplateToCommunication;
                 box.IsDuplicatePreventionOptionShown = this.ShowDuplicatePreventionOption;
                 box.IsUsingRockMobilePushTransport = GetIsUsingRockMobilePushTransport( mediumBags );
                 box.MaxSmsImageWidth = this.MaxSmsImageWidth;
@@ -1221,24 +1222,28 @@ namespace Rock.Blocks.Communication
         /// <param name="communication">The communication entity, which may be null for a new communication.</param>
         /// <param name="communicationTemplateInfoList">A list of available communication template information.</param>
         /// <param name="currentPerson">The currently logged-in person, used for authorization checks.</param>
+        /// <param name="shouldApplyTemplateToCommunication">Whether there is a template that should be applied to the communication.</param>
         /// <returns>
         /// A <see cref="CommunicationEntryWizardCommunicationTemplateDetailBag"/> containing the communication template details,
         /// or <see langword="null"/> if no valid template is found.
         /// </returns>
-        private CommunicationEntryWizardCommunicationTemplateDetailBag GetCommunicationTemplateDetailBag( Model.Communication communication, List<CommunicationEntryWizardTemplateInfo> communicationTemplateInfoList, Person currentPerson )
+        private CommunicationEntryWizardCommunicationTemplateDetailBag GetCommunicationTemplateDetailBag( Model.Communication communication, List<CommunicationEntryWizardTemplateInfo> communicationTemplateInfoList, Person currentPerson, out bool shouldApplyTemplateToCommunication )
         {
             CommunicationEntryWizardTemplateInfo communicationTemplateInfo = null;
+            var hasTemplateToApply = false;
 
             // If a communication template key was passed in and this is a new communication, set that as the selected template.
             var communicationTemplateKey = this.CommunicationTemplateOrTemplateGuidPageParameter;
 
-            if ( ( communication == null || communication.Id == 0 ) && communicationTemplateKey.IsNotNullOrWhiteSpace() )
+            if ( communication?.Id > 0 && communicationTemplateKey.IsNotNullOrWhiteSpace() )
             {
                 communicationTemplateInfo = communicationTemplateInfoList.FirstOrDefault( d => EntityHasKey( d.CommunicationTemplate, communicationTemplateKey ) );
+                hasTemplateToApply = communicationTemplateInfo != null;
             }
             else if ( communication?.CommunicationTemplateId.HasValue == true )
             {
                 communicationTemplateInfo = communicationTemplateInfoList.FirstOrDefault( d => d.CommunicationTemplate.Id == communication.CommunicationTemplateId.Value );
+                hasTemplateToApply = false;
             }
             else
             {
@@ -1248,6 +1253,8 @@ namespace Rock.Blocks.Communication
                 {
                     communicationTemplateInfo = communicationTemplateInfoList.FirstOrDefault( d => d.CommunicationTemplate.Guid == communicationTemplateGuidPersonPreference );
                 }
+
+                hasTemplateToApply = communicationTemplateInfo != null;
             }
 
             // NOTE: Only set the selected template if the user has auth for this template
@@ -1256,10 +1263,12 @@ namespace Rock.Blocks.Communication
                 && communicationTemplateInfo.CommunicationTemplate.IsAuthorized( Authorization.VIEW, currentPerson )
                 && communicationTemplateInfo.CommunicationTemplate.SupportsEmailWizard() )
             {
+                shouldApplyTemplateToCommunication = hasTemplateToApply;
                 return GetCommunicationTemplateDetailBag( communicationTemplateInfo );
             }
             else
             {
+                shouldApplyTemplateToCommunication = false;
                 return null;
             }
         }
