@@ -407,62 +407,49 @@ namespace Rock.Rest.v2
         {
             using ( var rockContext = new RockContext() )
             {
-                var ccService = new CategoryClientService( rockContext, GetPerson( rockContext ) );
-                var amcService = new AdaptiveMessageCategoryService( rockContext );
+                var clientService = new CategoryClientService( rockContext, GetPerson( rockContext ) );
                 var grant = SecurityGrant.FromToken( options.SecurityGrantToken );
-                var items = GetAdaptiveMessageChildren( options.ParentValue.AsGuidOrNull(), ccService, amcService, grant );
+
+                var parentGuid = options.ParentValue.AsGuidOrNull();
+
+                var queryOptions = new CategoryItemTreeOptions
+                {
+                    ParentGuid = parentGuid,
+                    GetCategorizedItems = parentGuid.HasValue,
+                    EntityTypeGuid = EntityTypeCache.Get<Rock.Model.AdaptiveMessageCategory>().Guid,
+                    IncludeUnnamedEntityItems = true,
+                    IncludeCategoriesWithoutChildren = false,
+                    DefaultIconCssClass = "ti ti-list-numbers",
+                    LazyLoad = true,
+                    SecurityGrant = grant,
+                    ExpandToCategoryGuids = AdaptiveMessagePickerGetExpandToCategoryGuids( options.ExpandToValues )
+                };
+
+                var items = clientService.GetCategorizedTreeItems( queryOptions );
 
                 return Ok( items );
             }
         }
 
-        private List<TreeItemBag> GetAdaptiveMessageChildren( Guid? parent, CategoryClientService ccService, AdaptiveMessageCategoryService amcService, SecurityGrant grant )
+        /// <summary>
+        /// Gets the unique category identifiers that need to be expanded to in order to display the selected adaptive
+        /// message values.
+        /// </summary>
+        /// <param name="selectedValues">The currently selected values in the picker.
+        /// <returns>A list of unique identifiers that represent the categories that need to be expanded to.</returns>
+        private List<Guid> AdaptiveMessagePickerGetExpandToCategoryGuids( List<string> selectedValues )
         {
-            var items = ccService.GetCategorizedTreeItems( new CategoryItemTreeOptions
+            if ( selectedValues == null )
             {
-                ParentGuid = parent,
-                GetCategorizedItems = true,
-                EntityTypeGuid = EntityTypeCache.Get<Rock.Model.AdaptiveMessageCategory>().Guid,
-                IncludeUnnamedEntityItems = true,
-                IncludeCategoriesWithoutChildren = false,
-                DefaultIconCssClass = "ti ti-list-numbers",
-                LazyLoad = true,
-                SecurityGrant = grant
-            } );
-
-            var messages = new List<TreeItemBag>();
-
-            // Not a folder, so is actually an AdaptiveMessage, except it was loaded as an
-            // AdaptiveMessageCategory so we need to get the Guid of the actual AdaptiveMessage
-            foreach ( var item in items )
-            {
-                if ( !item.IsFolder )
-                {
-                    item.Type = "Item";
-                    // Load the AdaptiveMessageCategory.
-                    var category = amcService.Get( item.Value.AsGuid() );
-                    if ( category != null )
-                    {
-                        // Swap the Guid to the AdaptiveMessage Guid
-                        item.Value = category.AdaptiveMessage.Guid.ToString();
-                    }
-                }
-                else
-                {
-                    item.Type = "Category";
-                }
-
-                // Get Children
-                if ( item.HasChildren )
-                {
-                    item.Children = new List<TreeItemBag>();
-                    item.Children.AddRange( GetAdaptiveMessageChildren( item.Value.AsGuid(), ccService, amcService, grant ) );
-                }
-
-                messages.Add( item );
+                return new List<Guid>();
             }
 
-            return messages;
+            var selectedCategories = selectedValues
+                .Select( v => AdaptiveMessageCache.Get( v.AsGuid() ) )
+                .Where( am => am != null )
+                .SelectMany( am => am.Categories );
+
+            return GetExpandToCategoryGuids( selectedCategories );
         }
 
         #endregion
@@ -6424,7 +6411,7 @@ namespace Rock.Rest.v2
 
             var autoExpandGroups = selectedValues
                 .Select( v => GroupCache.Get( v.AsGuid() ) )
-                .Where( v => v != null );
+                .Where( g => g != null );
 
             foreach ( var selectedGroup in autoExpandGroups )
             {
@@ -7102,7 +7089,7 @@ namespace Rock.Rest.v2
 
             var autoExpandLocations = selectedValues
                 .Select( v => NamedLocationCache.Get( v.AsGuid() ) )
-                .Where( v => v != null );
+                .Where( l => l != null );
 
             foreach ( var selectedLocation in autoExpandLocations )
             {
@@ -8795,7 +8782,7 @@ namespace Rock.Rest.v2
 
             var autoExpandPages = selectedValues
                 .Select( v => PageCache.Get( v.AsGuid() ) )
-                .Where( v => v != null );
+                .Where( p => p != null );
 
             foreach ( var selectedPage in autoExpandPages )
             {
@@ -11020,6 +11007,34 @@ namespace Rock.Rest.v2
                 var depth = 0;
 
                 for ( var category = CategoryCache.Get( categorized.CategoryId.Value ); category != null; category = category.ParentCategory )
+                {
+                    autoExpandedGuids.Add( category.Guid );
+
+                    if ( depth++ > 50 )
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return autoExpandedGuids;
+        }
+
+        /// <summary>
+        /// Gets the unique identifiers of the <see cref="Category"/> items that should be automatically expanded to
+        /// within the tree, based on the given <see cref="CategoryCache"/> items.
+        /// </summary>
+        /// <param name="categoryCaches">The currently selected categories in the picker.</param>
+        /// <returns>A list of unique identifiers for the categories that should be eager loaded.</returns>
+        private List<Guid> GetExpandToCategoryGuids( IEnumerable<CategoryCache> categoryCaches )
+        {
+            var autoExpandedGuids = new List<Guid>();
+
+            foreach ( var categoryCache in categoryCaches )
+            {
+                var depth = 0;
+
+                for ( var category = categoryCache; category != null; category = category.ParentCategory )
                 {
                     autoExpandedGuids.Add( category.Guid );
 

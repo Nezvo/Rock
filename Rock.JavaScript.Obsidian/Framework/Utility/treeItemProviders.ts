@@ -1206,13 +1206,15 @@ export class AdaptiveMessageTreeItemProvider implements ITreeItemProvider {
      * Gets the child items from the server.
      *
      * @param parentGuid The parent item whose children are retrieved.
+     * @param expandToValues The values that should be auto-expanded to.
      *
      * @returns A collection of TreeItem objects as an asynchronous operation.
      */
-    private async getItems(parentGuid?: Guid | null): Promise<TreeItemBag[]> {
+    private async getItems(parentGuid?: Guid | null, expandToValues?: string[]): Promise<TreeItemBag[]> {
         const options: UniversalItemTreePickerOptionsBag = {
             parentValue: parentGuid,
             securityGrantToken: this.securityGrantToken,
+            expandToValues
         };
 
         const response = await post<TreeItemBag[]>("/api/v2/Controls/AdaptiveMessagePickerGetAdaptiveMessages", {}, options);
@@ -1229,8 +1231,8 @@ export class AdaptiveMessageTreeItemProvider implements ITreeItemProvider {
     /**
      * @inheritdoc
      */
-    async getRootItems(): Promise<TreeItemBag[]> {
-        return await this.getItems();
+    async getRootItems(expandToValues: string[]): Promise<TreeItemBag[]> {
+        return await this.getItems(null, expandToValues);
     }
 
     /**
