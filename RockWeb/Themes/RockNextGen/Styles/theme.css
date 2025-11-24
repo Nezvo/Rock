@@ -17667,23 +17667,6 @@ iframe.file-browser {
   background-color: var(--color-interface-softer);
 }
 
-.rockbadge-assessment a {
-  display: inline-flex;
-  color: inherit;
-}
-
-.rockbadge-assessment .ti-stacked-1x {
-  color: var(--color-interface-softest) !important;
-}
-
-.rockbadge-assessment .ti-stacked-2x {
-  color: currentColor !important;
-}
-
-.rockbadge-assessment.requested {
-  color: var(--color-link-strong) !important;
-}
-
 .avatar-lg, .avatar-lg::after {
   border-radius: var(--rounded-small);
 }
@@ -23480,7 +23463,7 @@ li.L9 {
   color: var(--color-interface-soft) !important;
 }
 .rockbadge-assessment.requested {
-  color: var(--color-link-strong) !important;
+  color: var(--color-link-tint) !important;
 }
 
 .assessment-tooltip-item {
