@@ -19179,6 +19179,10 @@ iframe.file-browser {
   padding-bottom: var(--spacing-small);
 }
 
+.contentstack:only-child {
+  padding-bottom: 0;
+}
+
 @media (max-width: 767px) {
   .contentstack {
     flex-direction: column;
