@@ -883,11 +883,8 @@ namespace Rock.Blocks.Reporting
 
             if ( isPersonReport )
             {
-                // We're employing some fuzzy logic here:
-                //      If the admin told us this is a person report,
-                //      AND there is at least one column of type "Person",
-                //
-                // we'll defer to using that column as the key field.
+                // If the admin told us this is a person report, we'll use the first "person" column as the person key
+                // field. If no such column exists, we'll disable person report functionality.
                 var personColumn = columnConfigurations.FirstOrDefault( c => c.ColumnType == ColumnType.PersonValue );
                 if ( personColumn == null )
                 {
