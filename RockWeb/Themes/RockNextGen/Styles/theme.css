@@ -19579,6 +19579,43 @@ iframe.file-browser {
   display: none;
 }
 
+.monaco-editor > .overflow-guard > .margin,
+.monaco-editor > .overflow-guard > .monaco-scrollable-element > .monaco-editor-background,
+.monaco-editor canvas.decorationsOverviewRuler,
+.monaco-editor .sticky-widget,
+.monaco-editor .sticky-line-content {
+  background-color: var(--color-interface-softest) !important;
+}
+.monaco-editor .monaco-editor-background {
+  background-color: transparent !important;
+}
+.monaco-editor .line-numbers.active-line-number {
+  color: var(--color-interface-strong) !important;
+}
+.monaco-editor .view-overlays .current-line-exact,
+.monaco-editor .sticky-widget {
+  border-color: var(--color-interface-soft) !important;
+}
+.monaco-editor .sticky-widget {
+  box-shadow: 0 4px 2px -2px var(--color-interface-soft) !important;
+}
+.monaco-editor .scroll-decoration {
+  box-shadow: var(--color-interface-strong) 0 6px 6px -6px inset !important;
+}
+.monaco-editor .mtk14,
+.monaco-editor .mtk10 {
+  color: var(--color-danger-strong) !important;
+}
+.monaco-editor .mtk1 {
+  color: var(--color-interface-stronger) !important;
+}
+.monaco-editor .cursor {
+  background-color: var(--color-interface-stronger) !important;
+}
+.monaco-editor .mtk23 {
+  color: var(--color-info-strong) !important;
+}
+
 /* ===================== BLOCK =================== */
 .rock-fullscreen-toggle {
   position: absolute;
