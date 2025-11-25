@@ -10710,11 +10710,21 @@ a.rock-bookmark {
 }
 
 .ace-tm .ace_gutter-active-line, .ace-github .ace_gutter-active-line {
-  background: var(--color-interface-soft) !important;
+  background: var(--color-info-tint) !important;
+  color: var(--color-interface-strong) !important;
 }
 
 .ace-tm .ace_marker-layer .ace_active-line, .ace-github .ace_marker-layer .ace_active-line {
-  background-color: var(--color-interface-softer) !important;
+  background: var(--color-info-soft) !important;
+}
+
+.ace_selected-word {
+  background: var(--color-info-soft) !important;
+  border: 1px solid var(--color-info-soft) !important;
+}
+
+.ace_bracket {
+  border: 1px solid var(--color-info-strong) !important;
 }
 
 .ace_scroller {
@@ -10723,6 +10733,10 @@ a.rock-bookmark {
 
 .ace_line {
   color: var(--color-interface-strongest);
+}
+.ace_line .ace_string,
+.ace_line .ace_text {
+  color: var(--color-danger-strong) !important;
 }
 
 .ace_editor .ace_marker-layer .ace_selection {
@@ -33412,11 +33426,11 @@ body.navbar-side-open {
   font-size: 24px;
   font-weight: var(--font-weight-semibold);
   line-height: 1;
-  color: var(--color-interface-softer);
+  color: var(--base-interface-softer);
 }
 .navbar-static-side .navbar-side .nav-item-top .item-title:after {
-  content: "\f054";
-  font-family: FontAwesome;
+  content: "\ea61";
+  font-family: tabler-icons;
   font-size: 12px;
   font-weight: 900;
   margin-left: 12px;
