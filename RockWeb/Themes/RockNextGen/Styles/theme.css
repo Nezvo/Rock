@@ -12561,12 +12561,18 @@ div.aspNetDisabled {
 }
 .smartsearch .dropdown .dropdown-menu {
   top: 35px;
-  right: 0;
-  left: auto;
+  right: auto;
+  left: 0;
   font-size: var(--font-size-xsmall);
   cursor: pointer;
 }
 
+@media (max-width: 767px) {
+  .rock-top-header .block-instance .smartsearch .dropdown .dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+}
 .numberincrement {
   -webkit-user-select: none;
   -moz-user-select: none;
