@@ -10124,6 +10124,15 @@ ul.activeusers {
   color: var(--color-interface-strong);
 }
 
+.navbar-static-side .navbar-side .nav-item-top.open .item-title,
+.navbar-static-side .navbar-side .nav-item-top.open .nav-childpages li.title {
+  color: var(--color-interface-stronger);
+}
+.navbar-static-side .navbar-side .nav-item-top.open .item-title i,
+.navbar-static-side .navbar-side .nav-item-top.open .nav-childpages li.title i {
+  color: var(--color-interface-strong);
+}
+
 a.rock-bookmark {
   color: var(--color-interface-strong);
 }
