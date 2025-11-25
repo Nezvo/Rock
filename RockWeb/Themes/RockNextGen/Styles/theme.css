@@ -10124,6 +10124,15 @@ ul.activeusers {
   color: var(--color-interface-strong);
 }
 
+.navbar-static-side .navbar-side .nav-item-top.open .item-title,
+.navbar-static-side .navbar-side .nav-item-top.open .nav-childpages li.title {
+  color: var(--color-interface-stronger);
+}
+.navbar-static-side .navbar-side .nav-item-top.open .item-title i,
+.navbar-static-side .navbar-side .nav-item-top.open .nav-childpages li.title i {
+  color: var(--color-interface-strong);
+}
+
 a.rock-bookmark {
   color: var(--color-interface-strong);
 }
@@ -12561,12 +12570,18 @@ div.aspNetDisabled {
 }
 .smartsearch .dropdown .dropdown-menu {
   top: 35px;
-  right: 0;
-  left: auto;
+  right: auto;
+  left: 0;
   font-size: var(--font-size-xsmall);
   cursor: pointer;
 }
 
+@media (max-width: 767px) {
+  .rock-top-header .block-instance .smartsearch .dropdown .dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+}
 .numberincrement {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -19577,6 +19592,43 @@ iframe.file-browser {
 .sms-action-components .sms-action.gu-mirror::before,
 .sms-action-components .sms-action.gu-mirror::after {
   display: none;
+}
+
+.monaco-editor > .overflow-guard > .margin,
+.monaco-editor > .overflow-guard > .monaco-scrollable-element > .monaco-editor-background,
+.monaco-editor canvas.decorationsOverviewRuler,
+.monaco-editor .sticky-widget,
+.monaco-editor .sticky-line-content {
+  background-color: var(--color-interface-softest) !important;
+}
+.monaco-editor .monaco-editor-background {
+  background-color: transparent !important;
+}
+.monaco-editor .line-numbers.active-line-number {
+  color: var(--color-interface-strong) !important;
+}
+.monaco-editor .view-overlays .current-line-exact,
+.monaco-editor .sticky-widget {
+  border-color: var(--color-interface-soft) !important;
+}
+.monaco-editor .sticky-widget {
+  box-shadow: 0 4px 2px -2px var(--color-interface-soft) !important;
+}
+.monaco-editor .scroll-decoration {
+  box-shadow: var(--color-interface-strong) 0 6px 6px -6px inset !important;
+}
+.monaco-editor .mtk14,
+.monaco-editor .mtk10 {
+  color: var(--color-danger-strong) !important;
+}
+.monaco-editor .mtk1 {
+  color: var(--color-interface-stronger) !important;
+}
+.monaco-editor .cursor {
+  background-color: var(--color-interface-stronger) !important;
+}
+.monaco-editor .mtk23 {
+  color: var(--color-info-strong) !important;
 }
 
 /* ===================== BLOCK =================== */
