@@ -47,6 +47,8 @@ using CSScriptLibrary;
 
 namespace CSScriptEvaluatorExtensions
 {
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public class HostApp
     {
         public static void Test()
@@ -286,11 +288,15 @@ script.UnloadOwnerDomain();
         }
     }
 
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public interface ICalc
     {
         int Sum(int a, int b);
     }
 
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public interface IFullCalc
     {
         int Sum(int a, int b);

@@ -42,6 +42,8 @@ using CSScriptLibrary;
 
 namespace CSScriptEvaluatorApi
 {
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public class HostApp
     {
         public static void Test()
@@ -345,11 +347,15 @@ namespace CSScriptEvaluatorApi
         }
     }
 
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public interface ICalc
     {
         int Sum(int a, int b);
     }
 
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public class InputData
     {
         public int Index = 0;
