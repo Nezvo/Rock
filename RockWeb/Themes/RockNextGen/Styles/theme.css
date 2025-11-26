@@ -19083,6 +19083,10 @@ iframe.file-browser {
   height: 100%;
   flex: 0 0 20%;
   position: sticky;
+  top: calc(var(--spacing-medium) + 80px);
+}
+
+.full-work-surface .contentsection-container > .contentsection-nav {
   top: 0;
 }
 
@@ -19100,9 +19104,14 @@ iframe.file-browser {
   flex-direction: row-reverse;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .contentsection-container .contentsection-nav {
     display: none;
+  }
+}
+@media (max-width: 992px) {
+  .contentsection-container .contentsection-nav {
+    top: var(--spacing-medium);
   }
 }
 @media (max-width: 480px) {
