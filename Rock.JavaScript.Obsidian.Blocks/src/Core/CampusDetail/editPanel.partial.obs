@@ -387,10 +387,10 @@
         // The `editingTopic` variable happens to be null if a new topic is being added.
         // The "if block" contains the logic to add the new topic if needed.
 
-        let editingTopic = campusTopics.value.find(c => c.type?.value === campusTopicType.value?.value ?? false) || null;
+        let editingTopic = campusTopics.value.find(c => c.type?.value === campusTopicType.value?.value) || null;
 
         if (editingTopic === null && campusTopicGuid.value !== null) {
-            editingTopic = campusTopics.value.find(c => c.guid === campusTopicGuid.value ?? false) || null;
+            editingTopic = campusTopics.value.find(c => c.guid === campusTopicGuid.value) || null;
         }
 
         if (editingTopic === null) {
