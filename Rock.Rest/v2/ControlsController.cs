@@ -435,7 +435,7 @@ namespace Rock.Rest.v2
         /// Gets the unique category identifiers that need to be expanded to in order to display the selected adaptive
         /// message values.
         /// </summary>
-        /// <param name="selectedValues">The currently selected values in the picker.
+        /// <param name="selectedValues">The currently selected values in the picker.</param>
         /// <returns>A list of unique identifiers that represent the categories that need to be expanded to.</returns>
         private List<Guid> AdaptiveMessagePickerGetExpandToCategoryGuids( List<string> selectedValues )
         {

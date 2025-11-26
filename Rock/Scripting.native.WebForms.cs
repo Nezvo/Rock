@@ -43,6 +43,8 @@ using CSScriptLibrary;
 
 namespace CSScriptNativeApi
 {
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public class HostApp
     {
         public static void Test()
@@ -262,11 +264,15 @@ namespace CSScriptNativeApi
         }
     }
 
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public interface IScript
     {
         void Hello(string greeting);
     }
 
+    [Obsolete( "This is not used and will be removed in the future." )]
+    [Rock.RockObsolete( "19.0" )]
     public interface ICalc
     {
         HostApp Host { get; set; }
