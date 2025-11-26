@@ -1,0 +1,28 @@
+<!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
+<template>
+    <div v-if="config.errorMessage || errorMessage" alertType="danger" v-html="config.errorMessage || errorMessage"></div>
+
+    <!---->
+</template>
+
+<script setup lang="ts">
+    import { ref } from "vue";
+    import { onConfigurationValuesChanged, useConfigurationValues, useInvokeBlockAction, useReloadBlock } from "@Obsidian/Utility/block";
+    import { EmailFormBag } from "@Obsidian/ViewModels/Blocks/Cms/EmailForm/emailFormBag";
+
+    // #region Values
+
+    const config = useConfigurationValues<EmailFormBag>();
+    const invokeBlockAction = useInvokeBlockAction();
+    const reloadBlock = useReloadBlock();
+
+    const errorMessage = ref("");
+
+    // #endregion Values
+
+    // #region Functions
+
+    // #endregion Functions
+
+    onConfigurationValuesChanged(reloadBlock);
+</script>
