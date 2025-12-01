@@ -398,10 +398,6 @@
         return entity.requester?.personIdKey?.toString() ?? "";
     });
 
-    const caseWorkerAvatarId = computed((): string => {
-        return entity.caseWorker?.personIdKey?.toString() ?? "";
-    });
-
     const hasEmail = computed((): boolean => {
         if (entity.requester == null || entity.requester === undefined) {
             return false;
