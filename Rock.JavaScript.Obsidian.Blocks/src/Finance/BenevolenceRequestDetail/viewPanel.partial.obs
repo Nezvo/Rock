@@ -180,7 +180,7 @@
         }
 
         if (hasEmail.value) {
-            valueBuilder.addHtmlValue("Email", `<a :href="mailto:${entity.requester?.email}">${entity.requester?.email ?? ""}</a>`);
+            valueBuilder.addHtmlValue("Email", `<a href="${window.location.origin}/Communication/?person=${entity.requester?.personIdKey}">${entity.requester?.email ?? ""}</a>`);
         }
 
         if (hasPhone.value) {
