@@ -15,31 +15,21 @@
 // </copyright>
 //
 
-using System.Collections.Generic;
-
-using Rock.ViewModels.Utility;
-
-namespace Rock.ViewModels.Blocks.Cms.LavaShortcodeDetail
+namespace Rock.Enums.Cms
 {
     /// <summary>
-    /// 
+    /// Determines how variables defined within Lava shortcodes are scoped.
     /// </summary>
-    public class LavaShortcodeDetailOptionsBag
+    public enum ShortcodeScopeBehavior
     {
         /// <summary>
-        /// Gets or sets the tag types.
+        /// Variables defined in the shortcode are not accessible in the surrounding Lava after the shortcode runs.
         /// </summary>
-        /// <value>
-        /// The tag types.
-        /// </value>
-        public List<ListItemBag> TagTypes { get; set; }
+        Isolated = 0,
 
         /// <summary>
-        /// Gets or sets the shortcode scope behaviors.
+        /// Variables defined in the shortcode are accessible in the surrounding Lava after the shortcode runs.
         /// </summary>
-        /// <value>
-        /// The shortcode scope behaviors.
-        /// </value>
-        public List<ListItemBag> ShortcodeScopeBehaviors { get; set; }
+        Shared = 1
     }
 }

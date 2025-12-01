@@ -21,12 +21,21 @@
 // </copyright>
 //
 
-import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+/** Determines how variables defined within Lava shortcodes are scoped. */
+export const ShortcodeScopeBehavior = {
+    /** Runs in a new scope (no variable bleed). */
+    Isolated: 0,
 
-export type LavaShortcodeDetailOptionsBag = {
-    /** Gets or sets the shortcode scope behaviors. */
-    shortcodeScopeBehaviors?: ListItemBag[] | null;
+    /** Runs in the parent scope (variables persist after). */
+    Shared: 1
+} as const;
 
-    /** Gets or sets the tag types. */
-    tagTypes?: ListItemBag[] | null;
+/** Determines how variables defined within Lava shortcodes are scoped. */
+export const ShortcodeScopeBehaviorDescription: Record<number, string> = {
+    0: "Isolated",
+
+    1: "Shared"
 };
+
+/** Determines how variables defined within Lava shortcodes are scoped. */
+export type ShortcodeScopeBehavior = typeof ShortcodeScopeBehavior[keyof typeof ShortcodeScopeBehavior];
