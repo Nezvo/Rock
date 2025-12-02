@@ -180,7 +180,14 @@
         }
 
         if (hasEmail.value) {
-            valueBuilder.addHtmlValue("Email", `<a href="${window.location.origin}/Communication/?person=${entity.requester?.personIdKey}">${entity.requester?.email ?? ""}</a>`);
+            const requesterIdKey = entity.requester?.personIdKey;
+            if (requesterIdKey !== "" && requesterIdKey !== "0" && requesterIdKey !== null && requesterIdKey !== undefined) {
+                valueBuilder.addHtmlValue("Email", `<a href="${window.location.origin}/Communication/?person=${requesterIdKey}">${entity.requester?.email ?? ""}</a>`);
+            }
+            else {
+                const subject = `Benevolence Request - ${props.options.benevolenceRequestTypes?.find(type => Number(type.value) === entity.benevolenceTypeId)?.text ?? ""}`;
+                valueBuilder.addHtmlValue("Email", `<a href="mailto:${entity.requester?.email ?? ""}?subject=${encodeURIComponent(subject)}">${entity.requester?.email ?? ""}</a>`);
+            }
         }
 
         if (hasPhone.value) {
