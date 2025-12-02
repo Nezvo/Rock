@@ -956,18 +956,6 @@ namespace Rock.Blocks.Finance
                 EthnicityGuid = person.EthnicityValue?.Guid ?? Guid.Empty,
             };
 
-            generatedPersonBag.HomePhoneNumber.IsNumberFromPersonRecord = !string.IsNullOrEmpty( generatedPersonBag.HomePhoneNumber.Number )
-                ? true
-                : false;
-
-            generatedPersonBag.CellPhoneNumber.IsNumberFromPersonRecord = !string.IsNullOrEmpty( generatedPersonBag.CellPhoneNumber.Number )
-                ? true
-                : false;
-
-            generatedPersonBag.WorkPhoneNumber.IsNumberFromPersonRecord = !string.IsNullOrEmpty( generatedPersonBag.WorkPhoneNumber.Number )
-                ? true
-                : false;
-
             return true;
         }
 
@@ -1199,9 +1187,14 @@ namespace Rock.Blocks.Finance
                 ? new PhoneNumberBag
                 {
                     Number = phone.Number,
-                    CountryCode = phone.CountryCode
+                    CountryCode = phone.CountryCode,
+                    NumberFormatted = phone.NumberFormatted,
+                    IsNumberFromPersonRecord = true,
                 }
-                : new PhoneNumberBag();
+                : new PhoneNumberBag
+                {
+                    IsNumberFromPersonRecord = false,
+                };
         }
 
         /// <summary>
