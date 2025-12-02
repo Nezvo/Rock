@@ -254,6 +254,8 @@
     import { PersonBag } from "@Obsidian/ViewModels/Blocks/Finance/BenevolenceRequestDetail/personBag";
     import { CampusBag } from "@Obsidian/ViewModels/Blocks/Finance/BenevolenceRequestDetail/campusBag";
     import { LocationBag } from "@Obsidian/ViewModels/Blocks/Finance/BenevolenceRequestDetail/locationBag";
+    import { PhoneNumberBag } from "@Obsidian/ViewModels/Blocks/Finance/BenevolenceRequestDetail/phoneNumberBag";
+    import { PhoneNumberBoxWithSmsControlBag } from "@Obsidian/ViewModels/Controls/phoneNumberBoxWithSmsControlBag";
     import { isNullish, isNotNullish } from "@Obsidian/Utility/util";
     import { Guid } from "@Obsidian/Types";
     import { emptyGuid, areEqual } from "@Obsidian/Utility/guid";
@@ -310,6 +312,9 @@
     const providedNextSteps = propertyRef(props.modelValue.bag?.providedNextSteps ?? "", "providedNextSteps");
     const campus = propertyRef(props.modelValue.bag?.campus ?? {} as CampusBag, "campus");
     const requestDocuments = propertyRef(props.modelValue.bag?.requestDocuments ?? [] as BenevolenceDocumentBag[], "requestDocuments");
+    const requesterHomePhoneNumber = ref<PhoneNumberBoxWithSmsControlBag>(getInitialPhoneNumberBag(requester.value.homePhoneNumber ?? undefined));
+    const requesterCellPhoneNumber = ref<PhoneNumberBoxWithSmsControlBag>(getInitialPhoneNumberBag(requester.value.cellPhoneNumber ?? undefined));
+    const requesterWorkPhoneNumber = ref<PhoneNumberBoxWithSmsControlBag>(getInitialPhoneNumberBag(requester.value.workPhoneNumber ?? undefined));
 
     const attributes = ref(props.modelValue.bag?.attributes ?? {});
     const attributeValues = ref(props.modelValue.bag?.attributeValues ?? {});
@@ -393,80 +398,6 @@
         }
     });
 
-    const requesterHomePhoneNumber = computed({
-        get() {
-            return requester.value.homePhoneNumber
-                ? {
-                    number: requester.value.homePhoneNumber.isNumberFromPersonRecord
-                        ? requester.value.homePhoneNumber.numberFormatted ?? requester.value.homePhoneNumber.number ?? undefined
-                        : requester.value.homePhoneNumber.number ?? undefined,
-                    countryCode: requester.value.homePhoneNumber.countryCode ?? undefined,
-                    isMessagingEnabled: false,
-                }
-                : { number: undefined, countryCode: undefined, isMessagingEnabled: false };
-        },
-        set(val) {
-            requester.value = {
-                ...requester.value,
-                homePhoneNumber: {
-                    number: val.number,
-                    numberFormatted: val.number,
-                    countryCode: val.countryCode ?? "",
-                    isNumberFromPersonRecord: false
-                }
-            };
-        }
-    });
-
-    const requesterCellPhoneNumber = computed({
-        get() {
-            return requester.value.cellPhoneNumber
-                ? {
-                    number: requester.value.cellPhoneNumber.isNumberFromPersonRecord
-                        ? requester.value.cellPhoneNumber.numberFormatted ?? requester.value.cellPhoneNumber.number ?? undefined
-                        : requester.value.cellPhoneNumber.number ?? undefined,
-                    countryCode: requester.value.cellPhoneNumber.countryCode ?? undefined,
-                    isMessagingEnabled: false,
-                }
-                : { number: undefined, countryCode: undefined, isMessagingEnabled: false };
-        },
-        set(val) {
-            requester.value = {
-                ...requester.value,
-                cellPhoneNumber: {
-                    number: val.number,
-                    numberFormatted: val.number,
-                    countryCode: val.countryCode ?? "",
-                    isNumberFromPersonRecord: false
-                }
-            };
-        }
-    });
-
-    const requesterWorkPhoneNumber = computed({
-        get() {
-            return requester.value.workPhoneNumber
-                ? {
-                    number: requester.value.workPhoneNumber.isNumberFromPersonRecord
-                        ? requester.value.workPhoneNumber.numberFormatted ?? requester.value.workPhoneNumber.number ?? undefined
-                        : requester.value.workPhoneNumber.number ?? undefined,
-                    countryCode: requester.value.workPhoneNumber.countryCode ?? undefined,
-                    isMessagingEnabled: false,
-                }
-                : { number: undefined, countryCode: undefined, isMessagingEnabled: false };
-        },
-        set(val) {
-            requester.value = {
-                ...requester.value,
-                workPhoneNumber: {
-                    number: val.number,
-                    numberFormatted: val.number,
-                    countryCode: val.countryCode ?? "",
-                    isNumberFromPersonRecord: false
-                }
-            };
-        }
-    });
 
     const requesterEmail = computed<string>({
         get: () => requester.value.email ?? "",
@@ -748,6 +679,19 @@
     }
 
     /**
+     * Get an initial PhoneNumberBag from an optional source PhoneNumberBag
+     * @param source The source PhoneNumberBag to copy values from (optional)
+     * @returns An initial PhoneNumberBoxWithSmsControlBag created from the source
+     */
+    function getInitialPhoneNumberBag(source?: PhoneNumberBag): PhoneNumberBoxWithSmsControlBag {
+        return {
+            number: source?.numberFormatted ?? "",
+            countryCode: source?.countryCode ?? "",
+            isMessagingEnabled: false,
+        };
+    }
+
+    /**
      * Get a PersonBag from a PersonAliasGuid
      * @param guid The PersonAliasGuid
      * @returns A Promise that resolves to a PersonBag
@@ -812,7 +756,7 @@
         isHomePhoneDisabled.value = value && (!!requester.value.homePhoneNumber && !!requester.value.homePhoneNumber.isNumberFromPersonRecord);
         isCellPhoneDisabled.value = value && (!!requester.value.cellPhoneNumber && !!requester.value.cellPhoneNumber.isNumberFromPersonRecord);
         isWorkPhoneDisabled.value = value && (!!requester.value.workPhoneNumber && !!requester.value.workPhoneNumber.isNumberFromPersonRecord);
-        isEmailDisabled.value = value && !!requester.value.email;
+        isEmailDisabled.value = value && (requester.value.email !== null && requester.value.email !== undefined && requester.value.personIdKey !== null && requester.value.personIdKey !== undefined);
         isAddressFieldDisabled.value = value && !!requester.value.location?.addressFields;
         isCreateRecordFromFieldsHidden.value = value && selectedBenevolenceRequester.value.value !== "";
 
@@ -859,6 +803,10 @@
             const newRequester = await getPersonBagFromPersonAliasGuid(person.value ?? "");
 
             lastRequesterPersonAliasGuid.value = person.value ?? "";
+
+            requesterHomePhoneNumber.value = getInitialPhoneNumberBag(newRequester.homePhoneNumber ?? undefined);
+            requesterCellPhoneNumber.value = getInitialPhoneNumberBag(newRequester.cellPhoneNumber ?? undefined);
+            requesterWorkPhoneNumber.value = getInitialPhoneNumberBag(newRequester.workPhoneNumber ?? undefined);
 
             newRequester.governmentId = governmentId ?? "";
             requester.value = newRequester;
@@ -1049,6 +997,29 @@
     // Determines which values we want to track changes on (defined in the
     // array) and then emit a new object defined as newValue.
     watch([...propRefs], () => {
+        // Build a shallow copy of requester for emit, including phone numbers from local refs
+        const requesterCopy = {
+            ...requester.value,
+            homePhoneNumber: {
+                number: requesterHomePhoneNumber.value.number,
+                numberFormatted: requesterHomePhoneNumber.value.number, // numberFormatted is not used in backend, so just copy number
+                countryCode: requesterHomePhoneNumber.value.countryCode,
+                isNumberFromPersonRecord: requester.value.homePhoneNumber?.isNumberFromPersonRecord ?? false,
+            },
+            cellPhoneNumber: {
+                number: requesterCellPhoneNumber.value.number,
+                numberFormatted: requesterCellPhoneNumber.value.number, // numberFormatted is not used in backend, so just copy number
+                countryCode: requesterCellPhoneNumber.value.countryCode,
+                isNumberFromPersonRecord: requester.value.cellPhoneNumber?.isNumberFromPersonRecord ?? false,
+            },
+            workPhoneNumber: {
+                number: requesterWorkPhoneNumber.value.number,
+                numberFormatted: requesterWorkPhoneNumber.value.number, // numberFormatted is not used in backend, so just copy number
+                countryCode: requesterWorkPhoneNumber.value.countryCode,
+                isNumberFromPersonRecord: requester.value.workPhoneNumber?.isNumberFromPersonRecord ?? false,
+            }
+        };
+
         const newValue: ValidPropertiesBox<BenevolenceRequestBag> = {
             bag: { ...props.modelValue.bag } as BenevolenceRequestBag
         };
@@ -1056,7 +1027,7 @@
         setPropertiesBoxValue(newValue, "benevolenceTypeId", benevolenceTypeId.value ?? 0);
         setPropertiesBoxValue(newValue, "requestStatusValueId", requestStatusValueId.value ?? 0);
         setPropertiesBoxValue(newValue, "requestDateTime", requestDateTime.value ?? new Date().toISOString());
-        setPropertiesBoxValue(newValue, "requester", requester.value);
+        setPropertiesBoxValue(newValue, "requester", requesterCopy);
         setPropertiesBoxValue(newValue, "caseWorker", caseWorker.value);
         setPropertiesBoxValue(newValue, "requestText", requestText.value);
         setPropertiesBoxValue(newValue, "resultSummary", resultSummary.value);
