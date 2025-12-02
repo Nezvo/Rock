@@ -71,7 +71,8 @@
     </ContentSection>
     <br>
     <ContentSection title="Requester"
-                    icon="ti ti-user-question">
+                    icon="ti ti-user-question"
+                    disableCollapse>
         <ContentStack>
             <div class="row">
                 <div class="col-md-3">
@@ -198,27 +199,25 @@
                      rules="required" />
             <Label class="control-label mt-3">Related Documents</Label>
             <div class="d-flex flex-row mb-2">
+                <div v-if="requestDocuments.length > 0" class="mr-2">
+                    <div class="d-flex flex-row flex-wrap">
+                        <div v-for="doc in requestDocuments" :key="doc.guid">
+                            <div v-if="doc.isMarkedForDeletion === false" class="fileupload-thumbnail ml-2">
+                                <FileUploader v-model="doc.listItemBag"
+                                              :binaryFileTypeGuid="props.options.benevolenceDocumentBinaryFileTypeGuid"
+                                              :disabled="isSavingAttachment"
+                                              :uploadAsTemporary="true"
+                                              @update:modelValue="updatedModelValue => onRequestDocumentModified(doc, updatedModelValue)"
+                                              @fileRemoved="onRequestDocumentRemoved(doc)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <FileUploader v-model="currentAttachment"
                               :binaryFileTypeGuid="props.options.benevolenceDocumentBinaryFileTypeGuid"
                               :disabled="isSavingAttachment"
                               :uploadAsTemporary="true"
                               @update:modelValue="onRequestDocumentAdded" />
-                <div v-if="requestDocuments.length > 0">
-                    <div class="d-flex flex-row flex-wrap">
-                        <div v-for="binaryFileAttachment in requestDocuments">
-                            <div v-if="binaryFileAttachment.isMarkedForDeletion == false" class="fileupload-thumbnail ml-2">
-                                <div class="fileupload-group">
-                                    <div>
-                                        <a :href="`/GetFile.ashx?guid=${binaryFileAttachment.guid}&fileName=${binaryFileAttachment.fileName}`" target="_blank" rel="noopener noreferrer" class="file-link file-exists">{{ binaryFileAttachment.fileName }}</a>
-                                        <div class="fileupload-remove">
-                                            <a :disabled="isSavingAttachment"><i class="ti ti-x remove-file" @click="onRequestDocumentRemoved(binaryFileAttachment)"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </ContentStack>
     </ContentSection>
@@ -311,7 +310,17 @@
     const resultSummary = propertyRef(props.modelValue.bag?.resultSummary ?? "", "resultSummary");
     const providedNextSteps = propertyRef(props.modelValue.bag?.providedNextSteps ?? "", "providedNextSteps");
     const campus = propertyRef(props.modelValue.bag?.campus ?? {} as CampusBag, "campus");
-    const requestDocuments = propertyRef(props.modelValue.bag?.requestDocuments ?? [] as BenevolenceDocumentBag[], "requestDocuments");
+    const requestDocuments = propertyRef(
+        (props.modelValue.bag?.requestDocuments ?? []).map(doc => ({
+            ...doc,
+            listItemBag: {
+                text: doc.fileName ?? "Unnamed Document",
+                value: doc.guid ?? ""
+            }
+        })),
+        "requestDocuments"
+    );
+
     const requesterHomePhoneNumber = ref<PhoneNumberBoxWithSmsControlBag>(getInitialPhoneNumberBag(requester.value.homePhoneNumber ?? undefined));
     const requesterCellPhoneNumber = ref<PhoneNumberBoxWithSmsControlBag>(getInitialPhoneNumberBag(requester.value.cellPhoneNumber ?? undefined));
     const requesterWorkPhoneNumber = ref<PhoneNumberBoxWithSmsControlBag>(getInitialPhoneNumberBag(requester.value.workPhoneNumber ?? undefined));
@@ -323,7 +332,8 @@
     // objects returned by propertyRef().
     const propRefs = [
         benevolenceTypeId, requestStatusValueId, requestDateTime, requester, caseWorker, requestText, resultSummary,
-        providedNextSteps, campus, requestDocuments, attributes, attributeValues
+        providedNextSteps, campus, requestDocuments, requesterHomePhoneNumber, requesterCellPhoneNumber,
+        requesterWorkPhoneNumber, attributes, attributeValues
     ];
 
     const lastRequesterPersonAliasGuid = ref<Guid>("");
@@ -850,10 +860,16 @@
             return;
         }
 
-        const newRequestDocument: BenevolenceDocumentBag = {
+        isSavingAttachment.value = true;
+
+        const newRequestDocument = {
             guid: requestDocument.value ?? "",
             fileName: requestDocument.text ?? "",
             isMarkedForDeletion: false,
+            listItemBag: {
+                text: requestDocument.text ?? "Unnamed Document",
+                value: requestDocument.value ?? ""
+            }
         };
 
         requestDocuments.value = [
@@ -863,28 +879,85 @@
 
         // Clear the attachment uploader.
         currentAttachment.value = null;
+        isSavingAttachment.value = false;
+    }
+
+    /**
+     * Handler for when a document attached to the benevolence request is modified.
+     * @param originalDocument The original document before modification.
+     * @param updatedModelValue The updated ListItemBag representing the modified document.
+     */
+    function onRequestDocumentModified(originalDocument: BenevolenceDocumentBag, updatedModelValue: ListItemBag | null | undefined): void {
+        if (isSavingAttachment.value) {
+            return;
+        }
+
+        isSavingAttachment.value = true;
+
+        if (updatedModelValue) {
+            let updatedDocuments;
+
+            // Mark the original document as deleted
+            updatedDocuments = requestDocuments.value.map(doc => {
+                if (doc.guid === originalDocument.guid) {
+                    return {
+                        ...doc,
+                        isMarkedForDeletion: true
+                    };
+                }
+                return doc;
+            });
+
+            // Add the new document as a new item
+            updatedDocuments = [
+                ...updatedDocuments,
+                {
+                    guid: updatedModelValue.value ?? "",
+                    fileName: updatedModelValue.text ?? "",
+                    isMarkedForDeletion: false,
+                    listItemBag: {
+                        text: updatedModelValue.text ?? "Unnamed Document",
+                        value: updatedModelValue.value ?? ""
+                    }
+                }
+            ];
+
+            requestDocuments.value = updatedDocuments;
+
+            isSavingAttachment.value = false;
+            return;
+        }
+
+        isSavingAttachment.value = false;
     }
 
     /**
      * Handler for when a document is removed from the benevolence request.
      * @param requestDocument The document being removed.
      */
-    async function onRequestDocumentRemoved(requestDocument: BenevolenceDocumentBag | null | undefined): Promise<void> {
-        if (isNullish(requestDocument) || isSavingAttachment.value) {
+    function onRequestDocumentRemoved(documentToRemove: BenevolenceDocumentBag | null | undefined): void {
+        if (!documentToRemove || isSavingAttachment.value) {
             return;
         }
 
-        const updatedDocuments = requestDocuments.value?.map(a => {
-            if (a === requestDocument) {
+        isSavingAttachment.value = true;
+
+        // Mark the original document as deleted
+        const updatedDocuments = (requestDocuments.value ?? []).map(requestDocument => {
+            if (requestDocument === documentToRemove) {
+                isSavingAttachment.value = false;
                 return {
-                    ...a,
+                    ...requestDocument,
                     isMarkedForDeletion: true
                 };
             }
-            return a;
-        }) ?? [];
+            isSavingAttachment.value = false;
+            return requestDocument;
+        });
 
         requestDocuments.value = updatedDocuments;
+        isSavingAttachment.value = false;
+        return;
     }
 
     /**
