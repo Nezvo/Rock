@@ -12,6 +12,7 @@
                                   :grouped="false"
                                   :multiple="false"
                                   :showBlankItem="true"
+                                  :disabled="isExistingRequest"
                                   rules="required" />
                 </div>
                 <div class="col-md-3">
@@ -298,6 +299,8 @@
     // #region Values
 
     const invokeBlockAction = useInvokeBlockAction();
+
+    const isExistingRequest = !!props.modelValue.bag?.benevolenceTypeId;
 
     const benevolenceRequestTypes = ref(props.options.benevolenceRequestTypes ?? []);
     const benevolenceRequestTypeItemBags = ref<ListItemBag[]>(benevolenceRequestTypes.value.map(type => ({
