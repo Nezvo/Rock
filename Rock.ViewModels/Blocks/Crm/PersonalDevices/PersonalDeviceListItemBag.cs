@@ -17,6 +17,7 @@
 
 using System;
 using Rock.Enums.Mobile;
+using Rock.ViewModels.Utility;
 
 namespace Rock.ViewModels.Blocks.Crm.PersonalDevices
 {
@@ -34,6 +35,31 @@ namespace Rock.ViewModels.Blocks.Crm.PersonalDevices
         /// Gets or sets a value indicating whether the device is active.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier of the item.
+        /// </summary>
+        public Guid Guid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the device type.
+        /// </summary>
+        public ListItemBag DeviceType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the icon to display for this device.
+        /// </summary>
+        public string IconCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the device platform.
+        /// </summary>
+        public ListItemBag Platform { get; set; }
+
+        /// <summary>
+        /// Gets or sets the device version.
+        /// </summary>
+        public string DeviceVersion { get; set; }
 
         /// <summary>
         /// Gets or sets the MAC address, if provided.

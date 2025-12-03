@@ -1,4 +1,3 @@
-﻿
 // <copyright>
 // Copyright by the Spark Development Network
 //
@@ -16,23 +15,6 @@
 // </copyright>
 //
 
-using System.Collections.Generic;
-
-namespace Rock.ViewModels.Blocks.Crm.PersonalDevices
-{
-    /// <summary>
-    ///  Holds initialization data for the Personal Devices block.
-    /// </summary>
-    public class PersonalDevicesBag
-    {
-        /// <summary>
-        /// Gets or sets the list of personal devices for the person.
-        /// </summary>
-        public List<PersonalDeviceListItemBag> PersonalDevices { get; set; }
-
-        /// <summary>
-		/// Gets or sets the display name of the person for the panel title.
-		/// </summary>
-		public string PersonName { get; set; }
-    }
+export const enum NavigationUrlKey {
+    InteractionsPage = "InteractionsPage",
 }

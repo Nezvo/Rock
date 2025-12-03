@@ -15,18 +15,19 @@
 // </copyright>
 //
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Entity;
 using System.Linq;
 
 using Rock;
-using Rock.Model;
 using Rock.Attribute;
-using Rock.Web.UI;
-using System.Data.Entity;
+using Rock.Data;
+using Rock.Model;
+using Rock.ViewModels.Blocks;
 using Rock.ViewModels.Blocks.Crm.PersonalDevices;
 using Rock.Web.Cache;
+using Rock.Web.UI;
 
 namespace Rock.Blocks.Crm
 {
@@ -40,15 +41,29 @@ namespace Rock.Blocks.Crm
         Description = "The interactions associated with a specific personal device.",
         Order = 0 )]
 
+    [BooleanField(
+        "Show Device Last Seen DateTime",
+        Description = "Checking this option will display the time when the device was last seen.",
+        DefaultBooleanValue = false,
+        Order = 1,
+        Key = AttributeKey.ShowDeviceLastSeenDateTime )]
+
     [ContextAware( typeof( Person ) )]
-    [Rock.SystemGuid.BlockTypeGuid( "9A504904-8AF6-4351-AE31-CBC4DB2F55BA" )]
+    // was [Rock.SystemGuid.BlockTypeGuid( "9A504904-8AF6-4351-AE31-CBC4DB2F55BA" )]
+    [Rock.SystemGuid.BlockTypeGuid( "2D90562E-7332-46DB-9100-0C4106151CA1" )]
     public class PersonalDevices : RockBlockType
     {
         #region Keys
 
+        private static class AttributeKey
+        {
+            public const string ShowDeviceLastSeenDateTime = "ShowDeviceLastSeenDateTime";
+        }
+
         private static class PageParameterKey
         {
             public const string PersonId = "PersonId";
+            public const string PersonGuid = "PersonGuid";
         }
 
         private static class NavigationUrlKey
@@ -60,16 +75,30 @@ namespace Rock.Blocks.Crm
 
         #region Methods
 
+        /// <inheritdoc/>
         public override object GetObsidianBlockInitialization()
         {
-            var box = new PersonalDevicesBag();
+			var box = new CustomBlockBox<PersonalDevicesBag, PersonalDevicesOptionsBag>();
 
-            var personalDevices = GetPersonalDevices();
+			var person = GetPerson();
+
+			var personalDevices = GetPersonalDevices( person?.Id );
 
             var items = personalDevices.Select( pd => new PersonalDeviceListItemBag
             {
                 Name = pd.Name,
                 IsActive = pd.IsActive,
+                Guid = pd.Guid,
+                DeviceType = pd.PersonalDeviceTypeValueId.HasValue
+                    ? DefinedValueCache.Get( pd.PersonalDeviceTypeValueId.Value ).ToListItemBag()
+                    : null,
+                IconCssClass = pd.PersonalDeviceTypeValueId.HasValue
+                    ? DefinedValueCache.Get( pd.PersonalDeviceTypeValueId.Value )?.GetAttributeValue( "IconCssClass" )
+                    : null,
+                Platform = pd.PlatformValueId.HasValue
+                    ? DefinedValueCache.Get( pd.PlatformValueId.Value ).ToListItemBag()
+                    : null,
+                DeviceVersion = pd.DeviceVersion,
                 MacAddress = pd.MACAddress,
                 NotificationsEnabled = pd.NotificationsEnabled,
                 LocationPermissionStatus = pd.LocationPermissionStatus,
@@ -79,61 +108,139 @@ namespace Rock.Blocks.Crm
                 LastSeenDateTime = pd.LastSeenDateTime,
             } ).ToList();
 
-            box.PersonalDevices = items;
+			box.Bag = new PersonalDevicesBag
+			{
+				PersonalDevices = items,
+                PersonName = person?.FullName ?? string.Empty
+            };
 
-            box.NavigationUrls = GetBoxNavigationUrls();
+            box.Options.ShowDeviceLastSeenDateTime = GetAttributeValue( AttributeKey.ShowDeviceLastSeenDateTime ).AsBoolean();
+            box.Options.DeviceTypeOptions = DefinedTypeCache.Get( Rock.SystemGuid.DefinedType.PERSONAL_DEVICE_TYPE.AsGuid() ).DefinedValues.ToListItemBagList();
 
             return box;
         }
+            
+		/// <summary>
+		/// Gets the current person either from the context or the page parameter.
+		/// </summary>
+		/// <returns>The resolved person or null.</returns>
+		private Person GetPerson()
+		{
+			var person = this.RequestContext.GetContextEntity<Person>();
+			if ( person != null )
+			{
+				return person;
+			}
 
-        private List<PersonalDevice> GetPersonalDevices()
-        {
-            var person = this.RequestContext.GetContextEntity<Person>();
-            int? personId = person?.Id;
+			var personIdKey = PageParameter( PageParameterKey.PersonId );
+			if ( personIdKey.IsNotNullOrWhiteSpace() )
+			{
+				return new PersonService( RockContext ).Get( personIdKey, !PageCache.Layout.Site.DisablePredictableIds );
+			}
 
-            if ( !personId.HasValue )
+            var personGuidKey = PageParameter( PageParameterKey.PersonGuid );
+            if ( personGuidKey.IsNotNullOrWhiteSpace() )
             {
-                var key = PageParameter( PageParameterKey.PersonId );
-                if ( key.IsNotNullOrWhiteSpace() )
+                var personGuid = personGuidKey.AsGuidOrNull();
+                if ( personGuid.HasValue )
                 {
-                    var personFromKey = new PersonService( RockContext ).Get( key, !PageCache.Layout.Site.DisablePredictableIds );
-                    personId = personFromKey?.Id;
+                    return new PersonService( RockContext ).Get( personGuid.Value );
                 }
             }
 
-            if ( !personId.HasValue )
-            {
-                return new List<PersonalDevice>();
-            }
+			return null;
+		}
 
-            var personalDeviceService = new PersonalDeviceService( RockContext );
+		/// <summary>
+		/// Gets the personal devices for the specified person identifier.
+		/// </summary>
+		/// <param name="personId">The person identifier.</param>
+		/// <returns>A list of personal devices.</returns>
+		private List<PersonalDevice> GetPersonalDevices( int? personId )
+		{
+			if ( !personId.HasValue )
+			{
+				return new List<PersonalDevice>();
+			}
 
-            return personalDeviceService
-                .Queryable()
-                .AsNoTracking()
-                .Where( pd => pd.PersonAlias != null && pd.PersonAlias.PersonId == personId.Value )
-                .ToList();
-        }
+			var personalDeviceService = new PersonalDeviceService( RockContext );
 
-        /// <summary>
-        /// Gets the box navigation URLs required for the page to operate.
-        /// </summary>
-        /// <returns>A dictionary of key names and URL values.</returns>
-        private Dictionary<string, string> GetBoxNavigationUrls()
-        {
-            return new Dictionary<string, string>
-            {
-                [NavigationUrlKey.InteractionsPage] = this.GetLinkedPageUrl( NavigationUrlKey.InteractionsPage )
-            };
-        }
+			return personalDeviceService
+				.Queryable()
+				.AsNoTracking()
+				.Where( pd => pd.PersonAlias != null && pd.PersonAlias.PersonId == personId.Value )
+				.ToList();
+		}
 
         #endregion Methods
 
         #region Block Actions
 
+        /// <summary>
+        /// Deletes the specified personal device.
+        /// </summary>
+        /// <param name="key">The personal device key (IdKey) identifying the device to delete.</param>
+        [BlockAction]
         public BlockActionResult DeletePersonalDevice( string key )
         {
-            return ActionBadRequest( "Not authorized to delete this personal device." );
+            var personalDeviceService = new PersonalDeviceService( RockContext );
+            var personalDevice = personalDeviceService.Get( key, !PageCache.Layout.Site.DisablePredictableIds );
+
+            if ( personalDevice == null )
+            {
+                return ActionBadRequest( "Personal Device not found." );
+            }
+
+            if ( !BlockCache.IsAuthorized( Rock.Security.Authorization.EDIT, RequestContext.CurrentPerson ) )
+            {
+                return ActionBadRequest( "Not authorized to delete this personal device." );
+            }
+
+            if ( !personalDeviceService.CanDelete( personalDevice, out var errorMessage ) )
+            {
+                return ActionBadRequest( errorMessage );
+            }
+
+            personalDeviceService.Delete( personalDevice );
+            RockContext.SaveChanges();
+
+            return ActionOk();
+        }
+
+        /// <summary>
+        /// Gets the interactions page URL for the specified personal device.
+        /// </summary>
+        /// <param name="key">The identifier of the personal device.</param>
+        /// <returns>The URL to navigate to for viewing interactions.</returns>
+        [BlockAction]
+        public BlockActionResult GetInteractionsUrl( string key )
+        {
+            var personalDeviceService = new PersonalDeviceService( RockContext );
+            var personalDevice = personalDeviceService.Get( key, !PageCache.Layout.Site.DisablePredictableIds );
+
+            if ( personalDevice == null )
+            {
+                return ActionBadRequest( "Personal Device not found." );
+            }
+
+            if ( !BlockCache.IsAuthorized( Rock.Security.Authorization.VIEW, RequestContext.CurrentPerson ) )
+            {
+                return ActionBadRequest( "Not authorized to view interactions for this personal device." );
+            }
+
+            var queryParams = new Dictionary<string, string>
+            {
+                ["PersonalDeviceId"] = personalDevice.IdKey
+            };
+
+            var url = this.GetLinkedPageUrl( NavigationUrlKey.InteractionsPage, queryParams );
+
+            if ( string.IsNullOrWhiteSpace( url ) )
+            {
+                return ActionBadRequest( "Interactions page is not configured." );
+            }
+
+            return ActionOk( url );
         }
 
         #endregion Block Actions

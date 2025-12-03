@@ -1,5 +1,4 @@
-﻿
-// <copyright>
+﻿// <copyright>
 // Copyright by the Spark Development Network
 //
 // Licensed under the Rock Community License (the "License");
@@ -18,21 +17,25 @@
 
 using System.Collections.Generic;
 
+using Rock.ViewModels.Utility;
+
 namespace Rock.ViewModels.Blocks.Crm.PersonalDevices
 {
-    /// <summary>
-    ///  Holds initialization data for the Personal Devices block.
-    /// </summary>
-    public class PersonalDevicesBag
-    {
+	/// <summary>
+	/// Options for the Personal Devices block.
+	/// </summary>
+	public class PersonalDevicesOptionsBag
+	{
         /// <summary>
-        /// Gets or sets the list of personal devices for the person.
+        /// Gets or sets a value indicating whether to show the DeviceLastSeenDatetime property.
         /// </summary>
-        public List<PersonalDeviceListItemBag> PersonalDevices { get; set; }
+        public bool ShowDeviceLastSeenDateTime { get; set; }
 
         /// <summary>
-		/// Gets or sets the display name of the person for the panel title.
-		/// </summary>
-		public string PersonName { get; set; }
+        /// Gets or sets a list of the personal device type options used for filtering.
+        /// </summary>
+        public List<ListItemBag> DeviceTypeOptions { get; set; }
     }
 }
+
+
