@@ -89,7 +89,7 @@ namespace Rock.ViewModels.Blocks.Finance.BenevolenceRequestDetail
         /// <summary>
         /// Gets or sets the benevolence type.
         /// </summary>
-        public List<ListItemBag> BenevolenceRequestTypes { get; set; }
+        public List<BenevolenceTypeBag> BenevolenceRequestTypes { get; set; }
 
         /// <summary>
         /// Gets or sets the Rock.Model.DefinedValue representing the Benevolence Request's status.
