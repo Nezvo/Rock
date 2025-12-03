@@ -87,7 +87,8 @@
                     </div>
                 </div>
 
-                <BenevolenceResultsList @update:requestResults="onResultsListUpdate"
+                <BenevolenceResultsList v-if="isShowingFinancialInfo"
+                                        @update:requestResults="onResultsListUpdate"
                                         :modelValue="entity"
                                         :isEditable="props.isEditable"
                                         :options="props.options" />
@@ -450,11 +451,17 @@
         return !hasEmail.value && !hasPhone.value && !hasAddress.value;
     });
 
-    const benevolenceRequestTypeLavaDetails = props.options.benevolenceRequestTypes?.find(requestType => requestType.id === entity.benevolenceTypeId)?.lavaDetails ?? "";
+    const requestType = props.options.benevolenceRequestTypes?.find(requestType => requestType.id === entity.benevolenceTypeId);
+
+    const benevolenceRequestTypeLavaDetails = requestType?.lavaDetails ?? "";
     const hasRequestLavaTemplateDetails = computed((): boolean => {
         return benevolenceRequestTypeLavaDetails !== null
             && benevolenceRequestTypeLavaDetails !== undefined
             && benevolenceRequestTypeLavaDetails !== "";
+    });
+
+    const isShowingFinancialInfo = computed((): boolean => {
+        return requestType?.options?.isShowingFinancialResults ?? false;
     });
 
     /** Whether or not there are any attributes to display. */
