@@ -125,8 +125,7 @@ namespace Rock.Blocks.Finance
 
         #region Properties
 
-        #region Properties - Services
-
+        // Services
         private PersonAliasService PersonAliasService => new PersonAliasService( RockContext );
         private LocationService LocationService => new LocationService( RockContext );
         private CampusService CampusService => new CampusService( RockContext );
@@ -134,8 +133,6 @@ namespace Rock.Blocks.Finance
         private BenevolenceTypeService BenevolenceTypeService => new BenevolenceTypeService( RockContext );
         private BinaryFileService BinaryFileService => new BinaryFileService( RockContext );
         private BenevolenceRequestDocumentService BenevolenceRequestDocumentService => new BenevolenceRequestDocumentService( RockContext );
-
-        #endregion Properties - Services
 
         #endregion Properties
 
@@ -158,8 +155,6 @@ namespace Rock.Blocks.Finance
             public const string EthnicityOption = "EthnicityOption";
         }
 
-        #region List Source
-
         /// <summary>
         /// Provides a source of predefined list values used for configuration or validation purposes.
         /// </summary>
@@ -169,8 +164,6 @@ namespace Rock.Blocks.Finance
         {
             public const string HIDE_OPTIONAL_REQUIRED = "Hide,Optional,Required";
         }
-
-        #endregion
 
         /// <summary>
         /// Provides a collection of constant keys used for identifying page parameters.
@@ -493,10 +486,6 @@ namespace Rock.Blocks.Finance
             return true;
         }
 
-        #region Helper Methods
-
-        #region Helper Methods - Entity Update
-
         /// <summary>
         /// Updates the properties of the requester in the specified <see cref="BenevolenceRequest"/> entity based on
         /// the provided <see cref="ValidPropertiesBox{T}"/> and a list of active country codes.
@@ -710,10 +699,6 @@ namespace Rock.Blocks.Finance
             box.IfValidProperty( nameof( box.Bag.ProvidedNextSteps ), () => entity.ProvidedNextSteps = box.Bag.ProvidedNextSteps );
         }
 
-        #endregion Helper Methods - Entity Update
-
-        #region Helper Methods - Bag Construction
-
         /// <summary>
         /// Gets the entity bag that is common between both view and edit modes.
         /// </summary>
@@ -731,6 +716,23 @@ namespace Rock.Blocks.Finance
                 var requesterPersonBag = BuildPersonBag( entity, entity.RequestedByPersonAliasId ?? 0, entity.GovernmentId );
                 var caseWorkerPersonBag = BuildPersonBag( entity, entity.CaseWorkerPersonAliasId ?? 0, "", isRequester: false );
                 var campus = BuildCampusBag( entity.CampusId ?? 0 );
+
+                // Add workflow info for frontend
+                var workflows = GetAuthorizedManualWorkflows( entity )
+                    .Select( w => new BenevolenceRequestWorkflowBag
+                    {
+                        TypeId = w.WorkflowTypeId,
+                        TypeGuid = w.WorkflowType.Guid,
+                        TypeName = w.WorkflowType.Name,
+                        TriggerType = w.TriggerType,
+                        LaunchUrl = this.GetLinkedPageUrl( AttributeKey.WorkflowEntryPage, new Dictionary<string, string>
+                        {
+                            { "WorkflowTypeId", w.WorkflowTypeId.ToString() },
+                            { "BenevolenceRequestId", entity.IdKey }
+                        }),
+                        iconCssClass = w.WorkflowType.IconCssClass,
+                    })
+                    .ToList();
 
                 return new BenevolenceRequestBag
                 {
@@ -763,7 +765,8 @@ namespace Rock.Blocks.Finance
                             FileName = document.BinaryFile.FileName,
                             IsMarkedForDeletion = false
                         } )
-                        .ToList()
+                        .ToList(),
+                    Workflows = workflows
                 };
             }
 
@@ -1269,10 +1272,6 @@ namespace Rock.Blocks.Finance
             };
         }
 
-        #endregion Helper Methods - Bag Construction
-
-        #region Helper Methods - Person Creation
-
         /// <summary>
         /// Finds an existing person based on the provided information or creates a new person record if no match is
         /// found.
@@ -1504,9 +1503,35 @@ namespace Rock.Blocks.Finance
             return true;
         }
 
-        #endregion Helper Methods - Person Creation
+        /// <summary>
+        /// Gets the authorized manual workflows for the given benevolence request.
+        /// </summary>
+        /// <param name="benevolenceRequest">The benevolence request.</param>
+        /// <returns>A list of authorized manual workflows.</returns>
+        private List<BenevolenceWorkflow> GetAuthorizedManualWorkflows( BenevolenceRequest benevolenceRequest )
+        {
+            if ( benevolenceRequest?.BenevolenceType == null )
+            {
+                return new List<BenevolenceWorkflow>();
+            }
 
-        #endregion Helper Methods
+            var benevolenceWorkflows = benevolenceRequest.BenevolenceType.BenevolenceWorkflows;
+            var manualWorkflows = benevolenceWorkflows
+                .Where( w => w.TriggerType == BenevolenceWorkflowTriggerType.Manual && w.WorkflowType != null )
+                .OrderBy( w => w.WorkflowType.Name )
+                .Distinct();
+
+            var authorizedWorkflows = new List<BenevolenceWorkflow>();
+            foreach ( var manualWorkflow in manualWorkflows )
+            {
+                if ( ( manualWorkflow.WorkflowType.IsActive ?? true ) && manualWorkflow.WorkflowType.IsAuthorized( Authorization.VIEW, RequestContext.CurrentPerson ) )
+                {
+                    authorizedWorkflows.Add( manualWorkflow );
+                }
+            }
+
+            return authorizedWorkflows;
+        }
 
         #endregion Methods
 

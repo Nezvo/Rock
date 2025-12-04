@@ -109,7 +109,7 @@ namespace Rock.ViewModels.Blocks.Finance.BenevolenceRequestDetail
         /// <summary>
         /// Gets or sets the unique identifier for the binary file type associated with benevolence documents.
         /// </summary>
-        public System.Guid BenevolenceDocumentBinaryFileTypeGuid { get; set; }
+        public Guid BenevolenceDocumentBinaryFileTypeGuid { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether country codes are enabled.
