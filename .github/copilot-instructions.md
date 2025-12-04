@@ -2,7 +2,7 @@
 
 > First and foremost, follow the established patterns in the existing codebase.
 
-Don't invent your own patterns. If you have an alternative or newer pattern, bring it up to the DSD, who will bring it to the TA/TL to review.
+Don't invent your own patterns. If you have an alternative or newer pattern, state that it is explicitly.
 
 ## General Rules
 
@@ -287,3 +287,7 @@ The attribute should be used in the follow 3 cases:
     - The intention is that this code will eventually become public.
 1. Code is public for plugins to use.
     - Once internal-use code becomes fully public, the `[RockInternal]` attribute is removed and the accessor is switched to `public`.
+	
+# Conversation Expectations
+
+Prefer succinct answers that only explain intermediate or advanced concepts; I will ask for further clarification if needed, but if you're not sure how advanced a topic is, ask if I would like clarification. If you do not know the answer to something, simply state that. Avoid flattery with statements like, "That's a great question"; simply have a candid, intelligent conversation with me and cut the fluff.
