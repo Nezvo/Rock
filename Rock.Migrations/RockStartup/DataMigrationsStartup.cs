@@ -117,7 +117,6 @@ namespace Rock.Migrations.RockStartup
             SystemGuid.ServiceJob.DATA_MIGRATIONS_180_POPULATE_COMMUNICATIONRECIPIENT_DELIVEREDDATETIME.AsGuid(),
             SystemGuid.ServiceJob.DATA_MIGRATIONS_180_DELETE_SELFSERVICE_KIOSK_SITE_AND_RELATED.AsGuid(),
             SystemGuid.ServiceJob.DATA_MIGRATIONS_180_UPDATE_EMAIL_PREFERENCE_ENTRY_BLOCK_MANAGE_MY_ACCOUNT_PAGE.AsGuid(),
-            SystemGuid.ServiceJob.DATA_MIGRATIONS_181_ADD_INDEXES_FOR_COMMUNICATION_PREP.AsGuid(),
         };
 
 
@@ -131,7 +130,8 @@ namespace Rock.Migrations.RockStartup
             SystemGuid.ServiceJob.POST_170_UPDATE_HISTORY_ENTITYTYPEID_INDEX.AsGuid(),
             SystemGuid.ServiceJob.DATA_MIGRATIONS_173_UPDATE_NAMELESS_SCHEDULES.AsGuid(),
             SystemGuid.ServiceJob.DATA_MIGRATIONS_180_UPDATE_NAMELESS_LOCATIONS.AsGuid(),
-            SystemGuid.ServiceJob.DATA_MIGRATIONS_180_MIGRATE_ERA_DATA_TO_STEPS.AsGuid()
+            SystemGuid.ServiceJob.DATA_MIGRATIONS_180_MIGRATE_ERA_DATA_TO_STEPS.AsGuid(),
+            SystemGuid.ServiceJob.DATA_MIGRATIONS_181_ADD_INDEXES_FOR_COMMUNICATION_PREP.AsGuid(),
         };
 
         /// <summary>
