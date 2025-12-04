@@ -14,7 +14,7 @@ Don't invent your own patterns. If you have an alternative or newer pattern, sta
 1. Do not add optional parameters that change the signature of a `public` method. This will break code compiled using the previous assembly. Instead, add the new method signature with the original one intact. Keep in mind that plugins do not get re-compiled as often as core.
 1. Regarding Booleans:
     1. Boolean property field names should always ask a question that is answered by the value. For example, a `bool` property to indicate if something is active should be named `IsActive` and not just `Active`. A `bool` property to indicate if a category field should be displayed should be named `IsCategoryFieldVisible` and not `ShowCategoryField`.
-    1. For Obsidian components, the default value must be `false` — and the name should reflect a default value of `false` as the typical/normal setting. Examples:
+    1. For Obsidian components, the default value must be `false` ï¿½ and the name should reflect a default value of `false` as the typical/normal setting. Examples:
         - If a panel is normally hidden, then the name would be `IsPanelShown` with the default value of `false`.
         - If a `foo` option is normally enabled, then the name would be `IsFooDisabled` with a default value of `false`.
         - If a `foo` option is normally disabled, then the name would be `IsFooEnabled` with a default value of `false`.
@@ -22,7 +22,7 @@ Don't invent your own patterns. If you have an alternative or newer pattern, sta
 1. All Page Parameters (query string params) should be in Pascal Case (`AccountId`).
 1. When needing to persist configuration (Data Views, Field Types, Etc.) do not use delimiters but instead use JSON.
 1. Use `private static readonly` for strings that may change.
-1. Use `const` only for constants – for things that will never change such as our `SystemGuid`, `SystemSetting`, Etc.
+1. Use `const` only for constants ï¿½ for things that will never change such as our `SystemGuid`, `SystemSetting`, Etc.
 1. When writing `.Where()` expressions in blocks, instead consider adding reusable expressions on the service.
 1. When writing a LINQ query that filters results against a list of elements (e.g., a query like `.Where( p => personNameList.Contains( p.FirstName )` and `personNameList` is a `List<string>`) make sure you're aware that this will result in a `WHERE IN` clause. Avoid situations where the number of elements causes the SQL query to become too complex. The upper bound of the number of elements you can include is not a hard and fast rule, but if it causes the size of the query itself to exceed the batch size limit it will result in an error ("The query processor ran out of internal resources and could not produce a query plan.")
     - Batch Size Limit is 65,536 * (network packet size, which defaults to 4k)
@@ -37,7 +37,7 @@ Don't invent your own patterns. If you have an alternative or newer pattern, sta
 1. When the block uses Person Preferences, set those in a `PersonPreferenceKey` `private static class`.
 1. When accessing a page parameter use:
     - `PageParameter( PageParameterKey.Group )`
-    - instead of `Request.Params[ “Group” ] or PageParameter( “Group” )`
+    - instead of `Request.Params[ ï¿½Groupï¿½ ] or PageParameter( ï¿½Groupï¿½ )`
 1. When creating a link to a page use the `LinkedPageUrl()` method, like this:
     ```
     var pageParams = new Dictionary<string, string>();
@@ -46,8 +46,8 @@ Don't invent your own patterns. If you have an alternative or newer pattern, sta
     var url = LinkedPageUrl( AttributeKey.AttendancePageAttribute, pageParams );
     ```
 1. Business logic methods that work with the database must be made on the service (e.g. `GetImpliedGroup()`. If there is a clear case for having it in the model add it there by calling the service. These must be approved by Developer Discussion.
-1. Always use braces – even for single line blocks (`for`, `if`/`else`, Etc.).
-1. Early Outs Ifs – Avoid `if` statement nesting and use early returns in your methods.
+1. Always use braces ï¿½ even for single line blocks (`for`, `if`/`else`, Etc.).
+1. Early Outs Ifs ï¿½ Avoid `if` statement nesting and use early returns in your methods.
 1. Use variables to document the intent for complicated `if` conditions. For example:
     ```
     // This:
@@ -89,7 +89,7 @@ Don't invent your own patterns. If you have an alternative or newer pattern, sta
         1. Storage Providers
         1. And more!
     - FieldTypes - These are also singletons.
-    - Cache types – These obviously have to have class variables, so be careful that they aren't updated outside of the normal flush logic, and treat them as `readonly`.
+    - Cache types ï¿½ These obviously have to have class variables, so be careful that they aren't updated outside of the normal flush logic, and treat them as `readonly`.
     - If something must be a class variable, there are some ways to avoid the problem.
         1. Make it a `const` or `readonly` (set the values in the constructor).
         1. Store it in `HttpContext.Current.Items` (see https://github.com/sparkdevnetwork/rock/commit/b6989f562843165b9b87b8757600003a03ee2a22 for examples).
@@ -270,7 +270,7 @@ Due to the increasing nature of clustered/web-farm Rock environments, we are loo
 
 ## Block Settings
 
-All new blocks should use the ‘Vertical' format for block settings, where the Properties of the FieldAttribute is assigned (not the constructor parameters)
+All new blocks should use the ï¿½Vertical' format for block settings, where the Properties of the FieldAttribute is assigned (not the constructor parameters)
 
 ## RockInternal Attribute
 
@@ -281,13 +281,13 @@ The attribute should be used in the follow 3 cases:
 1. Code is for internal use only and will always be used for internal use only.
     - Code has no intention of ever becoming available to 3rd party plugins.
     - If the property needs to be accessed by code in RockWeb, it must be public and denoted with the `[RockInternal]` attribute alongside a specific version and the `true` value for the optional `keepInternalForever` parameter.
-1. Code is currently for internal use only but should become public eventually.
+2. Code is currently for internal use only but should become public eventually.
     - Code for a new feature but the method names and parameters are not yet confirmed.
     - Feature is considered experimental.
     - The intention is that this code will eventually become public.
-1. Code is public for plugins to use.
-    - Once internal-use code becomes fully public, the `[RockInternal]` attribute is removed and the accessor is switched to `public`.
-	
+3. Code is public for plugins to use.
+    - Once internal-use code becomes fully public, the `[RockInternal]` attribute is removed and the accessor is switched to `public`. If uncertain about whether something is going to be public or not, do not remove the attribute without confirmation.
+
 # Conversation Expectations
 
 Prefer succinct answers that only explain intermediate or advanced concepts; I will ask for further clarification if needed, but if you're not sure how advanced a topic is, ask if I would like clarification. If you do not know the answer to something, simply state that. Avoid flattery with statements like, "That's a great question"; simply have a candid, intelligent conversation with me and cut the fluff.
