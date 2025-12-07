@@ -84,33 +84,9 @@ namespace Rock.Blocks.Crm
 
 			var personalDevices = GetPersonalDevices( person?.Id );
 
-            var items = personalDevices.Select( pd => new PersonalDeviceListItemBag
-            {
-                Name = pd.Name,
-                IsActive = pd.IsActive,
-                Guid = pd.Guid,
-                DeviceType = pd.PersonalDeviceTypeValueId.HasValue
-                    ? DefinedValueCache.Get( pd.PersonalDeviceTypeValueId.Value ).ToListItemBag()
-                    : null,
-                IconCssClass = pd.PersonalDeviceTypeValueId.HasValue
-                    ? DefinedValueCache.Get( pd.PersonalDeviceTypeValueId.Value )?.GetAttributeValue( "IconCssClass" )
-                    : null,
-                Platform = pd.PlatformValueId.HasValue
-                    ? DefinedValueCache.Get( pd.PlatformValueId.Value ).ToListItemBag()
-                    : null,
-                DeviceVersion = pd.DeviceVersion,
-                MacAddress = pd.MACAddress,
-                NotificationsEnabled = pd.NotificationsEnabled,
-                LocationPermissionStatus = pd.LocationPermissionStatus,
-                IsPreciseLocationEnabled = pd.IsPreciseLocationEnabled,
-                IsBeaconMonitoringEnabled = pd.IsBeaconMonitoringEnabled,
-                CreatedDateTime = pd.CreatedDateTime,
-                LastSeenDateTime = pd.LastSeenDateTime,
-            } ).ToList();
-
 			box.Bag = new PersonalDevicesBag
 			{
-				PersonalDevices = items,
+				PersonalDevices = personalDevices,
                 PersonName = person?.FullName ?? string.Empty
             };
 
@@ -155,21 +131,49 @@ namespace Rock.Blocks.Crm
 		/// Gets the personal devices for the specified person identifier.
 		/// </summary>
 		/// <param name="personId">The person identifier.</param>
-		/// <returns>A list of personal devices.</returns>
-		private List<PersonalDevice> GetPersonalDevices( int? personId )
+		/// <returns>A list of personal device list item bags.</returns>
+		private List<PersonalDeviceListItemBag> GetPersonalDevices( int? personId )
 		{
 			if ( !personId.HasValue )
 			{
-				return new List<PersonalDevice>();
+				return new List<PersonalDeviceListItemBag>();
 			}
 
 			var personalDeviceService = new PersonalDeviceService( RockContext );
 
-			return personalDeviceService
+			var personalDevices = personalDeviceService
 				.Queryable()
 				.AsNoTracking()
+				.Include( pd => pd.PersonalDeviceType )
+				.Include( pd => pd.Platform )
 				.Where( pd => pd.PersonAlias != null && pd.PersonAlias.PersonId == personId.Value )
 				.ToList();
+
+			var items = personalDevices.Select( pd => new PersonalDeviceListItemBag
+			{
+				Name = pd.Name,
+				IsActive = pd.IsActive,
+				Guid = pd.Guid,
+				DeviceType = pd.PersonalDeviceType != null
+					? pd.PersonalDeviceType.ToListItemBag()
+					: null,
+				IconCssClass = pd.PersonalDeviceTypeValueId.HasValue
+					? DefinedValueCache.Get( pd.PersonalDeviceTypeValueId.Value )?.GetAttributeValue( "IconCssClass" )
+					: null,
+				Platform = pd.Platform != null
+					? pd.Platform.ToListItemBag()
+					: null,
+				DeviceVersion = pd.DeviceVersion,
+				MacAddress = pd.MACAddress,
+				NotificationsEnabled = pd.NotificationsEnabled,
+				LocationPermissionStatus = pd.LocationPermissionStatus,
+				IsPreciseLocationEnabled = pd.IsPreciseLocationEnabled,
+				IsBeaconMonitoringEnabled = pd.IsBeaconMonitoringEnabled,
+				CreatedDateTime = pd.CreatedDateTime,
+				LastSeenDateTime = pd.LastSeenDateTime,
+			} ).ToList();
+
+            return items;
 		}
 
         #endregion Methods
