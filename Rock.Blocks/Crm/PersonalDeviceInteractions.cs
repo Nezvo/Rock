@@ -15,7 +15,6 @@
 // </copyright>
 //
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
@@ -147,7 +146,10 @@ namespace Rock.Blocks.Crm
             var interactionService = new InteractionService( rockContext );
             var baseQuery = interactionService.Queryable()
                 .AsNoTracking()
-                .Where( i => i.PersonalDeviceId != null );
+				.Where( i => i.PersonalDeviceId != null )
+				.Include( i => i.PersonalDevice.PersonalDeviceType )
+				.Include( i => i.PersonalDevice.Platform )
+				.Include( i => i.PersonAlias.Person );
 
             var personalDevice = GetPersonalDevice();
 
@@ -239,9 +241,15 @@ namespace Rock.Blocks.Crm
                 return null;
             }
 
-            var personalDevice = new PersonalDeviceService( RockContext ).Get( key );
+			var personalDeviceService = new PersonalDeviceService( RockContext );
+			var personalDevice = personalDeviceService
+				.GetQueryableByKey( key )
+				.AsNoTracking()
+				.Include( pd => pd.Platform )
+				.Include( pd => pd.PersonAlias.Person )
+				.FirstOrDefault();
 
-            return personalDevice ?? null;
+			return personalDevice;
         }
 
         /// <summary>
