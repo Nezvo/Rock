@@ -15,6 +15,7 @@
 // </copyright>
 
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,11 +27,52 @@ namespace RockDbBackupManager
 {
     public partial class MainWindow : Window
     {
-        // Connection string for listing databases and backup/restore operations (SQL Server Authentication)
-        private readonly string masterConnectionString = "Server=localhost;Database=master;User Id=RockUser;Password=E2mufCzpNVZBZOzTijSB0qLeAQsaUi96LXPpW5wpTtPz5JYkAgJpyZjUCI9M18bOFKOFlzin3rHhcjOhTS24V3xopRXLA2CdqYlEq4QQ2wx26l9aYlBT2QfUSK4Qf4n9;TrustServerCertificate=True;MultipleActiveResultSets=true";
-        
+        /// <summary>
+        /// Connection string sourced from RockWeb/web.ConnectionStrings.config
+        /// </summary>
+        private readonly SqlConnectionStringBuilder connectionStringBuilder;
+        /// <summary>
+        /// Regex used to remove non-alphanumeric characters from tags.
+        /// </summary>
+        private static readonly Regex AlphanumericRegex = CompiledAlphanumericRegex();
+
+        /// <summary>
+        /// Generates a compiled regex that matches non-alphanumeric characters.
+        /// </summary>
+        /// <returns>A compiled Regex instance.</returns>
+        [GeneratedRegex( "[^a-zA-Z0-9]", RegexOptions.Compiled )]
+        private static partial Regex CompiledAlphanumericRegex();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// Loads connection string, backup directory, and database names.
+        /// </summary>
         public MainWindow()
         {
+            // Load connection string from RockWeb/web.ConnectionStrings.config
+            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "RockWeb", "web.ConnectionStrings.config");
+            if (File.Exists(configPath))
+            {
+                var xml = System.Xml.Linq.XDocument.Load(configPath);
+                var connElem = xml.Descendants("add").FirstOrDefault(e => (string?)e.Attribute("name") == "RockContext");
+                if (connElem != null && connElem.Attribute("connectionString") != null)
+                {
+                    var connectionElementRealized = ((string?)connElem.Attribute( "connectionString" ))?.Replace( "\n", "" ).Trim();
+                    connectionStringBuilder = new SqlConnectionStringBuilder(connectionElementRealized);
+                }
+                else
+                {
+                    connectionStringBuilder = [];
+                }
+            }
+            else
+            {
+                connectionStringBuilder = [];
+            }
+
+            connectionStringBuilder.InitialCatalog = "master";
+            connectionStringBuilder.TrustServerCertificate = true;
+
             InitializeComponent();
             // Load backup directory from settings or use default
             string savedDir = BackupManager.Default.BackupDirectory;
@@ -44,27 +86,32 @@ namespace RockDbBackupManager
             }
             LoadDatabaseNames();
             var dbName = DatabaseNameComboBox.SelectedItem as string;
-            LoadBackupFiles(dbName);
+            LoadBackupFiles(dbName ?? string.Empty);
         }
 
+        /// <summary>
+        /// Loads the list of database names from the SQL Server and populates the combo box.
+        /// </summary>
         private void LoadDatabaseNames()
         {
+            if (string.IsNullOrWhiteSpace(connectionStringBuilder.ConnectionString))
+            {
+                StatusTextBlock.Text = "Error: Database connection string not found. Cannot load databases.";
+                DatabaseNameComboBox.ItemsSource = null;
+                return;
+            }
             try
             {
                 var databases = new List<string>();
-                using (var connection = new SqlConnection(masterConnectionString))
+                using var connection = new SqlConnection(connectionStringBuilder.ConnectionString);
+                connection.Open();
+                using var command = new SqlCommand("SELECT name FROM sys.databases WHERE database_id > 4", connection);
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    connection.Open();
-                    using (var command = new SqlCommand("SELECT name FROM sys.databases WHERE database_id > 4", connection))
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            databases.Add(reader.GetString(0));
-                        }
-                    }
+                    databases.Add(reader.GetString(0));
                 }
-                DatabaseNameComboBox.ItemsSource = databases;
+                DatabaseNameComboBox.ItemsSource = new List<string>(databases);
                 if (databases.Count > 0)
                     DatabaseNameComboBox.SelectedIndex = 0;
             }
@@ -74,16 +121,20 @@ namespace RockDbBackupManager
             }
         }
 
-        private void LoadBackupFiles(string filterDbName = null)
+        /// <summary>
+        /// Loads backup files from the backup directory, optionally filtering by database name.
+        /// </summary>
+        /// <param name="filterDbName">Optional database name to filter backup files.</param>
+        private void LoadBackupFiles(string? filterDbName = null)
         {
-            var backupDir = BackupDirectoryTextBox.Text.Trim();
+            var backupDir = BackupDirectoryTextBox?.Text?.Trim();
             if (!string.IsNullOrWhiteSpace(backupDir) && System.IO.Directory.Exists(backupDir))
             {
                 var files = Directory.GetFiles(backupDir, "*.bak");
                 var fileNames = files.Select(f => Path.GetFileName(f)).ToList();
                 if (!string.IsNullOrWhiteSpace(filterDbName))
                 {
-                    fileNames = fileNames.Where(f => f.Contains(filterDbName, StringComparison.OrdinalIgnoreCase)).ToList();
+                    fileNames = [.. fileNames.Where(f => f != null && f.Contains(filterDbName, StringComparison.OrdinalIgnoreCase))];
                 }
                 BackupFilesListBox.ItemsSource = fileNames;
             }
@@ -93,6 +144,12 @@ namespace RockDbBackupManager
             }
         }
         
+        /// <summary>
+        /// Sets the status message in the UI with optional error and loading indicators.
+        /// </summary>
+        /// <param name="message">The status message to display.</param>
+        /// <param name="isError">Whether the message is an error.</param>
+        /// <param name="isLoading">Whether the message indicates a loading state.</param>
         private void SetStatus(string message, bool isError = false, bool isLoading = false)
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -100,6 +157,10 @@ namespace RockDbBackupManager
             StatusTextBlock.Foreground = isError ? System.Windows.Media.Brushes.Red : System.Windows.Media.Brushes.Black;
         }
 
+        /// <summary>
+        /// Enables or disables UI controls based on the provided flag.
+        /// </summary>
+        /// <param name="enabled">True to enable controls, false to disable.</param>
         private void SetUiEnabled(bool enabled)
         {
             DatabaseNameComboBox.IsEnabled = enabled;
@@ -111,20 +172,38 @@ namespace RockDbBackupManager
             BrowseRestoreFileButton.IsEnabled = enabled;
             BackupFilesListBox.IsEnabled = enabled;
         }
+        /// <summary>
+        /// Handles the selection change event for the database name combo box.
+        /// Loads backup files for the selected database.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Selection changed event arguments.</param>
         private void DatabaseNameComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var dbName = DatabaseNameComboBox.SelectedItem as string;
-            LoadBackupFiles(dbName);
+            LoadBackupFiles(dbName ?? string.Empty);
         }
 
+        /// <summary>
+        /// Handles the selection change event for the backup files list box.
+        /// Sets the restore file text box to the selected file.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Selection changed event arguments.</param>
         private void BackupFilesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (BackupFilesListBox.SelectedItem is string selectedFile)
+            if (BackupFilesListBox.SelectedItem is string selectedFile && RestoreFileTextBox != null)
             {
                 RestoreFileTextBox.Text = selectedFile;
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the browse restore file button.
+        /// Opens a file dialog to select a backup file for restore.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private void BrowseRestoreFileButton_Click(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new OpenFileDialog
@@ -134,8 +213,8 @@ namespace RockDbBackupManager
                 Multiselect = false
             };
             // If RestoreFileTextBox is empty, use BackupDirectoryTextBox as initial directory
-            var restoreFilePath = RestoreFileTextBox.Text.Trim();
-            string initialDir = null;
+            var restoreFilePath = RestoreFileTextBox?.Text?.Trim();
+            string? initialDir = null;
             if (!string.IsNullOrWhiteSpace(restoreFilePath) && System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(restoreFilePath)))
             {
                 initialDir = Path.GetDirectoryName(restoreFilePath);
@@ -150,15 +229,20 @@ namespace RockDbBackupManager
             }
             if (openFileDialog.ShowDialog() == WinForms.DialogResult.OK)
             {
-                RestoreFileTextBox.Text = openFileDialog.FileName;
+                RestoreFileTextBox?.Text = openFileDialog.FileName;
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the backup button.
+        /// Initiates a database backup operation.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private async void BackupButton_Click(object sender, RoutedEventArgs e)
         {
-
-            string dbName = DatabaseNameComboBox.SelectedItem as string;
-            string backupDir = BackupDirectoryTextBox.Text.Trim();
+            string? dbName = DatabaseNameComboBox.SelectedItem as string;
+            string? backupDir = BackupDirectoryTextBox?.Text?.Trim();
             if (string.IsNullOrWhiteSpace(dbName) || string.IsNullOrWhiteSpace(backupDir))
             {
                 SetStatus("Database name and backup directory are required.", isError: true);
@@ -173,7 +257,7 @@ namespace RockDbBackupManager
                 var tagList = tags.Split(',')
                                   .Select(t => t.Trim())
                                   .Where(t => !string.IsNullOrWhiteSpace(t))
-                                  .Select(t => System.Text.RegularExpressions.Regex.Replace(t, "[^a-zA-Z0-9]", ""))
+                                  .Select(t => AlphanumericRegex.Replace(t, string.Empty))
                                   .Where(t => !string.IsNullOrWhiteSpace(t))
                                   .ToList();
                 if (tagList.Count > 0)
@@ -181,6 +265,7 @@ namespace RockDbBackupManager
                     tagPart = "-" + string.Join("_", tagList);
                 }
             }
+
             string backupFileName = $"{timestamp}-{dbName}{tagPart}.bak";
             string backupPath = System.IO.Path.Combine(backupDir, backupFileName);
 
@@ -190,40 +275,45 @@ namespace RockDbBackupManager
             SetUiEnabled(false);
             try
             {
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
-                    using (var connection = new SqlConnection(masterConnectionString))
-                    {
-                        connection.Open();
-                        using (var command = new SqlCommand(sql, connection))
-                        {
-                            command.CommandTimeout = 0;
-                            command.ExecuteNonQuery();
-                        }
-                    }
+                    using var connection = new SqlConnection(connectionStringBuilder.ConnectionString);
+                    await connection.OpenAsync();
+                    using var command = new SqlCommand(sql, connection);
+                    command.CommandTimeout = 0;
+                    await command.ExecuteNonQueryAsync();
                 });
-                SetStatus($"Backup completed: {backupPath}");
-                LoadBackupFiles(dbName); // Refresh restore list after backup
-                RestoreFileTextBox.Text = string.Empty;
+                Dispatcher.Invoke(() =>
+                {
+                    SetStatus($"Backup completed: {backupPath}");
+                    LoadBackupFiles(dbName); // Refresh restore list after backup
+                    RestoreFileTextBox.Text = string.Empty;
+                });
             }
             catch (SqlException ex)
             {
-                SetStatus($"SQL error during backup: {ex.Message}", isError: true);
+                Dispatcher.Invoke(() => SetStatus($"SQL error during backup: {ex.Message}", isError: true));
             }
             catch (Exception ex)
             {
-                SetStatus($"Backup failed: {ex.Message}", isError: true);
+                Dispatcher.Invoke(() => SetStatus($"Backup failed: {ex.Message}", isError: true));
             }
             finally
             {
-                SetUiEnabled(true);
+                Dispatcher.Invoke(() => SetUiEnabled(true));
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the restore button.
+        /// Initiates a database restore operation.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private async void RestoreButton_Click(object sender, RoutedEventArgs e)
         {
-            string dbName = DatabaseNameComboBox.SelectedItem as string;
-            string restoreFile = RestoreFileTextBox.Text.Trim();
+            string? dbName = DatabaseNameComboBox.SelectedItem as string;
+            string? restoreFile = RestoreFileTextBox?.Text?.Trim();
             if (string.IsNullOrWhiteSpace(dbName) || string.IsNullOrWhiteSpace(restoreFile))
             {
                 SetStatus("Database name and restore file are required.", isError: true);
@@ -269,33 +359,35 @@ namespace RockDbBackupManager
             SetUiEnabled(false);
             try
             {
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
-                    using (var connection = new SqlConnection(masterConnectionString))
-                    {
-                        connection.Open();
-                        using (var command = new SqlCommand(sql, connection))
-                        {
-                            command.CommandTimeout = 0;
-                            command.ExecuteNonQuery();
-                        }
-                    }
+                    using var connection = new SqlConnection(connectionStringBuilder.ConnectionString);
+                    await connection.OpenAsync();
+                    using var command = new SqlCommand(sql, connection);
+                    command.CommandTimeout = 0;
+                    await command.ExecuteNonQueryAsync();
                 });
-                SetStatus($"Restore completed: {restoreFile}");
+                Dispatcher.Invoke(() => SetStatus($"Restore completed: {restoreFile}"));
             }
             catch (SqlException ex)
             {
-                SetStatus($"SQL error during restore: {ex.Message}", isError: true);
+                Dispatcher.Invoke(() => SetStatus($"SQL error during restore: {ex.Message}", isError: true));
             }
             catch (Exception ex)
             {
-                SetStatus($"Restore failed: {ex.Message}", isError: true);
+                Dispatcher.Invoke(() => SetStatus($"Restore failed: {ex.Message}", isError: true));
             }
             finally
             {
-                SetUiEnabled(true);
+                Dispatcher.Invoke(() => SetUiEnabled(true));
             }
         }
+        /// <summary>
+        /// Handles the click event for the browse backup directory button.
+        /// Opens a folder browser dialog to select the backup directory.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private void BrowseBackupDirectoryButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new FolderBrowserDialog
@@ -303,7 +395,7 @@ namespace RockDbBackupManager
                 ShowNewFolderButton = true
             };
 
-            var initialDir = BackupDirectoryTextBox.Text.Trim();
+            var initialDir = BackupDirectoryTextBox?.Text?.Trim();
             if (!string.IsNullOrWhiteSpace(initialDir) && System.IO.Directory.Exists(initialDir))
             {
                 dialog.InitialDirectory = initialDir;
@@ -311,17 +403,24 @@ namespace RockDbBackupManager
             if (dialog.ShowDialog() == WinForms.DialogResult.OK)
             {
                 var folder = dialog.SelectedPath;
-                BackupDirectoryTextBox.Text = folder;
+
+                BackupDirectoryTextBox?.Text = folder;
 
                 // Save to settings
                 BackupManager.Default.BackupDirectory = folder;
                 BackupManager.Default.Save();
 
                 var dbName = DatabaseNameComboBox.SelectedItem as string;
-                LoadBackupFiles(dbName); // Refresh backup files list filtered by selected DB
+                LoadBackupFiles(dbName ?? string.Empty); // Refresh backup files list filtered by selected DB
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the delete backup button.
+        /// Deletes the selected backup file after confirmation.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private void DeleteBackupButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is System.Windows.Controls.Button btn && btn.Tag is string fileName)
@@ -340,7 +439,7 @@ namespace RockDbBackupManager
                     {
                         System.IO.File.Delete(filePath);
                         var dbName = DatabaseNameComboBox.SelectedItem as string;
-                        LoadBackupFiles(dbName);
+                        LoadBackupFiles(dbName ?? string.Empty);
                         RestoreFileTextBox.Text = string.Empty;
                         SetStatus($"Deleted backup: {fileName}");
                     }
@@ -352,6 +451,12 @@ namespace RockDbBackupManager
             }
         }
 
+        /// <summary>
+        /// Handles the click event for the restore warning menu item.
+        /// Resets the restore warning setting.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private void RestoreWarningMenuItem_Click(object sender, RoutedEventArgs e)
         {
             BackupManager.Default.IsWarningOnRestore = true;
@@ -363,19 +468,51 @@ namespace RockDbBackupManager
                 MessageBoxImage.Information);
         }
 
+        /// <summary>
+        /// Handles the click event for the exit menu item.
+        /// Shuts down the application.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
         private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
         }
 
-        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Handles the click event for the about help menu item.
+        /// Displays information about the application.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
+        private void AboutMenuHelpItem_Click(object sender, RoutedEventArgs e)
         {
             string info = "RockDB Backup Manager\n\n" +
                 "Copyright © Spark Development Network\n" +
                 "Licensed under the Rock Community License\n" +
                 "https://www.rockrms.com/license\n\n" +
                 "This core developer tool allows you to create and restore full, copy-only SQL Server backups for Rock RMS databases.";
+
             System.Windows.MessageBox.Show(info, "About RockDB Backup Manager", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Handles the click event for the about usage menu item.
+        /// Displays usage information about the application.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">Routed event arguments.</param>
+        private void AboutMenuUsageItem_Click(object sender, RoutedEventArgs e)
+        {
+            string info = "This tool creates and restores full, copy-only SQL Server backups for Rock RMS databases.\n\n" +
+            "Connection settings are automatically sourced from the RockWeb/web.ConnectionStrings.config file. " +
+            "To ensure correct database connectivity, run this application in Debug mode from its default build directory. " +
+            "This allows the tool to locate the RockWeb folder and its configuration files as expected.\n\n" +
+            "Backups are saved to the directory specified, which defaults to the SQL Server backup folder. " +
+            "Restores will overwrite the selected database completely. Use caution and verify your backup files before restoring.\n\n" +
+            "For best results, ensure both you and NT SERVICE\\MSSQLSERVER have appropriate permissions to access the SQL Server instance and file system locations.";
+
+            System.Windows.MessageBox.Show( info, "About RockDB Backup Manager", MessageBoxButton.OK, MessageBoxImage.Information );
         }
     }
 }

@@ -37,7 +37,8 @@
                 <MenuItem Header="Reset 'Restore Database' Warning" Click="RestoreWarningMenuItem_Click"/>
             </MenuItem>
             <MenuItem Header="Help" HorizontalAlignment="Right">
-                <MenuItem Header="About RockDB Backup Manager" Click="AboutMenuItem_Click"/>
+                <MenuItem Header="Usage" Click="AboutMenuUsageItem_Click"/>
+                <MenuItem Header="About" Click="AboutMenuHelpItem_Click"/>
             </MenuItem>
         </Menu>
         <Grid Margin="20">
