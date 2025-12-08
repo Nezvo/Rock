@@ -11,7 +11,7 @@
         <slot name="prepend" />
 
         <div v-if="badgeText" class="displaycard-badge">
-            <Badge badgeType="success">{{ badgeText }}</Badge>
+            <Badge :badgeType="badgeType">{{ badgeText }}</Badge>
         </div>
 
         <div class="displaycard-heading">
@@ -100,6 +100,7 @@
     import HighlightLabel from "./highlightLabel.obs";
     import RockButton from "./rockButton.obs";
     import { MenuAction } from "@Obsidian/Types/Controls/dropDownMenu";
+    import { BadgeType } from "@Obsidian/Enums/Controls/badgeType";
 
     const highlightLabelTypes = ["default", "primary", "success", "info", "warning", "danger", "type", "campus", "custom"] as const;
     type HighlightLabelType = (typeof highlightLabelTypes)[number];
@@ -118,6 +119,12 @@
         badgeText: {
             type: String as PropType<string | null | undefined>,
             required: false
+        },
+
+        badgeType: {
+            type: String as PropType<BadgeType>,
+            required: false,
+            default: "success" as const
         },
 
         iconCssClass: {
