@@ -23,10 +23,10 @@
 
 /** Determines how variables defined within Lava shortcodes are scoped. */
 export const ShortcodeScopeBehavior = {
-    /** Runs in a new scope (no variable bleed). */
+    /** Variables defined in the shortcode are not accessible in the surrounding Lava after the shortcode runs. */
     Isolated: 0,
 
-    /** Runs in the parent scope (variables persist after). */
+    /** Variables defined in the shortcode are accessible in the surrounding Lava after the shortcode runs. */
     Shared: 1
 } as const;
 
