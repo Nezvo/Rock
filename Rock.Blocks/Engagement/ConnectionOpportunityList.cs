@@ -47,7 +47,8 @@ namespace Rock.Blocks.Engagement
 
     [Rock.Cms.DefaultBlockRole( Rock.Enums.Cms.BlockRole.Secondary )]
     [Rock.SystemGuid.EntityTypeGuid( "02713f10-e574-45e0-9178-a02f7957b3a4" )]
-    [Rock.SystemGuid.BlockTypeGuid( "8eb82e1e-c0bd-4591-9d7a-f120a871fec3" )]
+    // was [Rock.SystemGuid.BlockTypeGuid( "8eb82e1e-c0bd-4591-9d7a-f120a871fec3" )]
+    [Rock.SystemGuid.BlockTypeGuid( "481AE184-4654-48FB-A2B4-90F6604B59B8" )]
     [CustomizedGrid]
     public class ConnectionOpportunityList : RockEntityListBlockType<ConnectionOpportunity>
     {
