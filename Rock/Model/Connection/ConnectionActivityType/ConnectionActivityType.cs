@@ -68,6 +68,18 @@ namespace Rock.Model
         [DataMember]
         public bool IsActive { get; set; } = true;
 
+        /// <summary>
+        /// Determines whether a Person Note summarizing this activity should be created when the activity is added to a Connection Request.
+        /// </summary>
+        [DataMember]
+        public PersonNoteCreationBehavior? PersonNoteCreationBehavior { get; set; }
+
+        /// <summary>
+        /// The note type to use when creating person notes for this request.
+        /// </summary>
+        [DataMember]
+        public int? PersonNoteTypeId { get; set; }
+
         #endregion
 
         #region Navigation Properties
