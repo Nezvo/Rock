@@ -6578,6 +6578,11 @@ namespace Rock.Rest.v2
                     } )
                     .ToList();
 
+                if ( options.ExcludeAllByDefault && !includedGroupTypeIds.Any() )
+                {
+                    return Ok( new List<TreeItemBag>() );
+                }
+
                 var groupNameList = GroupPickerGetChildrenInternal(
                     options.Guid,
                     options.RootGroupGuid,
