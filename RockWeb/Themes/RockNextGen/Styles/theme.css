@@ -7551,8 +7551,6 @@ table tbody tr td .required-indicator::after {
 }
 .chosen-container-active .chosen-choices {
   border: 1px solid var(--color-primary);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
   box-shadow: var(--input-focus-box-shadow);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -17410,7 +17408,7 @@ iframe.file-browser {
   padding: var(--spacing-small) var(--spacing-large) 0;
 }
 .profile-notes .notes .note-editor-attributes .settings {
-  padding: var(--spacing-tiny) var(--spacing-small) var(--spacing-xsmall);
+  padding: var(--spacing-xsmall);
 }
 .profile-notes .notes .noteentry-control textarea {
   height: auto;
@@ -20180,7 +20178,7 @@ iframe.file-browser {
 .note-editor .meta-body {
   background: var(--color-interface-softest);
   border: 1px solid var(--color-interface-soft);
-  border-radius: var(--color-interface-soft) -radius;
+  border-radius: var(--rounded-xsmall);
 }
 .note-editor .settings {
   padding: 3px 12px 6px;
@@ -34182,7 +34180,7 @@ body.navbar-side-open {
   left: 0;
   width: 100%;
   display: none;
-  padding: 0 10px 0 var(--spacing-small);
+  padding: 0 var(--spacing-small) var(--spacing-xlarge) var(--spacing-small);
   overflow-x: hidden;
   overflow-y: auto;
   text-align: left;
