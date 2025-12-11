@@ -105,6 +105,13 @@
         const element = document.getElementById(sectionId);
         if (element) {
             const offset = getFixedHeaderOffsetPx();
+
+            // If the section is already fully visible (accounting for the fixed
+            // header offset), don't scroll.
+            if (isSectionFullyVisible(element, offset)) {
+                return;
+            }
+
             const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - offset;
 
@@ -150,6 +157,33 @@
         headerOffsetPx = offset + extraPaddingPx;
 
         return headerOffsetPx;
+    }
+
+    /**
+     * Determines if a section element is fully visible within the viewport.
+     * @param element The section element to check.
+     * @param fixedHeaderOffset The offset in pixels for any fixed headers.
+     * @returns True if the section is fully visible; otherwise, false.
+     */
+    function isSectionFullyVisible(element: HTMLElement, fixedHeaderOffset: number): boolean {
+        const rect = element.getBoundingClientRect();
+        const visibleTop = fixedHeaderOffset;
+        const visibleBottom = window.innerHeight;
+
+        // Tiny tolerance in case of sub-pixel layout.
+        const epsilon = 1;
+
+        // Completely above visible area.
+        if (rect.bottom <= visibleTop + epsilon) {
+            return false;
+        }
+
+        // Completely below visible area.
+        if (rect.top >= visibleBottom - epsilon) {
+            return false;
+        }
+
+        return rect.top >= visibleTop - epsilon && rect.bottom <= visibleBottom + epsilon;
     }
 
     // #endregion Functions
