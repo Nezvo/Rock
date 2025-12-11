@@ -4,7 +4,7 @@
         <!-- Mobile Device: Show icons only if ALL values are not null -->
         <template v-if="isMobileDevice && allValuesPresent">
             <span :title="notificationsTooltip" ref="notificationsElement">
-                <i class="ti ti-bell icon-info" :class="{ 'is-dim': notificationsEnabled === false }"></i>
+                <i class="ti ti-bell text-info-strong" :class="{ 'is-dim': notificationsEnabled === false }"></i>
             </span>
 
             <span :title="locationPermissionsTooltip" ref="locationPermissionElement">
@@ -12,25 +12,25 @@
             </span>
 
             <span :title="preciseLocationTooltip" ref="preciseLocationElement">
-                <i class="ti ti-current-location icon-info"
+                <i class="ti ti-current-location text-info-strong"
                    :class="{ 'is-dim': isPreciseLocationEnabled === false }"></i>
             </span>
 
             <span :title="beaconMonitoringTooltip" ref="beaconElement">
-                <i class="ti ti-bluetooth-connected icon-info"
+                <i class="ti ti-bluetooth-connected text-info-strong"
                    :class="{ 'is-dim': isBeaconMonitoringEnabled === false }"></i>
             </span>
 
             <!-- MAC Address for Mobile Devices: only active if NO other mobile features are enabled -->
             <span v-if="macAddress" :title="macAddressEnabled ? macAddressTooltip : undefined" ref="macElement">
-                <i class="ti ti-access-point icon-info" :class="{ 'is-dim': !macAddressEnabled }"></i>
+                <i class="ti ti-access-point text-info-strong" :class="{ 'is-dim': !macAddressEnabled }"></i>
             </span>
         </template>
 
         <!-- Desktop/TV: Only show MAC Address if present -->
         <template v-else-if="macAddress">
             <span :title="macAddressTooltip" ref="macElement">
-                <i class="ti ti-access-point icon-info"></i>
+                <i class="ti ti-access-point text-info-strong"></i>
             </span>
         </template>
     </div>
@@ -41,23 +41,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-large);
-}
-
-.icon-list i {
-    font-size: var(--font-size-h4);
-}
-
-.icon-info {
-    color: var(--color-info-strong);
-}
-
-.icon-primary {
-    color: var(--color-critical-strong);
-}
-
-.icon-danger {
-    color: var(--color-danger-strong);
+    gap: var(--spacing-medium);
+    flex-wrap: wrap;
 }
 
 .is-dim {
@@ -133,15 +118,15 @@
         }
 
         if (props.locationPermissionStatus === LocationPermissionStatus.Always) {
-            return "icon-info";
+            return "text-info-strong";
         }
 
         if (props.locationPermissionStatus === LocationPermissionStatus.WhenInUse) {
-            return "icon-primary";
+            return "text-critical-strong";
         }
 
         // NotGranted or Denied
-        return "icon-danger";
+        return "text-danger-strong";
     });
 
     const notificationsElement = ref<HTMLElement | null>(null);

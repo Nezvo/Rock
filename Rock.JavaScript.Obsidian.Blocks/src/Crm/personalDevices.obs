@@ -6,14 +6,14 @@
         </NotificationBox>
 
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-sm-3">
                 <DropDownList label="Filter By"
                               v-model="deviceTypeFilter"
                               :items="deviceTypeOptions"
                               :showBlankItem="false"
                               :multiple="false" />
             </div>
-            <div class="col-md-2">
+            <div class="col-sm-3">
                 <DropDownList label="Sort By"
                               v-model="sortBy"
                               :items="sortByOptions"

@@ -13,19 +13,19 @@
         <template #rightMiddleSection>
             <div class="right-middle-container">
                 <div v-if="discoveredInfo.hasValue" class="dateInfo" ref="discoveredElement" :title="discoveredTooltip">
-                    <i class="ti ti-calendar-plus"></i>
-                    <span>Discovered: {{ discoveredInfo.date }}</span>
+                    <i class="ti ti-calendar-plus font-size-sm"></i>
+                    <small>Discovered: {{ discoveredInfo.date }}</small>
                 </div>
                 <div v-if="showDeviceLastSeenDateTime && lastSeenInfo.hasValue" class="dateInfo" ref="lastSeenElement"
                      :title="lastSeenTooltip">
-                    <i class="ti ti-eye"></i>
-                    <span>Last Seen: {{ lastSeenInfo.date }}</span>
+                    <i class="ti ti-eye font-size-sm"></i>
+                    <small>Last Seen: {{ lastSeenInfo.date }}</small>
                 </div>
             </div>
         </template>
 
         <template #actions>
-            <RockButton @click="onClickViewInteractions">
+            <RockButton btnSize="sm" @click="onClickViewInteractions">
                 <span class="btn-interactions">
                     <i class="ti ti-activity"></i>
                     <span>View Interactions</span>
@@ -44,9 +44,8 @@
 <style scoped>
 .right-middle-container {
     display: flex;
-    gap: var(--spacing-xlarge);
-    justify-content: center;
-    align-items: center;
+    justify-content: start;
+    flex-direction: column;
 }
 
 .dateInfo {
@@ -56,22 +55,10 @@
     color: var(--color-interface-medium);
 }
 
-.dateInfo i {
-    font-size: var(--font-size-h4);
-}
-
 .btn-interactions {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xsmall);
-}
-
-.btn-interactions .ti-activity {
-    margin-top: 3px;
-}
-
-.btn-interactions .ti-chevron-right {
-    margin-top: 4px;
 }
 
 :deep(.displaycard-aside + .displaycard-actions) {
@@ -86,6 +73,10 @@
     .right-middle-container {
         flex-direction: column;
         gap: var(--spacing-tiny);
+    }
+
+    :deep(.displaycard-content:has(.icon-list:empty)) {
+        display: none;
     }
 }
 </style>
