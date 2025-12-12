@@ -64,6 +64,11 @@ namespace Rock.Blocks.Engagement
             public const string DetailPage = "DetailPage";
         }
 
+        private static class PageParameterKey
+        {
+            public const string ConnectionTypeId = "ConnectionTypeId";
+        }
+
         #endregion Keys
 
         #region Methods
@@ -121,7 +126,9 @@ namespace Rock.Blocks.Engagement
         /// <inheritdoc/>
         protected override IQueryable<ConnectionOpportunity> GetListQueryable( RockContext rockContext )
         {
-            return base.GetListQueryable( rockContext );
+            var connectionType = ConnectionTypeCache.Get( PageParameter( PageParameterKey.ConnectionTypeId ), !PageCache.Layout.Site.DisablePredictableIds );
+
+            return base.GetListQueryable( rockContext ).Where( c => c.ConnectionTypeId == connectionType.Id );
         }
 
         /// <inheritdoc/>
