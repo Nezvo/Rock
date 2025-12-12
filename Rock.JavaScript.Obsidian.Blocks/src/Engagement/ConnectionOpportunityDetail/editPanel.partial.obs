@@ -123,42 +123,6 @@
     </ContentSectionContainer>
 </template>
 
-<style scoped>
-
-/* Overrides for AttributeValuesContainer within Opportunity Attributes section to match new checkbox and radio patterns. */
-
-:deep(.opportunity-attributes-style .rock-radio-button-list > .control-wrapper .radio-inline) {
-    display: block;
-    margin: 0;
-}
-
-:deep(.opportunity-attributes-style .rock-radio-button-list > .control-wrapper .rockradiobuttonlist.in-columns-2) {
-    column-count: 1;
-    -webkit-column-count: 1;
-    -moz-column-count: 1;
-}
-
-:deep(.opportunity-attributes-style .check-box-list > .control-wrapper > .rockcheckboxlist) {
-    display: grid;
-    grid-auto-flow: column;
-    grid-template-rows: repeat(3, auto);
-    column-count: unset;
-    -webkit-column-count: unset;
-    -moz-column-count: unset;
-    column-width: auto;
-    -webkit-column-width: auto;
-    -moz-column-width: auto;
-    column-gap: 0;
-}
-
-:deep(.opportunity-attributes-style .check-box-list > .control-wrapper > .rockcheckboxlist > .checkbox),
-:deep(.opportunity-attributes-style .check-box-list > .control-wrapper > .rockcheckboxlist > .checkbox-inline) {
-    margin: 0;
-    break-inside: avoid;
-}
-
-</style>
-
 <script setup lang="ts">
     import { computed, PropType, ref, watch } from "vue";
     import AttributeValuesContainer from "@Obsidian/Controls/attributeValuesContainer.obs";
