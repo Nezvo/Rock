@@ -9,15 +9,15 @@
         <ContentSection light>
             <div class="basic-fields">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <TextBox v-model="name" label="Name" rules="required" />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <CheckBox v-model="isActive" label="Active" />
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <TextBox v-model="publicName" label="Public Name" rules="required" />
                     </div>
                     <div class="col-md-4">
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <ImageUploader v-model="photo" label="Photo" :uploadAsTemporary="false"
                                        :binaryFileTypeGuid="BinaryFiletype.Default" uploadButtonText="Upload"
                                        :showDeleteButton="true" />
@@ -99,19 +99,19 @@
                           description="Select which options to show on the Connection Request for this opportunity type.">
                 <div class="inline-checkbox-bold">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <InlineCheckBox label="Show Status On Transfer" v-model="showStatusOnTransfer"
                                             help="When enabled, the status field will be shown. Otherwise, the status will not be changeable and will remain the same after the transfer. This allows for workflow logic to change the status and not allow the individual to change it." />
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <InlineCheckBox label="Show Campus On Transfer" v-model="showCampusOnTransfer"
                                             help="When enabled, the transfer modal will display a campus dropdown when transferring a connection request to a different opportunity." />
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <InlineCheckBox label="Show Connect Button" v-model="showConnectButton"
                                             help="When enabled, the Connect button will be shown. Hiding the connect button allows for the connection process to be automated using workflows or for use cases where the concept of 'connection' doesn't make sense." />
                         </div>
@@ -124,13 +124,18 @@
 </template>
 
 <style scoped>
-.basic-fields :deep(.form-group) {
-    margin-bottom: var(--spacing-large);
-}
+
+/* Overrides for AttributeValuesContainer within Opportunity Attributes section to match new checkbox and radio patterns. */
 
 :deep(.opportunity-attributes-style .rock-radio-button-list > .control-wrapper .radio-inline) {
     display: block;
     margin: 0;
+}
+
+:deep(.opportunity-attributes-style .rock-radio-button-list > .control-wrapper .rockradiobuttonlist.in-columns-2) {
+    column-count: 1;
+    -webkit-column-count: 1;
+    -moz-column-count: 1;
 }
 
 :deep(.opportunity-attributes-style .check-box-list > .control-wrapper > .rockcheckboxlist) {
@@ -151,6 +156,7 @@
     margin: 0;
     break-inside: avoid;
 }
+
 </style>
 
 <script setup lang="ts">
