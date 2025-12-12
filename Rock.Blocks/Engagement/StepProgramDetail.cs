@@ -2048,7 +2048,7 @@ namespace Rock.Blocks.Engagement
 
             var dateRange = testRange.SelectedDateRange;
 
-            parameters.Add( "StartingStepTypeIds", startingStepTypeIds.ConvertToEntityIdListParameter( "StartingStepTypeIds" ) );
+            parameters.Add( "StartingStepTypeIds", startingStepTypeIds.ConvertToIdListParameter( "StartingStepTypeIds" ) );
 
             if ( dateRange.Start != null )
             {

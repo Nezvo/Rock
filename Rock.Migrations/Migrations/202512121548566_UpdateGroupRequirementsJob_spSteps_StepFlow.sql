@@ -55,7 +55,7 @@
 </doc>
 */
 
-ALTER PROCEDURE [dbo].[spSteps_StepFlow]
+CREATE PROCEDURE [dbo].[spSteps_StepFlow]
     @StepProgramId INT,
     @MaxLevels INT,
     @DateRangeStartDate DATETIME = NULL, -- null means don't filter by start date
@@ -79,7 +79,7 @@ BEGIN
             SELECT 
                   pa.[PersonId]
                 , s.[StepProgramCompletionId]
-        , s.[CompletedDateTime]
+                , s.[CompletedDateTime]
                 , st.[Id] AS [TargetStepTypeId]
                 , LAG(st.[Id]) OVER (
                       PARTITION BY pa.[PersonId], s.[StepProgramCompletionId] 
