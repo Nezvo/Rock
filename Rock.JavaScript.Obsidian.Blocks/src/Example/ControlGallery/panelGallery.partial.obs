@@ -26,13 +26,13 @@
             </template>
 
             <template v-if="simulateHeaderActions" #headerActions>
-                <span class="action">
+                <button type="button" class="btn btn-panel-action">
                     <i class="ti ti-star"></i>
-                </span>
+                </button>
 
-                <span class="action">
-                    <i class="ti ti-user"></i>
-                </span>
+                <button type="button" class="btn btn-panel-action btn-add">
+                    <i class="ti ti-square-plus"></i>
+                </button>
             </template>
 
             <template v-if="simulateSubheaderLeft" #subheaderLeft>

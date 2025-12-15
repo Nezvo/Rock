@@ -8851,10 +8851,6 @@ ul.activeusers {
   margin-left: var(--spacing-tiny);
 }
 
-.panel .panel-heading .panel-header-actions,
-.panel .panel-header .panel-header-actions {
-  margin-right: var(--spacing-xsmall);
-}
 .panel .panel-heading .panel-title small,
 .panel .panel-header .panel-title small {
   color: var(--color-interface-medium);
@@ -15787,17 +15783,34 @@ textarea:focus,
   position: relative;
   border-left: 0;
 }
-.panel.panel-flex > .panel-heading .panel-header-actions:not(:has(.action)),
-.panel.panel-flex > .panel-header .panel-header-actions:not(:has(.action)) {
+.panel.panel-flex > .panel-heading,
+.panel.panel-flex > .panel-header {
+  /*
+    12/15/2025 - JPH
+
+    Many of the following styles - especially those referencing the newly-added .btn-panel-action class - were copied
+    from the corresponding .btn-grid-action rules, so the panel's header actions will match those of the grid's:
+    https://github.com/SparkDevNetwork/Rock/blob/d3b2eddd6b39df240b1a72cde482943979f81821/RockWeb/Styles/styles-v2/rock-components/_grid-obsidian.scss#L82-L105
+
+    We should eventually merge these rules into a common set of rules if possible so we only have to maintain them in
+    a single place.
+
+    Reason: Panel and Grid header action styles should match.
+  */
+}
+.panel.panel-flex > .panel-heading .panel-header-actions:not(:has(.action, .btn-panel-action)),
+.panel.panel-flex > .panel-header .panel-header-actions:not(:has(.action, .btn-panel-action)) {
   margin-right: var(--spacing-medium);
 }
 .panel.panel-flex > .panel-heading .panel-header-actions,
 .panel.panel-flex > .panel-header .panel-header-actions {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding: 0;
   margin: 0;
+  font-size: var(--font-size-h5);
 }
 .panel.panel-flex > .panel-heading .panel-header-actions > .action,
 .panel.panel-flex > .panel-header .panel-header-actions > .action {
@@ -15814,6 +15827,34 @@ textarea:focus,
 .panel.panel-flex > .panel-header .panel-header-actions > .action.active {
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: var(--rounded-small);
+}
+.panel.panel-flex > .panel-heading .panel-header-actions .btn-panel-action,
+.panel.panel-flex > .panel-header .panel-header-actions .btn-panel-action {
+  height: 56px;
+  width: 56px;
+  margin: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--color-interface-medium);
+  font-size: 115%;
+}
+.panel.panel-flex > .panel-heading .panel-header-actions .btn-panel-action.btn-add,
+.panel.panel-flex > .panel-header .panel-header-actions .btn-panel-action.btn-add {
+  color: var(--color-info-strong);
+}
+.panel.panel-flex > .panel-heading .panel-header-actions .btn-panel-action.btn-add:hover,
+.panel.panel-flex > .panel-header .panel-header-actions .btn-panel-action.btn-add:hover {
+  color: var(--color-info-strong);
+}
+.panel.panel-flex > .panel-heading .panel-header-actions .btn-panel-action.active, .panel.panel-flex > .panel-heading .panel-header-actions .btn-panel-action:hover,
+.panel.panel-flex > .panel-header .panel-header-actions .btn-panel-action.active,
+.panel.panel-flex > .panel-header .panel-header-actions .btn-panel-action:hover {
+  background-color: var(--color-interface-soft);
+  color: var(--color-interface-stronger);
+}
+.panel.panel-flex > .panel-heading .panel-header-actions .quick-filter:has(+ *):not(:has(+ .btn-panel-action)),
+.panel.panel-flex > .panel-header .panel-header-actions .quick-filter:has(+ *):not(:has(+ .btn-panel-action)) {
+  margin-right: var(--spacing-medium);
 }
 @media screen and (max-width: 768px) {
   .panel.panel-flex > .panel-heading .panel-header-actions .panel-action-zoom,
@@ -16180,54 +16221,6 @@ textarea:focus,
   position: fixed;
   display: block;
   margin-top: 0;
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter {
-  display: flex;
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter > .grid-quick-filter-search {
-  width: 0;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  display: inline-flex;
-  align-items: stretch;
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter.active > .grid-quick-filter-search {
-  width: 240px;
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter.active > .grid-quick-filter-search > form {
-  width: 100%;
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter.active > .btn-grid-action {
-  background-color: var(--color-interface-soft);
-  color: var(--color-interface-stronger);
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter > .grid-quick-filter-search > .control-wrapper,
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter > .grid-quick-filter-search > form > .control-wrapper,
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter > .grid-quick-filter-search > form > .control-wrapper > div,
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter > .grid-quick-filter-search > form > .control-wrapper > div > .form-control {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-}
-
-.grid-quick-filter-search > .control-wrapper > div {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  display: flex;
-  align-items: center;
-}
-
-.grid-obsidian > .grid-header > .grid-title-header > .grid-quick-filter > .grid-quick-filter-search > .control-wrapper .form-control {
-  height: 100%;
-  width: 100%;
-  border-radius: 0;
 }
 
 .grid-column-header-row {
@@ -19793,6 +19786,54 @@ iframe.file-browser {
   margin-right: 4px;
   border-radius: 3px;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.quick-filter {
+  height: 100%;
+  display: flex;
+}
+
+.quick-filter > .quick-filter-search {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.quick-filter.quick-filter-active > .quick-filter-search {
+  width: 240px;
+}
+
+.quick-filter.quick-filter-active > .quick-filter-search > form {
+  width: 100%;
+}
+
+.quick-filter .form-control {
+  border: 0;
+}
+
+.quick-filter > .quick-filter-search > .control-wrapper,
+.quick-filter > .quick-filter-search > form > .control-wrapper,
+.quick-filter > .quick-filter-search > form > .control-wrapper > div,
+.quick-filter > .quick-filter-search > form > .control-wrapper > div > .form-control {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.quick-filter > .quick-filter-search > .control-wrapper > div {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.quick-filter > .quick-filter-search > .control-wrapper .form-control {
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
 }
 
 /* ===================== BLOCK =================== */
