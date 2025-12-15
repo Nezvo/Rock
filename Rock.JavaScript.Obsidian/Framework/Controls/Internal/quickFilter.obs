@@ -1,6 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <div :class="quickFilterClasses">
+    <div v-if="isVisible" :class="quickFilterClasses">
         <button type="button"
                 title="Search"
                 :class="quickFilterButtonClasses"
@@ -26,13 +26,15 @@
     import { computed, nextTick, onBeforeUnmount, onMounted, PropType, ref } from "vue";
     import RockForm from "@Obsidian/Controls/rockForm.obs";
     import TextBox from "@Obsidian/Controls/textBox.obs";
-    import { useVModelPassthrough } from "@Obsidian/Utility/component";
 
     const props = defineProps({
-        /** The current text being used for the quick filter feature. */
+        /**
+         * The current text being used for the quick filter search box.
+         * The quick filter will only be shown if this value is not undefined.
+         */
         modelValue: {
-            type: String as PropType<string>,
-            default: ""
+            type: String as PropType<string | undefined>,
+            default: undefined
         },
 
         /** Additional CSS classes to apply to the quick filter container element. */
@@ -54,13 +56,16 @@
 
     // #region Values
 
-    const quickFilterValue = useVModelPassthrough(props, "modelValue", emit);
     const quickFilterContainerElement = ref<HTMLElement>();
     const isSearchExpanded = ref(false);
 
     // #endregion Values
 
     // #region Computed Values
+
+    const isVisible = computed((): boolean => {
+        return typeof props.modelValue !== "undefined";
+    });
 
     const quickFilterClasses = computed((): string[] => {
         const classes = ["quick-filter"];
@@ -88,6 +93,17 @@
         }
 
         return classes;
+    });
+
+    const quickFilterValue = computed<string>({
+        get: () => {
+            return props.modelValue ?? "";
+        },
+        set: (value: string) => {
+            if (value !== props.modelValue) {
+                emit("update:modelValue", value);
+            }
+        }
     });
 
     // #endregion Computed Values
