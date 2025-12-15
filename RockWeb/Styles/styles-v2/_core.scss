@@ -1,6 +1,6 @@
 
 
-// This file compiles into core.css, which is then imported by theme.scss in the TestStyleV2 Themes.
+// This file compiles into core.css, which is then imported by theme.scss in the StyleV2 Themes.
 
 // ====================================================================================================
 //  + Fully Format: This means the file is formatted for ease of reading.
@@ -170,6 +170,7 @@
 @import 'utilities/cursor';                 // Fully Format.
 @import 'utilities/borders';                // Fully Format.
 @import 'utilities/utilities.scss';
+@import 'rock-utilities/helpers-rock';   // Fully Format.
 
 
 /* ======================= ANIMATION ======================*/
