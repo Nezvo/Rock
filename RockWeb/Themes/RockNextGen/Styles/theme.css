@@ -15753,6 +15753,18 @@ textarea:focus,
   min-height: 48px;
   padding: 0;
   line-height: 1em;
+  /*
+    12/15/2025 - JPH
+
+    Many of the following styles - especially those referencing the newly-added .btn-panel-action class - were copied
+    from the corresponding .btn-grid-action rules, so the panel's header actions will match those of the grid's:
+    https://github.com/SparkDevNetwork/Rock/blob/d3b2eddd6b39df240b1a72cde482943979f81821/RockWeb/Styles/styles-v2/rock-components/_grid-obsidian.scss#L82-L105
+
+    We should eventually merge these rules into a common set of rules if possible so we only have to maintain them in
+    a single place.
+
+    Reason: Panel and Grid header action styles should match.
+  */
 }
 .panel.panel-flex > .panel-heading > .panel-title,
 .panel.panel-flex > .panel-header > .panel-title {
@@ -15782,21 +15794,6 @@ textarea:focus,
 .panel.panel-flex > .panel-header > .panel-action .rock-fullscreen-toggle {
   position: relative;
   border-left: 0;
-}
-.panel.panel-flex > .panel-heading,
-.panel.panel-flex > .panel-header {
-  /*
-    12/15/2025 - JPH
-
-    Many of the following styles - especially those referencing the newly-added .btn-panel-action class - were copied
-    from the corresponding .btn-grid-action rules, so the panel's header actions will match those of the grid's:
-    https://github.com/SparkDevNetwork/Rock/blob/d3b2eddd6b39df240b1a72cde482943979f81821/RockWeb/Styles/styles-v2/rock-components/_grid-obsidian.scss#L82-L105
-
-    We should eventually merge these rules into a common set of rules if possible so we only have to maintain them in
-    a single place.
-
-    Reason: Panel and Grid header action styles should match.
-  */
 }
 .panel.panel-flex > .panel-heading .panel-header-actions:not(:has(.action, .btn-panel-action)),
 .panel.panel-flex > .panel-header .panel-header-actions:not(:has(.action, .btn-panel-action)) {
@@ -33280,6 +33277,10 @@ address {
   padding: var(--spacing-tiny) !important;
 }
 
+.p-spacing-xs {
+  padding: var(--spacing-xsmall) !important;
+}
+
 .p-spacing-sm {
   padding: var(--spacing-small) !important;
 }
@@ -33308,6 +33309,11 @@ address {
 .py-spacing-tiny {
   padding-top: var(--spacing-tiny) !important;
   padding-bottom: var(--spacing-tiny) !important;
+}
+
+.py-spacing-xs {
+  padding-top: var(--spacing-xsmall) !important;
+  padding-bottom: var(--spacing-xsmall) !important;
 }
 
 .py-spacing-sm {
@@ -33345,6 +33351,11 @@ address {
   padding-left: var(--spacing-tiny) !important;
 }
 
+.px-spacing-xs {
+  padding-right: var(--spacing-xsmall) !important;
+  padding-left: var(--spacing-xsmall) !important;
+}
+
 .px-spacing-sm {
   padding-right: var(--spacing-small) !important;
   padding-left: var(--spacing-small) !important;
@@ -33378,6 +33389,10 @@ address {
   padding-top: var(--spacing-tiny) !important;
 }
 
+.pt-spacing-xs {
+  padding-top: var(--spacing-xsmall) !important;
+}
+
 .pt-spacing-sm {
   padding-top: var(--spacing-small) !important;
 }
@@ -33404,6 +33419,10 @@ address {
 
 .pb-spacing-tiny {
   padding-bottom: var(--spacing-tiny) !important;
+}
+
+.pb-spacing-xs {
+  padding-bottom: var(--spacing-xsmall) !important;
 }
 
 .pb-spacing-sm {
@@ -33434,6 +33453,10 @@ address {
   padding-right: var(--spacing-tiny) !important;
 }
 
+.pr-spacing-xs {
+  padding-right: var(--spacing-xsmall) !important;
+}
+
 .pr-spacing-sm {
   padding-right: var(--spacing-small) !important;
 }
@@ -33460,6 +33483,10 @@ address {
 
 .pl-spacing-tiny {
   padding-left: var(--spacing-tiny) !important;
+}
+
+.pl-spacing-xs {
+  padding-left: var(--spacing-xsmall) !important;
 }
 
 .pl-spacing-sm {
@@ -33490,6 +33517,10 @@ address {
   margin: var(--spacing-tiny) !important;
 }
 
+.m-spacing-xs {
+  margin: var(--spacing-xsmall) !important;
+}
+
 .m-spacing-sm {
   margin: var(--spacing-small) !important;
 }
@@ -33518,6 +33549,11 @@ address {
 .my-spacing-tiny {
   margin-top: var(--spacing-tiny) !important;
   margin-bottom: var(--spacing-tiny) !important;
+}
+
+.my-spacing-xs {
+  margin-top: var(--spacing-xsmall) !important;
+  margin-bottom: var(--spacing-xsmall) !important;
 }
 
 .my-spacing-sm {
@@ -33555,6 +33591,11 @@ address {
   margin-left: var(--spacing-tiny) !important;
 }
 
+.mx-spacing-xs {
+  margin-right: var(--spacing-xsmall) !important;
+  margin-left: var(--spacing-xsmall) !important;
+}
+
 .mx-spacing-sm {
   margin-right: var(--spacing-small) !important;
   margin-left: var(--spacing-small) !important;
@@ -33588,6 +33629,10 @@ address {
   margin-top: var(--spacing-tiny) !important;
 }
 
+.mt-spacing-xs {
+  margin-top: var(--spacing-xsmall) !important;
+}
+
 .mt-spacing-sm {
   margin-top: var(--spacing-small) !important;
 }
@@ -33614,6 +33659,10 @@ address {
 
 .mb-spacing-tiny {
   margin-bottom: var(--spacing-tiny) !important;
+}
+
+.mb-spacing-xs {
+  margin-bottom: var(--spacing-xsmall) !important;
 }
 
 .mb-spacing-sm {
@@ -33644,6 +33693,10 @@ address {
   margin-right: var(--spacing-tiny) !important;
 }
 
+.mr-spacing-xs {
+  margin-right: var(--spacing-xsmall) !important;
+}
+
 .mr-spacing-sm {
   margin-right: var(--spacing-small) !important;
 }
@@ -33670,6 +33723,10 @@ address {
 
 .ml-spacing-tiny {
   margin-left: var(--spacing-tiny) !important;
+}
+
+.ml-spacing-xs {
+  margin-left: var(--spacing-xsmall) !important;
 }
 
 .ml-spacing-sm {
