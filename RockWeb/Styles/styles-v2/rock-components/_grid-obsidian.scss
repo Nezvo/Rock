@@ -23,7 +23,7 @@
 .grid-header {
     background: var(--color-interface-softest);
     border-radius: var(--rounded-medium) var(--rounded-medium) 0 0;
-    z-index: 1;
+    z-index: 3;
 }
 
 .grid-obsidian.grid-sticky > .grid-header {
@@ -33,7 +33,7 @@
 
 .grid-obsidian .grid-content-container .grid-column-header-container.sticky-column-header {
     position: sticky;
-    z-index: 1;
+    z-index: 3;
     background-color: var(--color-interface-softest);
 }
 
@@ -48,7 +48,7 @@
 .grid-obsidian.grid-sticky .sticky-column-header {
     position: sticky;
     top: calc(var(--sticky-element-offset) + 57px);
-    z-index: 1;
+    z-index: 3;
     background-color: var(--color-interface-softest);
 }
 
