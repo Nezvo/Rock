@@ -41,21 +41,23 @@ import {
     ShorthandModel,
     BorderStyle,
     ButtonComponentAdapter,
-    ComponentAdapter,
     ButtonLocalProps,
     ButtonGlobalProps,
     ShorthandPropertyNames,
+    DividerLocalProps,
+    DividerGlobalProps,
+    DividerComponentAdapter,
+    DividerGlobalAdapter,
+    RsvpLocalProps,
+    RsvpComponentAdapter,
+    ButtonGlobalAdapter,
 } from "./types.partial";
-import { isElement, isHTMLElement, isHTMLTableElement } from "@Obsidian/Utility/dom";
+import { isElement, isHTMLElement, isHTMLTableElement, replaceTagName } from "@Obsidian/Utility/dom";
 import { newGuid } from "@Obsidian/Utility/guid";
 import { Enumerable } from "@Obsidian/Utility/linq";
 import { splitCase, toTitleCase } from "@Obsidian/Utility/stringUtils";
 import { isNullish } from "@Obsidian/Utility/util";
 import { toNumberOrNull } from "@Obsidian/Utility/numberUtils";
-import { shorthandInlineStyleProvider, styleSheetProvider } from "./providers.partial";
-import { ChildProcessWithoutNullStreams } from "child_process";
-import { VERSION } from "luxon";
-import { Guid } from "@Obsidian/Types";
 
 // #region Constants
 
@@ -822,8 +824,8 @@ export function createComponentElement(document: Document, componentTypeName: Ed
         }
 
         case "divider": {
-            const { createComponentElement } = getDividerComponentHelper();
-            return createComponentElement();
+            const adapter = createDividerComponentAdapter();
+            return adapter.createComponentElement(document);
         }
 
         case "message": {
@@ -2327,245 +2329,6 @@ export function getTextComponentHelper(): ComponentMigrationHelper & {
     return helper;
 }
 
-type ButtonComponentStructure = {
-    /**
-     * The **outermost** structure that defines spacing and alignment.
-     * Ensures correct positioning within the email layout.
-     * - Controls **simulated margin** via padding.
-     * - Controls **horizontal alignment** (left, center, right).
-     */
-    marginWrapper: TableElements & {
-        /**
-         * Defines the **component's visual boundaries**.
-         * Handles styling and overall structure.
-         * - Controls **borders** and **border-radius**.
-         * - Defines **the width** of the component.
-         */
-        borderWrapper: TableElements;
-    };
-
-    readonly linkButton: HTMLAnchorElement | null;
-};
-
-export function getButtonComponentHelper(): ComponentMigrationHelper & {
-    getElements(componentElement: Element): ButtonComponentStructure | null;
-    createComponentElement(): HTMLElement;
-} {
-    // Don't forget to add a migration below if the version changes.
-    const latestVersion = "v17.3-alpha" as const;
-
-    return {
-        createComponentElement(): HTMLElement {
-            const componentElements = createComponent(
-                "button",
-                latestVersion,
-                `<a class="button-link ${RockCssClassContentEditable}" href="https://" rel="noopener noreferrer" title="Click Me" style="text-align: center; display: block;">Click Me</a>`
-            );
-
-            // For button components, we need to strip out the padding wrapper since padding is applied directly to the link.
-            // Move the content of the padding wrapper td into the border wrapper td.
-            const paddingWrapperTd = componentElements.marginWrapper.borderWrapper.paddingWrapper.td;
-            const borderWrapperTd = componentElements.marginWrapper.borderWrapper.td;
-            while (paddingWrapperTd.firstChild) {
-                borderWrapperTd.appendChild(paddingWrapperTd.firstChild);
-            }
-            // Remove the padding wrapper table.
-            componentElements.marginWrapper.borderWrapper.paddingWrapper.table.remove();
-
-            componentElements.marginWrapper.table.classList.add("button-outerwrap");
-            componentElements.marginWrapper.table.style.minWidth = "100%";
-            componentElements.marginWrapper.td.classList.add("button-innerwrap");
-            componentElements.marginWrapper.td.setAttribute("align", "center");
-            componentElements.marginWrapper.td.setAttribute("valign", "top");
-            componentElements.marginWrapper.borderWrapper.table.removeAttribute("width");
-            componentElements.marginWrapper.borderWrapper.table.classList.add("button-shell");
-            componentElements.marginWrapper.borderWrapper.td.classList.add("button-content");
-            componentElements.marginWrapper.borderWrapper.td.setAttribute("align", "center");
-            componentElements.marginWrapper.borderWrapper.td.setAttribute("valign", "middle");
-
-            return componentElements.marginWrapper.table;
-        },
-
-        getElements(componentElement: Element): ButtonComponentStructure | null {
-            if (!componentElement.classList.contains("component-button")) {
-                throw new Error(`Element is not a button component element: ${componentElement.outerHTML}`);
-            }
-
-            const wrappers = findComponentInnerWrappersPartial(componentElement);
-
-            if (!wrappers?.marginWrapper?.borderWrapper) {
-                return null;
-            }
-
-            const typedWrappers = wrappers as {
-                marginWrapper: TableElements & {
-                    borderWrapper: TableElements;
-                };
-            };
-
-            return {
-                ...typedWrappers,
-
-                get linkButton(): HTMLAnchorElement | null {
-                    const searchFrom = typedWrappers.marginWrapper.borderWrapper.td;
-
-                    return (searchFrom.querySelector("a.button-link") ?? null) as HTMLAnchorElement | null;
-                }
-            };
-        },
-
-        isMigrationRequired(componentElement: Element): boolean {
-            if (!componentElement.classList.contains("component-button")) {
-                throw new Error(`Element is not a button component element: ${componentElement.outerHTML}`);
-            }
-
-            const versionNumber = getComponentVersionNumber(componentElement);
-            return !versionNumber || compareComponentVersions(versionNumber, latestVersion) < 0;
-        },
-
-        migrate(oldComponentElement: Element): Element {
-            if (!oldComponentElement.classList.contains("component-button")) {
-                throw new Error(`Element is not a button component element: ${oldComponentElement.outerHTML}`);
-            }
-
-            if (!this.isMigrationRequired(oldComponentElement)) {
-                return oldComponentElement;
-            }
-
-            const migrations = [
-                function v0ToV2o1oAlpha(componentElement: Element): Element {
-                    if (getComponentVersionNumber(componentElement)) {
-                        return componentElement; // Already migrated
-                    }
-
-                    const outerWrapper = document.createElement("table");
-                    outerWrapper.setAttribute("border", "0");
-                    outerWrapper.setAttribute("cellpadding", "0");
-                    outerWrapper.setAttribute("cellspacing", "0");
-                    outerWrapper.setAttribute("width", "100%");
-                    outerWrapper.setAttribute("role", "presentation");
-                    outerWrapper.className = "margin-wrapper margin-wrapper-for-button component component-button button-outerwrap";
-                    outerWrapper.setAttribute("data-state", "component");
-                    outerWrapper.setAttribute("data-version", "v2.1-alpha");
-                    outerWrapper.style.minWidth = "100%";
-                    outerWrapper.setAttribute("data-component-background-color", "true");
-                    outerWrapper.setAttribute("data-component-button-width", "true");
-
-                    const buttonShell = componentElement.querySelector(".button-shell") as HTMLElement;
-                    const buttonContent = componentElement.querySelector(".button-content") as HTMLElement;
-                    const buttonLink = componentElement.querySelector("a.button-link") as HTMLElement;
-
-                    const text = buttonLink.textContent?.trim() ?? "";
-                    const href = (buttonLink as HTMLAnchorElement).href || "#";
-                    const title = buttonLink.getAttribute("title") || "";
-
-                    const backgroundColor = buttonLink.style.backgroundColor || "";
-                    const color = buttonLink.style.color || "";
-
-                    const fontFamily = buttonLink.style.fontFamily || "";
-                    const fontSize = buttonLink.style.fontSize || "";
-                    const fontWeight = buttonLink.style.fontWeight || "";
-                    const padding = buttonLink.style.padding || "";
-                    const borderRadius = buttonContent?.style.borderRadius || "";
-                    const align = componentElement.querySelector(".button-innerwrap")?.getAttribute("align") || "left";
-
-                    const widthAttr = buttonShell?.getAttribute("width") || "";
-                    const widthStyle = buttonShell?.style.width || buttonLink.style.width || "";
-                    const isFullWidth = widthAttr === "100%" || widthStyle === "100%";
-                    const isFixedWidth = !!widthStyle && /\d+px/.test(widthStyle);
-                    const fixedWidthValue = isFixedWidth ? widthStyle : "";
-
-                    // Build inner structure
-                    outerWrapper.innerHTML = `
-                        <tbody><tr><td class="button-innerwrap" align="${align}" valign="top">
-                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" class="border-wrapper border-wrapper-for-button button-shell" style="border-collapse: separate !important;">
-                                <tbody><tr><td class="button-content" align="center" valign="middle" style="overflow: hidden;">
-                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" class="padding-wrapper padding-wrapper-for-button" ${backgroundColor ? `bgcolor="${backgroundColor}"` : ""}>
-                                        <tbody><tr><td ${backgroundColor ? `style="background-color: ${backgroundColor};"` : ""}>
-                                            <a class="button-link rock-content-editable" href="${href}" rel="noopener noreferrer" title="${title}" style="display: block; text-align: center;">${text}</a>
-                                        </td></tr></tbody>
-                                    </table>
-                                </td></tr></tbody>
-                            </table>
-                        </td></tr></tbody>
-                    `;
-
-                    // Apply width logic
-                    const shell = outerWrapper.querySelector(".button-shell") as HTMLElement;
-                    const link = outerWrapper.querySelector(".button-link") as HTMLElement;
-                    const content = outerWrapper.querySelector(".button-content") as HTMLElement;
-
-                    if (isFullWidth) {
-                        shell.setAttribute("width", "100%");
-                        shell.style.width = "100%";
-                        shell.style.maxWidth = "100%";
-                    }
-                    else if (isFixedWidth) {
-                        shell.setAttribute("width", fixedWidthValue);
-                        shell.style.width = fixedWidthValue;
-                        link.style.width = fixedWidthValue;
-                    }
-                    else {
-                        shell.style.maxWidth = "100%";
-                    }
-
-                    // Apply style properties
-                    if (borderRadius) {
-                        content.style.borderRadius = borderRadius;
-                    }
-
-                    if (color) {
-                        link.style.color = color;
-                    }
-
-                    if (fontFamily) {
-                        link.style.fontFamily = fontFamily;
-                    }
-
-                    if (fontSize) {
-                        link.style.fontSize = fontSize;
-                    }
-
-                    if (fontWeight) {
-                        link.style.fontWeight = fontWeight;
-                    }
-
-                    if (padding) {
-                        link.style.padding = padding;
-                    }
-
-                    return outerWrapper;
-                },
-
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                function v2AlphaToV17_3Alpha(componentElement: Element): Element {
-                    const versionNumber = getComponentVersionNumber(componentElement);
-                    if (!versionNumber) {
-                        // This shouldn't occur unless the v0 migration was skipped or modified incorrectly.
-                        throw new Error("Component version number is missing.");
-                    }
-
-                    if (compareComponentVersions(versionNumber, "v17.3-alpha") >= 0) {
-                        return componentElement; // Already migrated
-                    }
-
-                    // Bump version.
-                    setComponentVersionNumber(componentElement, "v17.3-alpha");
-
-                    return componentElement;
-                }
-            ];
-
-            // Run migrations.
-            return migrations.reduce((component, migrate) => migrate(component), oldComponentElement as Element);
-        },
-
-        get latestVersion(): string {
-            return latestVersion;
-        }
-    };
-}
-
 export function getCodeComponentHelper(): ComponentMigrationHelper & {
     getElements(componentElement: Element): ComponentStructure & { readonly contentWrapper: HTMLElement | null; } | null
     createComponentElement(): HTMLElement;
@@ -2693,179 +2456,854 @@ export function getCodeComponentHelper(): ComponentMigrationHelper & {
     };
 }
 
-export function getDividerComponentHelper(): ComponentMigrationHelper & {
-    getElements(componentElement: Element): ComponentStructure | null;
-    createComponentElement(): HTMLElement;
-} {
-    const latestVersion = "v17.3-alpha" as const;
+export function createDividerGlobalAdapter(): DividerGlobalAdapter {
+    const globalVersions = ["v0", "v17.3-alpha", "v18.2"] as const;
+    type DividerGlobalVersion = (typeof globalVersions)[number];
 
-    return {
-        createComponentElement(): HTMLElement {
-            const componentElements = createComponent(
-                "divider",
-                latestVersion
-            );
-            return componentElements.marginWrapper.table;
+    const metaKeys = {
+        GLOBAL_DIVIDER_VERSION: "x-rock-global-divider-version"
+    } as const;
+
+    const dividerDatasetKeys = {
+        COMPONENT_HORIZONTAL_ALIGNMENT: "data-component-horizontal-alignment",
+        COMPONENT_WIDTH: "data-component-width"
+    } as const;
+
+    function getGlobalVersion(emailDocument: Document): DividerGlobalVersion {
+        // v18.2 and later use the meta tag to track global button schema version.
+        const globalPropsVersion: DividerGlobalVersion | undefined = (emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_DIVIDER_VERSION}"]`)?.getAttribute("content") || undefined) as (DividerGlobalVersion | undefined);
+
+        if (globalPropsVersion && globalVersions.includes(globalPropsVersion)) {
+            return globalPropsVersion;
+        }
+
+        // Try to infer from structure.
+        const hasAnyGlobalStylesFromV2_1_alpha =
+            findRockStyleRules(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td").any()
+            || findRockStyleRules(emailDocument, ".margin-wrapper-for-divider>tbody>tr>td").any();
+
+        if (hasAnyGlobalStylesFromV2_1_alpha) {
+            // v17.3-alpha and later used rock-styles for global divider styles.
+            return "v17.3-alpha";
+        }
+
+        // No version info, assume v0 (legacy).
+        return "v0";
+    }
+
+    // Define the adapters for each version and we'll only return the latest.
+    // These are used for migrations.
+    const adapters: Record<DividerGlobalVersion, DividerGlobalAdapter> = {
+        "v0": {
+            version: "v0",
+
+            areGlobalDefaultsNeeded(): boolean {
+                // No global defaults for v0.
+                return false;
+            },
+
+            getDefaultGlobalProps(): DividerGlobalProps {
+                // No global defaults for v0.
+                return {
+                    style: null,
+                    thicknessPx: null,
+                    color: null,
+                    widthPercent: null,
+                    horizontalAlignment: null,
+                    marginPx: null,
+                };
+            },
+
+            readGlobalProps(_emailDocument: Document): DividerGlobalProps {
+                // No global props for v0.
+                return {
+                    style: null,
+                    thicknessPx: null,
+                    color: null,
+                    widthPercent: null,
+                    horizontalAlignment: null,
+                    marginPx: null
+                };
+            },
+
+            writeGlobalProps(_emailDocument: Document, _globalProps: DividerGlobalProps): void {
+                // No global props for v0.
+            },
+
+            migrateGlobalProps(_emailDocument: Document): DividerGlobalProps {
+                // No global props for v0.
+                return {
+                    style: null,
+                    thicknessPx: null,
+                    color: null,
+                    widthPercent: null,
+                    horizontalAlignment: null,
+                    marginPx: null
+                };
+            }
         },
 
-        getElements(componentElement: Element): ComponentStructure | null {
-            if (!componentElement.classList.contains("component-divider")) {
-                throw new Error(`Element is not a divider component element: ${componentElement.outerHTML}`);
-            }
+        "v17.3-alpha": {
+            version: "v17.3-alpha",
 
-            return findComponentInnerWrappers(componentElement);
-        },
+            areGlobalDefaultsNeeded(emailDocument: Document): boolean {
+                // Only true if the default global styles are missing.
+                const isGlobalDividerStyleMissing = !findRockStyleRules(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td").any();
+                const isGlobalDividerPaddingStyleMissing = !findRockStyleRules(emailDocument, ".margin-wrapper-for-divider>tbody>tr>td").any();
+                return isGlobalDividerStyleMissing && isGlobalDividerPaddingStyleMissing;
+            },
 
-        isMigrationRequired(componentElement: Element): boolean {
-            if (!componentElement.classList.contains("component-divider")) {
-                throw new Error(`Element is not a divider component element: ${componentElement.outerHTML}`);
-            }
-
-            const versionNumber = getComponentVersionNumber(componentElement);
-            return !versionNumber || compareComponentVersions(versionNumber, latestVersion) < 0;
-        },
-
-        migrate(oldComponentElement: Element): Element {
-            if (!oldComponentElement.classList.contains("component-divider")) {
-                throw new Error(`Element is not a divider component element: ${oldComponentElement.outerHTML}`);
-            }
-
-            if (!this.isMigrationRequired(oldComponentElement)) {
-                // The component is already at the latest version.
-                return oldComponentElement;
-            }
-
-            const migrations = [
-                function v0ToV2Alpha(componentElement: Element): Element {
-                    if (getComponentVersionNumber(componentElement)) {
-                        // Already migrated since v0 didn't have a version number.
-                        return componentElement;
+            getDefaultGlobalProps(): DividerGlobalProps {
+                return {
+                    style: "solid",
+                    thicknessPx: 1,
+                    color: "#8b8ba7",
+                    widthPercent: 100,
+                    horizontalAlignment: "center",
+                    marginPx: {
+                        top: 12,
+                        bottom: 12,
+                        left: 0,
+                        right: 0
                     }
+                };
+            },
 
-                    // Create the new root table element
-                    const newRoot = document.createElement("table");
-                    newRoot.setAttribute("border", "0");
-                    newRoot.setAttribute("cellpadding", "0");
-                    newRoot.setAttribute("cellspacing", "0");
-                    newRoot.setAttribute("width", "100%");
-                    newRoot.setAttribute("role", "presentation");
-                    newRoot.classList.add("margin-wrapper", "component", "component-divider");
-                    newRoot.setAttribute("data-state", "component");
-                    setComponentVersionNumber(newRoot, "v2-alpha"); // Ensure version tracking
+            readGlobalProps(emailDocument: Document): DividerGlobalProps {
+                const paddingWrapperTdStyles = findRockStyleRules(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td")
+                    .select(r => r.style)
+                    .toArray();
+                const marginWrapperTdStyles = findRockStyleRules(emailDocument, ".margin-wrapper-for-divider>tbody>tr>td")
+                    .select(r => r.style)
+                    .toArray();
+                const firstDividerWithoutHorizontalAlignment = emailDocument.querySelector(`.component-divider:not([data-component-horizontal-alignment="true"]) > tbody > tr > td`);
+                const firstDividerWithoutWidth = emailDocument.querySelector(`.component-divider:not([data-component-width="true"]) .border-wrapper-for-divider`);
 
-                    // Extract the existing divider element (`<hr>` or `<div>`)
-                    const oldDivider = componentElement.querySelector("hr, div") as HTMLElement;
-                    if (!oldDivider) {
-                        throw new Error("No divider found in Divider component.");
-                    }
+                return {
+                    style: toBorderStyleOrNull(getStylePropertyValueOrNull(paddingWrapperTdStyles, "border-top-style")),
+                    thicknessPx: toPixelNumericValueOrNull(getStylePropertyValueOrNull(paddingWrapperTdStyles, "border-top-width")),
+                    color: getStylePropertyValueOrNull(paddingWrapperTdStyles, "border-top-color"),
+                    marginPx: getStylePaddingPx(marginWrapperTdStyles),
+                    horizontalAlignment: toHorizontalAlignmentOrNull(firstDividerWithoutHorizontalAlignment?.getAttribute("align")),
+                    widthPercent: toPercentageNumericValueOrNull(firstDividerWithoutWidth?.getAttribute("width"))
+                };
+            },
 
-                    // Determine if this was an `<hr>` or `<div>`
-                    const isHr = oldDivider.tagName.toLowerCase() === "hr";
+            writeGlobalProps(emailDocument: Document, globalProps: DividerGlobalProps): void {
+                const paddingWrapperTdRule = findRockStyleRules(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td");
+                const marginWrapperTdRule = findRockStyleRules(emailDocument, ".margin-wrapper-for-divider>tbody>tr>td").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".margin-wrapper-for-divider>tbody>tr>td");
+                const rules = [
+                    marginWrapperTdRule,
+                    paddingWrapperTdRule
+                ];
+                const dividersWithoutWidth = Enumerable.from(emailDocument.querySelectorAll(`.component-divider:not([data-component-width="true"]) .border-wrapper-for-divider`)).ofType<HTMLElement>(isHTMLElement).toArray();
+                const dividersWithoutHorizontalAlignment = Enumerable.from(emailDocument.querySelectorAll(`.component-divider:not([data-component-horizontal-alignment="true"]) > tbody > tr > td`)).ofType<HTMLElement>(isHTMLElement).toArray();
 
-                    // Extract styles from the old divider
-                    let height = oldDivider.style.height;
-                    if (isHr && !height) {
-                        height = "1px"; // Default to 1px if no height is specified
-                    }
-                    const backgroundColor = oldDivider.style.backgroundColor || "transparent"; // If missing, keep transparent
-                    const marginTop = oldDivider.style.marginTop || "";
-                    const marginBottom = oldDivider.style.marginBottom || "";
+                setStyleBorderStyle(
+                    paddingWrapperTdRule.style,
+                    globalProps.style
+                        ? {
+                            top: globalProps.style,
+                            bottom: "none",
+                            left: "none",
+                            right: "none"
+                        }
+                        : null);
 
-                    // Define border properties based on element type
-                    const borderWidth = `${height} 0px 0px`; // Top border uses height, others are 0px
-                    const borderColor = isHr ? `${backgroundColor} transparent transparent` : "transparent";
-                    const borderStyle = isHr ? "solid none none" : "solid"; // `solid` is optional for div
+                setStyleBorderWidthPx(
+                    paddingWrapperTdRule.style,
+                    !isNullish(globalProps.thicknessPx)
+                        ? {
+                            top: globalProps.thicknessPx,
+                            bottom: 0,
+                            left: 0,
+                            right: 0
+                        }
+                        : null);
 
-                    // Create the new inner structure
-                    newRoot.innerHTML = `
-                        <tbody><tr><td ${marginTop || marginBottom ? `style="${marginTop ? `padding-top: ${marginTop};` : ""} ${marginBottom ? `padding-bottom: ${marginBottom};` : ""}"` : ""}>
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" class="border-wrapper" style="border-collapse: separate !important;">
-                                <tbody><tr><td>
-                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" class="padding-wrapper">
-                                        <tbody><tr><td style="border-width: ${borderWidth};
-                                                             border-color: ${borderColor};
-                                                             ${isHr ? `border-style: ${borderStyle};` : ""}">
-                                        </td></tr></tbody>
-                                    </table>
-                                </td></tr></tbody>
-                            </table>
-                        </td></tr></tbody>
-                    `;
+                setStyleBorderColor(paddingWrapperTdRule.style,
+                    globalProps.color
+                        ? {
+                            top: globalProps.color,
+                            bottom: "transparent",
+                            left: "transparent",
+                            right: "transparent"
+                        }
+                        : null);
 
-                    return newRoot;
-                },
+                // divider width %
+                const dividerWidthPercentage = toPercentageStringValueOrNull(globalProps.widthPercent);
+                dividersWithoutWidth.forEach(divider => {
+                    setAttributePropertyValue(divider, "width", dividerWidthPercentage);
+                    setStylePropertyValue(divider.style, "width", dividerWidthPercentage);
+                });
 
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                function v2AlphaToV17_3Alpha(componentElement: Element): Element {
-                    const versionNumber = getComponentVersionNumber(componentElement);
-                    if (!versionNumber) {
-                        // This shouldn't occur unless the v0 migration was skipped or modified incorrectly.
-                        throw new Error("Component version number is missing.");
-                    }
+                // horizontal alignment
+                dividersWithoutHorizontalAlignment.forEach(dividerTd => {
+                    setAttributePropertyValue(dividerTd, "align", globalProps.horizontalAlignment);
+                });
 
-                    if (compareComponentVersions(versionNumber, "v17.3-alpha") >= 0) {
-                        return componentElement; // Already migrated
-                    }
+                // margin
+                setStylePaddingPx(marginWrapperTdRule.style, globalProps.marginPx);
 
-                    // Bump version.
-                    setComponentVersionNumber(componentElement, "v17.3-alpha");
+                // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
+                synchronizeRulesToDom(rules);
+            },
 
-                    return componentElement;
+            migrateGlobalProps(emailDocument: Document): DividerGlobalProps {
+                const globalVersion = getGlobalVersion(emailDocument);
+                const thisAdapter = adapters["v17.3-alpha"];
+                const adapter = adapters[globalVersion];
+
+                if (thisAdapter === adapter || compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                    // Already on this or a later version; no migration needed.
+                    return adapter.readGlobalProps(emailDocument);
                 }
-            ];
 
-            return migrations.reduce((component, migrate) => migrate(component), oldComponentElement);
+                // Clear the global props using the old adapter (to clean up any old styles),
+                // and restore them using the new adapter.
+                const globalProps = adapter.readGlobalProps(emailDocument);
+                adapter.writeGlobalProps(emailDocument, {
+                    color: null,
+                    horizontalAlignment: null,
+                    marginPx: null,
+                    style: null,
+                    thicknessPx: null,
+                    widthPercent: null
+                });
+                thisAdapter.writeGlobalProps(emailDocument, globalProps);
+                return thisAdapter.readGlobalProps(emailDocument);
+            }
         },
+        "v18.2": {
+            version: "v18.2",
 
-        get latestVersion(): string {
-            return latestVersion;
+            areGlobalDefaultsNeeded(emailDocument: Document): boolean {
+                const metaContent = (emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_DIVIDER_VERSION}"]`) as HTMLMetaElement | null)?.content;
+
+                // Global defaults are needed if there haven't been any added yet as identified by the meta tag introduced in v18.2.
+                return !metaContent;
+            },
+
+            getDefaultGlobalProps(): DividerGlobalProps {
+                return {
+                    style: "solid",
+                    thicknessPx: 1,
+                    color: "#8b8ba7",
+                    widthPercent: 100,
+                    horizontalAlignment: "center",
+                    marginPx: {
+                        top: 12,
+                        bottom: 12,
+                        left: 0,
+                        right: 0
+                    }
+                };
+            },
+
+            migrateGlobalProps(emailDocument: Document): DividerGlobalProps {
+                const adapter = adapters[getGlobalVersion(emailDocument)];
+                const thisAdapter = adapters["v18.2"];
+                const globalProps = adapter.readGlobalProps(emailDocument);
+
+                if (compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                    // Already on this or a newer version; no migration needed.
+                    return globalProps;
+                }
+
+                // Clear the global props using the old adapter (to clean up any old styles),
+                // and restore them using the new adapter.
+                adapter.writeGlobalProps(emailDocument, {
+                    color: null,
+                    horizontalAlignment: null,
+                    marginPx: null,
+                    style: null,
+                    thicknessPx: null,
+                    widthPercent: null
+                });
+                thisAdapter.writeGlobalProps(emailDocument, globalProps);
+                return thisAdapter.readGlobalProps(emailDocument);
+            },
+
+            readGlobalProps(emailDocument: Document): DividerGlobalProps {
+                const marginWrapperTdStyles = findRockStyleRules(emailDocument, ".margin-wrapper-for-divider > tbody > tr > td")
+                    .select(rule => rule.style)
+                    .toArray();
+                const borderWrapperTableStyles = findRockStyleRules(emailDocument, ".border-wrapper-for-divider")
+                    .select(rule => rule.style)
+                    .toArray();
+
+                const horizontalAlignmentMargin = getStyleShorthandValueOrNull(
+                    borderWrapperTableStyles,
+                    {
+                        top: "margin-top",
+                        bottom: "margin-bottom",
+                        left: "margin-left",
+                        right: "margin-right"
+                    },
+                    v => v);
+                const right = horizontalAlignmentMargin?.right;
+                const left = horizontalAlignmentMargin?.left;
+                const horizontalAlignment: HorizontalAlignment | null =
+                    left === "auto" && right === "auto" ? "center"
+                    : left === "auto" ? "right"
+                    : right === "auto" ? "left"
+                    : null;
+
+                return {
+                    style: toBorderStyleOrNull(getStylePropertyValueOrNull(borderWrapperTableStyles, "border-top-style")),
+                    thicknessPx: toPixelNumericValueOrNull(getStylePropertyValueOrNull(borderWrapperTableStyles, "border-top-width")),
+                    color: getStylePropertyValueOrNull(borderWrapperTableStyles, "border-top-color"),
+                    marginPx: getStylePaddingPx(marginWrapperTdStyles),
+                    horizontalAlignment: horizontalAlignment,
+                    widthPercent: toPercentageNumericValueOrNull(getStylePropertyValueOrNull(borderWrapperTableStyles, "width")),
+                };
+            },
+
+            writeGlobalProps(emailDocument: Document, globalProps: DividerGlobalProps): void {
+                // Write the version to the document body.
+                const globalVersionMeta = emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_DIVIDER_VERSION}"]`) as HTMLMetaElement | null;
+                if (globalVersionMeta) {
+                    globalVersionMeta.setAttribute("content", "v18.2");
+                }
+                else {
+                    const meta = emailDocument.createElement("meta");
+                    meta.setAttribute("name", metaKeys.GLOBAL_DIVIDER_VERSION);
+                    meta.setAttribute("content", "v18.2");
+                    emailDocument.head.appendChild(meta);
+                }
+
+                const marginWrapperTdSelector = ".margin-wrapper-for-divider > tbody > tr > td";
+                const marginWrapperTdRule = findRockStyleRules(emailDocument, marginWrapperTdSelector)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, marginWrapperTdSelector);
+                const borderWrapperTableSelector = ".border-wrapper-for-divider";
+                const borderWrapperTableRule = findRockStyleRules(emailDocument, borderWrapperTableSelector)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, borderWrapperTableSelector);
+                const rules = [
+                    marginWrapperTdRule,
+                    borderWrapperTableRule
+                ];
+
+                // style
+                setStyleBorderStyle(
+                    borderWrapperTableRule.style,
+                    globalProps.style
+                        ? {
+                            top: globalProps.style,
+                            // The following must be null instead of "none" so Outlook works.
+                            bottom: null,
+                            left: null,
+                            right: null
+                        }
+                        : null);
+
+                // thicknessPx
+                setStyleBorderWidthPx(
+                    borderWrapperTableRule.style,
+                    !isNullish(globalProps.thicknessPx)
+                        ? {
+                            top: globalProps.thicknessPx,
+                            // The following must be null instead of 0 so Outlook works.
+                            bottom: null,
+                            left: null,
+                            right: null
+                        }
+                        : null);
+
+                // color
+                setStyleBorderColor(
+                    borderWrapperTableRule.style,
+                    globalProps.color
+                        ? {
+                            top: globalProps.color,
+                            // The following must be null instead of "transparent" so Outlook works.
+                            bottom: null,
+                            left: null,
+                            right: null
+                        }
+                        : null);
+
+                // marginPx
+                setStylePaddingPx(marginWrapperTdRule?.style, globalProps.marginPx);
+
+                // horizontalAlignment
+                        // Only set attribute values on components that don't have the data attribute.
+                emailDocument.querySelectorAll(`.component-divider:not([${dividerDatasetKeys.COMPONENT_HORIZONTAL_ALIGNMENT}]) ${marginWrapperTdSelector}`)
+                    .forEach(marginWrapperTd => {
+                        setAttributePropertyValue(marginWrapperTd, "align", globalProps.horizontalAlignment);
+                    });
+                emailDocument.querySelectorAll(`.component-divider:not([${dividerDatasetKeys.COMPONENT_HORIZONTAL_ALIGNMENT}]) ${borderWrapperTableSelector}`)
+                    .forEach(borderWrapperTable => {
+                        setAttributePropertyValue(borderWrapperTable, "align", globalProps.horizontalAlignment);
+                    });
+                // Add margin to achieve horizontal alignment in Outlook.
+                const horizontalAlignmentMargin: ShorthandModel<string | null> | null =
+                    globalProps.horizontalAlignment === "center"
+                        ? {
+                            top: "0",
+                            bottom: "0",
+                            left: "auto",
+                            right: "auto"
+                        }
+                        : globalProps.horizontalAlignment === "left"
+                            ? {
+                                top: "0",
+                                bottom: "0",
+                                left: "0",
+                                right: "auto"
+                            }
+                            : globalProps.horizontalAlignment === "right"
+                                ? {
+                                    top: "0",
+                                    bottom: "0",
+                                    left: "auto",
+                                    right: "0"
+                                }
+                                : null;
+                setStyleShorthandValue(
+                    borderWrapperTableRule?.style,
+                    horizontalAlignmentMargin,
+                    {
+                        top: "margin-top",
+                        bottom: "margin-bottom",
+                        left: "margin-left",
+                        right: "margin-right"
+                    },
+                    v => v);
+
+                // widthPercent
+                setStylePropertyValue(borderWrapperTableRule?.style, "width", toPercentageStringValueOrNull(globalProps.widthPercent));
+                emailDocument.querySelectorAll(`.component-divider:not([${dividerDatasetKeys.COMPONENT_WIDTH}]) ${borderWrapperTableSelector}`)
+                    .forEach(borderWrapperTable => {
+                        setAttributePropertyValue(borderWrapperTable, "width", toPercentageStringValueOrNull(globalProps.widthPercent));
+                    });
+
+                // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
+                synchronizeRulesToDom(rules);
+            },
         }
     };
+
+    return adapters[getLatestVersion(globalVersions)];
+}
+
+export function createDividerComponentAdapter(): DividerComponentAdapter {
+    const componentVersions = ["v0", "v17.3-alpha", "v18.2"] as const;
+    type DividerComponentVersion = (typeof componentVersions)[number];
+    const latestVersion: DividerComponentVersion = getLatestVersion(componentVersions);
+
+    const dividerDatasetKeys = {
+        COMPONENT_HORIZONTAL_ALIGNMENT: "data-component-horizontal-alignment",
+        COMPONENT_WIDTH: "data-component-width"
+    } as const;
+
+    function getComponentVersion(componentElement: HTMLElement): DividerComponentVersion {
+        const version = componentElement.getAttribute("data-version");
+
+        if (version && componentVersions.includes(version as DividerComponentVersion)) {
+            return version as DividerComponentVersion;
+        }
+
+        return "v0";
+    }
+
+    // Define the adapters for each version and we'll only return the latest.
+    // These are used for both component migration and global props migration.
+    const adapters: Record<DividerComponentVersion, DividerComponentAdapter> = {
+        "v0": {
+            version: "v0",
+
+            createComponentElement(emailDocument: Document): HTMLElement {
+                const componentElement = createHtmlElement(emailDocument, `
+<div class="component component-divider" data-state="component">
+    <div></div>
+</div>`);
+
+                // Avoid setting default local props and use global props instead.
+                const defaultLocalProps: DividerLocalProps = {
+                    style: null,
+                    thicknessPx: null,
+                    color: null,
+                    marginPx: null,
+                    isDividedWithLine: false,
+                    horizontalAlignment: null, // not supported in v0
+                    widthPercent: null // not supported in v0
+                };
+
+                adapters["v0"].writeLocalProps(componentElement, defaultLocalProps);
+
+                return componentElement;
+            },
+
+            migrateComponent(_emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+                // No migration needed for v0.
+                return componentElement;
+            },
+
+            readLocalProps(componentElement: HTMLElement): DividerLocalProps {
+                const dividerElement = componentElement.querySelector(":scope > div,:scope > hr") as HTMLElement | null;
+
+                const localProps: DividerLocalProps = {
+                    style: null, // No border style in v0.
+                    thicknessPx: toPixelNumericValueOrNull(getStylePropertyValueOrNull(dividerElement?.style, "height")),
+                    color: getStylePropertyValueOrNull(dividerElement?.style, "background-color"),
+                    marginPx: getStyleMarginPx(dividerElement?.style),
+                    isDividedWithLine: dividerElement?.tagName.toLowerCase() === "hr",
+                    horizontalAlignment: null, // not supported in v0
+                    widthPercent: null // not supported in v0
+                };
+
+                return localProps;
+            },
+
+            writeLocalProps(componentElement: HTMLElement, localProps: DividerLocalProps): void {
+                const dividerElement = componentElement.querySelector(":scope > div,:scope > hr") as HTMLElement | null;
+
+                setStylePropertyValue(dividerElement?.style, "height", toPixelStringValueOrNull(localProps.thicknessPx));
+                setStylePropertyValue(dividerElement?.style, "background-color", localProps.color);
+                setStyleMarginPx(dividerElement?.style, localProps.marginPx);
+                if (dividerElement) {
+                    if (localProps.isDividedWithLine) {
+                        if (dividerElement?.tagName.toLowerCase() !== "hr") {
+                            replaceTagName(dividerElement, "hr");
+                        }
+                    }
+                    else {
+                        if (dividerElement?.tagName.toLowerCase() !== "div") {
+                            replaceTagName(dividerElement, "div");
+                        }
+                    }
+                }
+            }
+        },
+        "v17.3-alpha": {
+            version: "v17.3-alpha",
+
+            createComponentElement(emailDocument: Document): HTMLElement {
+                const componentElement = createHtmlElement(emailDocument, `
+<table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" class="margin-wrapper margin-wrapper-for-divider component component-divider" data-state="component" data-version="v17.3-alpha">
+    <tbody>
+        <tr>
+            <td>
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" class="border-wrapper border-wrapper-for-divider">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation" class="padding-wrapper padding-wrapper-for-divider">
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+`);
+
+                // Avoid setting default local props and use global props instead.
+                const defaultLocalProps: DividerLocalProps = {
+                    style: null,
+                    thicknessPx: null,
+                    color: null,
+                    marginPx: null,
+                    isDividedWithLine: false,
+                    horizontalAlignment: null,
+                    widthPercent: null
+                };
+                adapters["v17.3-alpha"].writeLocalProps(componentElement, defaultLocalProps);
+
+                return componentElement;
+            },
+
+            readLocalProps(componentElement: HTMLElement): DividerLocalProps {
+                const marginWrapperTd = componentElement.querySelector(":scope > tbody > tr > td") as HTMLElement | null;
+                const paddingWrapperTd = componentElement.querySelector(".padding-wrapper-for-divider > tbody > tr > td") as HTMLElement | null;
+                const borderWrapperTable = componentElement.querySelector(".border-wrapper-for-divider") as HTMLElement | null;
+
+                return {
+                    style: toBorderStyleOrNull(getStylePropertyValueOrNull(paddingWrapperTd?.style, "border-top-style")),
+                    thicknessPx: toPixelNumericValueOrNull(getStylePropertyValueOrNull(paddingWrapperTd?.style, "border-top-width")),
+                    color: getStylePropertyValueOrNull(paddingWrapperTd?.style, "border-top-color"),
+                    isDividedWithLine: false, // No longer used in v17.3-alpha
+                    marginPx: getStylePaddingPx(marginWrapperTd?.style), // Margin is stored as padding on the margin wrapper td.
+                    horizontalAlignment: toHorizontalAlignmentOrNull(marginWrapperTd?.getAttribute("align")),
+                    widthPercent: toPercentageNumericValueOrNull(borderWrapperTable?.getAttribute("width"))
+                };
+            },
+
+            writeLocalProps(componentElement: HTMLElement, localProps: DividerLocalProps): void {
+                const marginWrapperTd = componentElement.querySelector(":scope > tbody > tr > td") as HTMLElement | null;
+                const paddingWrapperTd = componentElement.querySelector(".padding-wrapper-for-divider > tbody > tr > td") as HTMLElement | null;
+                const borderWrapperTable = componentElement.querySelector(".border-wrapper-for-divider") as HTMLElement | null;
+
+                setStyleBorderStyle(
+                    paddingWrapperTd?.style,
+                    localProps.style
+                        ? {
+                            top: localProps.style,
+                            bottom: "none",
+                            left: "none",
+                            right: "none"
+                        }
+                        : null);
+                setStyleBorderWidthPx(
+                    paddingWrapperTd?.style,
+                    !isNullish(localProps.thicknessPx)
+                        ? {
+                            top: localProps.thicknessPx,
+                            bottom: 0,
+                            left: 0,
+                            right: 0
+                        }
+                        : null);
+                setStyleBorderColor(
+                    paddingWrapperTd?.style,
+                    localProps.color
+                        ? {
+                            top: localProps.color,
+                            bottom: "transparent",
+                            left: "transparent",
+                            right: "transparent"
+                        }
+                        : null
+                );
+                setStylePaddingPx(marginWrapperTd?.style, localProps.marginPx);
+
+                // horizontal alignment
+                setAttributePropertyValue(marginWrapperTd, "align", localProps.horizontalAlignment);
+                setAttributePropertyValue(componentElement, dividerDatasetKeys.COMPONENT_HORIZONTAL_ALIGNMENT, !isNullish(localProps.horizontalAlignment) ? "true" : null);
+
+                // width
+                setStylePropertyValue(borderWrapperTable?.style, "width", toPercentageStringValueOrNull(localProps.widthPercent));
+                setAttributePropertyValue(borderWrapperTable, "width", toPercentageStringValueOrNull(localProps.widthPercent));
+                setAttributePropertyValue(componentElement, dividerDatasetKeys.COMPONENT_WIDTH, !isNullish(localProps.widthPercent) ? "true" : null);
+            },
+
+            migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+                const version = getComponentVersion(componentElement);
+                const thisAdapter = adapters["v17.3-alpha"];
+                const adapter = adapters[version];
+
+                if (thisAdapter === adapter || compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                    // Already on this or a later version; no migration needed.
+                    return componentElement;
+                }
+
+                // Get the props of the current version,
+                // create a new component element at the latest version,
+                // and write the old props to the new element.
+                const localProps = adapter.readLocalProps(componentElement);
+                const newComponentElement = thisAdapter.createComponentElement(emailDocument);
+                thisAdapter.writeLocalProps(newComponentElement, localProps);
+                componentElement.replaceWith(newComponentElement);
+
+                return newComponentElement;
+            }
+        },
+        "v18.2": {
+            version: "v18.2",
+
+            createComponentElement(emailDocument: Document): HTMLElement {
+                const componentElement = createHtmlElement(emailDocument, `
+<div class="component component-divider"
+     data-state="component"
+     data-version="v18.2">
+    <table class="margin-wrapper margin-wrapper-for-divider"
+           border="0"
+           cellpadding="0"
+           cellspacing="0"
+           role="presentation"
+           style="vertical-align: top;"
+           width="100%">
+        <tbody>
+            <tr>
+                <td style="font-size: 0px;
+                           word-break: break-word;">
+                    <table class="border-wrapper border-wrapper-for-divider"
+                           border="0"
+                           cellpadding="0"
+                           cellspacing="0"
+                           role="presentation"
+                           style="font-size: 1px;">
+                        <tbody>
+                            <tr>
+                                <td style="height: 0; line-height: 0;"> &nbsp;
+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+`);
+
+                // Avoid setting default local props and use global props instead.
+                const defaultLocalProps: DividerLocalProps = {
+                    style: null,
+                    thicknessPx: null,
+                    color: null,
+                    marginPx: null,
+                    isDividedWithLine: false,
+                    horizontalAlignment: null,
+                    widthPercent: null
+                };
+                adapters["v18.2"].writeLocalProps(componentElement, defaultLocalProps);
+
+                return componentElement;
+            },
+
+            readLocalProps(componentElement: HTMLElement): DividerLocalProps {
+                const marginWrapperTd = componentElement.querySelector(".margin-wrapper-for-divider > tbody > tr > td") as HTMLElement | null | undefined;
+                const borderWrapperTable = marginWrapperTd?.querySelector(".border-wrapper-for-divider") as HTMLElement | null | undefined;
+
+                return {
+                    isDividedWithLine: false, // No longer used since v17.3-alpha
+                    style: toBorderStyleOrNull(getStylePropertyValueOrNull(borderWrapperTable?.style, "border-top-style")),
+                    thicknessPx: toPixelNumericValueOrNull(getStylePropertyValueOrNull(borderWrapperTable?.style, "border-top-width")),
+                    color: getStylePropertyValueOrNull(borderWrapperTable?.style, "border-top-color"),
+                    marginPx: getStylePaddingPx(marginWrapperTd?.style), // Margin is stored as padding on the margin wrapper td.
+                    horizontalAlignment: toHorizontalAlignmentOrNull(marginWrapperTd?.getAttribute("align")),
+                    widthPercent: toPercentageNumericValueOrNull(borderWrapperTable?.getAttribute("width") || "100%")
+                };
+            },
+
+            writeLocalProps(componentElement: HTMLElement, localProps: DividerLocalProps): void {
+                const marginWrapperTd = componentElement.querySelector(".margin-wrapper-for-divider > tbody > tr > td") as HTMLElement | null | undefined;
+                const borderWrapperTable = marginWrapperTd?.querySelector(".border-wrapper-for-divider") as HTMLElement | null | undefined;
+
+                // style
+                setStyleBorderStyle(
+                    borderWrapperTable?.style,
+                    localProps.style
+                        ? {
+                            top: localProps.style,
+                            // The following must be null instead of "none" so Outlook works.
+                            bottom: null,
+                            left: null,
+                            right: null
+                        }
+                        : null);
+
+                // thicknessPx
+                setStyleBorderWidthPx(
+                    borderWrapperTable?.style,
+                    !isNullish(localProps.thicknessPx)
+                        ? {
+                            top: localProps.thicknessPx,
+                            // The following must be null instead of 0 so Outlook works.
+                            bottom: null,
+                            left: null,
+                            right: null
+                        }
+                        : null);
+
+                // color
+                setStyleBorderColor(
+                    borderWrapperTable?.style,
+                    localProps.color
+                        ? {
+                            top: localProps.color,
+                            // The following must be null instead of "transparent" so Outlook works.
+                            bottom: null,
+                            left: null,
+                            right: null
+                        }
+                        : null);
+
+                // marginPx
+                setStylePaddingPx(marginWrapperTd?.style, localProps.marginPx);
+
+                // horizontalAlignment
+                setAttributePropertyValue(marginWrapperTd, "align", localProps.horizontalAlignment);
+                setAttributePropertyValue(borderWrapperTable, "align", localProps.horizontalAlignment);
+                // Add margin to achieve horizontal alignment in Outlook.
+                const horizontalAlignmentMargin: ShorthandModel<string | null> | null =
+                    localProps.horizontalAlignment === "center"
+                        ? {
+                            top: "0",
+                            bottom: "0",
+                            left: "auto",
+                            right: "auto"
+                        }
+                        : localProps.horizontalAlignment === "left"
+                            ? {
+                                top: "0",
+                                bottom: "0",
+                                left: "0",
+                                right: "auto"
+                            }
+                            : localProps.horizontalAlignment === "right"
+                                ? {
+                                    top: "0",
+                                    bottom: "0",
+                                    left: "auto",
+                                    right: "0"
+                                }
+                                : null;
+                setStyleShorthandValue(
+                    borderWrapperTable?.style,
+                    horizontalAlignmentMargin,
+                    {
+                        top: "margin-top",
+                        bottom: "margin-bottom",
+                        left: "margin-left",
+                        right: "margin-right"
+                    },
+                    v => v);
+                setAttributePropertyValue(componentElement, dividerDatasetKeys.COMPONENT_HORIZONTAL_ALIGNMENT, !isNullish(localProps.horizontalAlignment) ? "true" : null);
+
+                // widthPercent
+                setStylePropertyValue(borderWrapperTable?.style, "width", toPercentageStringValueOrNull(localProps.widthPercent));
+                setAttributePropertyValue(borderWrapperTable, "width", toPercentageStringValueOrNull(localProps.widthPercent));
+                setAttributePropertyValue(componentElement, dividerDatasetKeys.COMPONENT_WIDTH, !isNullish(localProps.widthPercent) ? "true" : null);
+            },
+
+            migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+                const version = getComponentVersion(componentElement);
+                const thisAdapter = adapters["v18.2"];
+                const adapter = adapters[version];
+
+                if (thisAdapter === adapter || compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                    // Already on this or a later version; no migration needed.
+                    return componentElement;
+                }
+
+                // Get the props of the current version,
+                // create a new component element at the latest version,
+                // and write the old props to the new element.
+                const localProps = adapter.readLocalProps(componentElement);
+                const newComponentElement = thisAdapter.createComponentElement(emailDocument);
+                thisAdapter.writeLocalProps(newComponentElement, localProps);
+                componentElement.replaceWith(newComponentElement);
+
+                return newComponentElement;
+            }
+        }
+    };
+
+    return adapters[latestVersion];
 }
 
 function getLatestVersion<T extends string>(versions: readonly T[] | T[]): T {
     return Enumerable.from(versions).aggregate((v1, v2) => compareComponentVersions(v1, v2) > 0 ? v1 : v2, "v0" as T);
 }
 
-type RsvpLocalProps = {
-    blockPaddingPx: ShorthandModel<number | null> | null;
-    blockHorizontalAlignment: HorizontalAlignment | null;
-    fontFamily: string | null;
-    fontSizePx: number | null;
-    isBold: boolean | null;
-    isUnderlined: boolean | null;
-    isItalicized: boolean | null;
-    letterCase: LetterCase | null;
-    lineHeight: number | null;
-    buttonPaddingPx: ShorthandModel<number | null> | null;
-    buttonBorderRadiusPx: ShorthandModel<number | null> | null;
-    acceptText: string;
-    acceptWidth: ButtonWidthModel | null;
-    acceptBackgroundColor: string | null;
-    acceptTextColor: string | null;
-    isDeclineHidden: boolean;
-    declineText: string;
-    declineWidth: ButtonWidthModel | null;
-    declineBackgroundColor: string | null;
-    declineTextColor: string | null;
-    rsvpGroupGuid: Guid | null;
-    rsvpOccurrenceValue: string | null;
-};
-type RsvpGlobalProps = {
-    /* no global props yet */
-};
-
-type RsvpComponentAdapter = ComponentAdapter<RsvpLocalProps, RsvpGlobalProps>;
-
 export function createRsvpComponentAdapter(): RsvpComponentAdapter {
     const componentVersions = ["v0", "v2-alpha", "v17.3-alpha"] as const;
-    const globalVersions = ["v0"] as const;
 
     type RsvpComponentVersion = typeof componentVersions[number];
-    type RsvpGlobalVersion = typeof globalVersions[number];
 
     const LATEST_VERSION = getLatestVersion(componentVersions);
-    const LATEST_GLOBAL_VERSION = getLatestVersion(globalVersions);
 
     // These are for reading local component properties for each version.
     const localPropReaders: Record<RsvpComponentVersion, (componentElement: HTMLElement) => RsvpLocalProps> = {
@@ -2975,28 +3413,10 @@ export function createRsvpComponentAdapter(): RsvpComponentAdapter {
         }
     };
 
-    // These are for reading global component properties for each version.
-    const globalPropReaders: Record<RsvpGlobalVersion, (emailDocument: Document) => RsvpGlobalProps> = {
-        "v0": (_emailDocument: Document): RsvpGlobalProps => {
-            // No global RSVP properties in v0.
-            return {};
-        }
-    };
-
-    // These are for writing global component properties for each version.
-    // Unlike local properties where we only keep the latest writer via writeLocalProps(),
-    // all global prop writers need to be tracked long-term for global property migrations;
-    // i.e., to clean up old versions that might be stored differently in the newest version.
-    const globalPropWriters: Record<RsvpGlobalVersion, (emailDocument: Document, globalProps: RsvpGlobalProps) => void> = {
-        "v0": (_emailDocument: Document, _globalProps: RsvpGlobalProps): void => {
-            // No global properties in v0.
-        }
-    };
-
     function createEmptyComponentElement(emailDocument: Document): HTMLElement {
         const div = emailDocument.createElement("div");
         div.classList.add("component", "component-rsvp");
-        setComponentVersionNumber(div, LATEST_VERSION);
+        setComponentVersionNumber(div, "v17.3-alpha");
         div.dataset.state = "component";
         div.innerHTML =
             `<table class="rsvp-outerwrap" border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="min-width: 100%;">
@@ -3050,13 +3470,8 @@ export function createRsvpComponentAdapter(): RsvpComponentAdapter {
         return versionNumber as RsvpComponentVersion;
     }
 
-    function getGlobalVersion(_emailDocument: Document): RsvpGlobalVersion {
-        return LATEST_GLOBAL_VERSION;
-    }
-
     const adapter: RsvpComponentAdapter = {
-        kind: "rsvp",
-        currentVersion: LATEST_VERSION,
+        version: LATEST_VERSION,
 
         createComponentElement(emailDocument: Document): HTMLElement {
             const componentElement = createEmptyComponentElement(emailDocument);
@@ -3233,33 +3648,7 @@ export function createRsvpComponentAdapter(): RsvpComponentAdapter {
             componentElement.replaceWith(newComponentElement);
 
             return newComponentElement;
-        },
-
-        // Global Props
-        readGlobalProps(emailDocument: Document): RsvpGlobalProps {
-            return globalPropReaders[LATEST_GLOBAL_VERSION](emailDocument);
-        },
-        writeGlobalProps(emailDocument: Document, globalProps: RsvpGlobalProps): void {
-            globalPropWriters[LATEST_GLOBAL_VERSION](emailDocument, globalProps);
-        },
-        migrateGlobalProps(emailDocument: Document): void {
-            const globalVersion = getGlobalVersion(emailDocument);
-            if (globalVersion === LATEST_GLOBAL_VERSION) {
-                return; // No migration needed
-            }
-
-            // Get the current global props and rewrite them in the latest format.
-            // const globalProps = globalPropReaders[globalVersion](emailDocument);
-            // adapter.writeGlobalProps(emailDocument, globalProps);
-        },
-        areGlobalDefaultsNeeded(_emailDocument: Document): boolean {
-            // Placeholder for future use.
-            return false;
-        },
-        getDefaultGlobalProps(): RsvpGlobalProps {
-            // Placeholder for future use.
-            return {};
-        },
+        }
     };
 
     return adapter;
@@ -3982,20 +4371,18 @@ export function getComponentHelper(componentTypeName: ComponentTypeName) {
             return getTextComponentHelper();
         case "image":
             return getImageComponentHelper();
-        case "button":
-            return null;
         case "video":
             return getVideoComponentHelper();
-        case "divider":
-            return getDividerComponentHelper();
         case "row":
             return getRowComponentHelper();
-        case "rsvp":
-            return null;
         case "code":
             return getCodeComponentHelper();
         case "section":
             return getSectionComponentHelper();
+        case "button":
+        case "rsvp":
+        case "divider":
+            return null;
         default:
             console.error(`Unknown component type: ${componentTypeName}`);
             return null;
@@ -4023,15 +4410,6 @@ export const LineHeights = {
     veryLoose: { value: "2", title: "Very Loose" }
 } as const;
 
-function isMigrationRequiredForComponent(componentElement: Element, componentTypeName: ComponentTypeName, latestVersion: string): boolean {
-    if (!componentElement.classList.contains(`component-${componentTypeName}`)) {
-        throw new Error(`Element is not a ${componentTypeName} component element: ${componentElement.outerHTML}`);
-    }
-
-    const versionNumber = getComponentVersionNumber(componentElement);
-    return !versionNumber || compareComponentVersions(versionNumber, latestVersion) < 0;
-}
-
 function createHtmlElement(document: Document, html: string): HTMLElement {
     const template = document.createElement("template");
     template.innerHTML = html.trim();
@@ -4043,51 +4421,6 @@ function createHtmlElement(document: Document, html: string): HTMLElement {
 
     return element;
 }
-
-/** Local props model for one component instance (example shape). */
-export type LocalProps = Record<string, unknown>;
-
-/** Global props model for one component type (example shape). */
-export type GlobalProps = Record<string, unknown>;
-
-/**
- * Adapter for globals that do not belong to any single component type.
- * Example: main background color, page width, body background image.
- */
-export type DocumentAdapter<G = GlobalProps> = {
-    /** Always "document" or similar. */
-    kind: string;
-
-    /**
-     * Migrates old DOM structures related to document-level globals
-     * into the canonical format.
-     */
-    migrate: (emailDocument: Document) => void;
-
-    /**
-     * Reads global document-level props from the DOM.
-     */
-    readGlobalProps: (emailDocument: Document) => G;
-
-    /**
-     * Writes document-level global props back into the DOM.
-     */
-    writeGlobalProps: (emailDocument: Document, globalProps: G) => void;
-};
-
-/**
- * In-memory global state for all component types + document-level globals.
- * Derived from DOM on load. Applied to DOM when edited.
- */
-export type EditorGlobalState = Record<string, GlobalProps>;
-
-/**
- * Registry mapping component type IDs to their adapters.
- */
-export type ComponentAdapterRegistry = Record<
-    string,
-    ComponentAdapter<unknown, unknown>
->;
 
 /**
  * Value provider used by ButtonWidthProperty controls for both local
@@ -4116,31 +4449,22 @@ function createShorthandModel<T>(value: T): ShorthandModel<T> {
 
 /**
  * Factory returning a self contained ButtonComponentAdapter.
- * You can refine selectors and CSS logic inside without changing the public contract.
  */
 export function createButtonComponentAdapter(): ButtonComponentAdapter {
-    // These are the supported versions for local and global props
+    // These are the supported versions for local props
     // and are used to look up the appropriate reader/writer functions
     // so that components can handle different versions correctly.
     // Must be in the format "v{major}.{minor}-{tag}" for proper comparison.
     const componentVersions = ["v0", "v2.1-alpha", "v17.3-alpha", "v18.2"] as const;
-    const globalVersions = ["v0", "v2.1-alpha", "v18.2"] as const;
 
     type ComponentVersion = typeof componentVersions[number];
-    type GlobalVersion = typeof globalVersions[number];
 
-    const KIND = "button";
     const LATEST_VERSION: ComponentVersion = getLatestVersion(componentVersions);
-    const LATEST_GLOBAL_VERSION: GlobalVersion = getLatestVersion(globalVersions);
 
     const datasetKeys = {
         VERSION: "data-version",
         COMPONENT_BUTTON_WIDTH: "data-component-button-width",
         COMPONENT_BACKGROUND_COLOR: "data-component-background-color",
-    } as const;
-
-    const metaKeys = {
-        GLOBAL_BUTTON_VERSION: "x-global-button-version",
     } as const;
 
     // These are for reading local component properties from different versions.
@@ -4261,6 +4585,209 @@ export function createButtonComponentAdapter(): ButtonComponentAdapter {
             };
         }
     };
+
+    function createEmptyComponentElement(emailDocument: Document): HTMLElement {
+        // Only put static/constant structure here; all styles and content should be set via writeLocalProps/writeGlobalProps.
+        return createHtmlElement(emailDocument, `
+<div class="component component-button" data-state="component" ${datasetKeys.VERSION}="${LATEST_VERSION}">
+    <table class="button-outerwrap" border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width: 100%;">
+        <tbody>
+            <tr>
+                <td class="button-innerwrap" valign="top">
+                    <table class="button-shell" border="0" cellpadding="0" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td class="button-content" align="center" valign="middle">
+                                    <a class="button-link ${RockCssClassContentEditable}" target="_blank" rel="noopener noreferrer" style="display: block; letter-spacing: normal; text-align: center;"></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>`);
+    }
+
+    function getComponentVersion(componentElement: HTMLElement): ComponentVersion {
+        const versionNumber = getComponentVersionNumber(componentElement);
+
+        if (!versionNumber || !componentVersions.includes(versionNumber as ComponentVersion)) {
+            throw new Error(`Unsupported Button component version "${versionNumber}".`);
+        }
+
+        return versionNumber as ComponentVersion;
+    }
+
+    const adapter: ButtonComponentAdapter = {
+        version: LATEST_VERSION,
+
+        migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+            const version = getComponentVersion(componentElement);
+
+            if (compareComponentVersions(version, LATEST_VERSION) >= 0) {
+                // Already latest version
+                return componentElement;
+            }
+
+            // Copy the local props from the old element to the new one.
+            const localProps = localPropReaders[version](componentElement);
+            const newComponentElement = createEmptyComponentElement(emailDocument);
+            adapter.writeLocalProps(newComponentElement, localProps);
+
+            // Replace the old element with the new one.
+            componentElement.replaceWith(newComponentElement);
+
+            return newComponentElement;
+        },
+
+        readLocalProps(componentElement: HTMLElement): ButtonLocalProps {
+            return localPropReaders[LATEST_VERSION](componentElement);
+        },
+
+        writeLocalProps(componentElement: HTMLElement, localProps: ButtonLocalProps): void {
+            // This always assumes the componentElement is already migrated to latest version.
+            // We don't keep track of version-specific writers; only the latest writer.
+
+            const {
+                text,
+                href,
+                fontFamily,
+                fontSizePx,
+                isBold,
+                isUnderlined,
+                isItalicized,
+                letterCase,
+                lineHeight,
+                textColor,
+                horizontalAlignment,
+                backgroundColor,
+                borderRadiusPx,
+                width,
+                marginPx,
+                paddingPx,
+                border
+            } = localProps;
+
+            const buttonInnerwrap = componentElement.querySelector(".button-innerwrap") as HTMLElement | null;
+            const buttonShell = componentElement.querySelector(".button-shell") as HTMLElement | null;
+            const buttonContent = componentElement.querySelector(".button-content") as HTMLElement | null;
+            const buttonLink = componentElement.querySelector(".button-link") as HTMLElement | null;
+
+            // text
+            if (buttonLink) {
+                buttonLink.textContent = text;
+                buttonLink.title = text;
+            }
+
+            setAttributePropertyValue(buttonLink, "href", href);
+            setStylePropertyValue(buttonLink?.style, "font-family", fontFamily);
+            setStyleFontSizePx(buttonLink?.style, fontSizePx);
+            setStyleIsBold(buttonLink?.style, isBold);
+            setStyleIsUnderlined(buttonLink?.style, isUnderlined);
+            setStyleIsItalicized(buttonLink?.style, isItalicized);
+            setStyleLetterCase(buttonLink?.style, letterCase);
+            setStyleLineHeight(buttonLink?.style, lineHeight);
+            setStylePropertyValue(buttonLink?.style, "color", textColor);
+            setStylePaddingPx(buttonLink?.style, paddingPx);
+            setStyleBorder(buttonLink?.style, border);
+
+            // background color
+            setAttributePropertyValue(componentElement, datasetKeys.COMPONENT_BACKGROUND_COLOR, backgroundColor ? "true" : null);
+            setStylePropertyValue(buttonLink?.style, "background-color", backgroundColor);
+            setStylePropertyValue(buttonContent?.style, "background-color", backgroundColor);
+
+            // border radius
+            setStyleBorderRadiusPx(buttonLink?.style, borderRadiusPx);
+            setStyleBorderRadiusPx(buttonContent?.style, borderRadiusPx);
+
+            // width
+            setAttributePropertyValue(componentElement, datasetKeys.COMPONENT_BUTTON_WIDTH, width?.mode); // v18.2 stores the actual mode instead of "true"
+            if (width?.mode === "full") {
+                setAttributePropertyValue(buttonShell, "width", "100%");
+                setStylePropertyValue(buttonShell?.style, "width", "100%");
+            }
+            else if (width?.mode === "fixed") {
+                setAttributePropertyValue(buttonShell, "width", width.fixedWidthPx); // no "px" in the attribute
+                setStylePropertyValue(buttonShell?.style, "width", toPixelStringValueOrNull(width.fixedWidthPx));
+            }
+            else {
+                // default and "fitToText"
+                setAttributePropertyValue(buttonShell, "width", null);
+                setStylePropertyValue(buttonShell?.style, "width", null);
+            }
+
+            // horizontal alignment
+            if (buttonInnerwrap && horizontalAlignment) {
+                buttonInnerwrap.setAttribute("align", horizontalAlignment);
+            }
+            else {
+                // Don't delete the horizontal alignment; let global styles handle it.
+                //innerwrap.removeAttribute("align");
+            }
+
+            // margin (padding on innerwrap)
+            setStylePaddingPx(buttonInnerwrap?.style, marginPx);
+        },
+
+        createComponentElement(emailDocument: Document): HTMLElement {
+            const componentElement = createEmptyComponentElement(emailDocument);
+
+            // Use global props instead of local props when possible.
+            const localPropDefaults: ButtonLocalProps = {
+                text: "Click Me",
+                href: "https://",
+                backgroundColor: null,
+                fontFamily: null,
+                fontSizePx: null,
+                isBold: null,
+                isUnderlined: null,
+                isItalicized: null,
+                letterCase: null,
+                lineHeight: null,
+                textColor: null,
+                horizontalAlignment: "center",
+                borderRadiusPx: null,
+                width: null,
+                border: null,
+                marginPx: null,
+                paddingPx: null
+            };
+
+            adapter.writeLocalProps(componentElement, localPropDefaults);
+
+            // Global props will be applied after the component is added to the email DOM.
+            return componentElement;
+        }
+    };
+
+    return adapter;
+}
+
+/**
+ * Factory returning a self contained ButtonGlobalAdapter.
+ */
+export function createButtonGlobalAdapter(): ButtonGlobalAdapter {
+    // These are the supported versions for global props
+    // and are used to look up the appropriate reader/writer functions
+    // so that components can handle different versions correctly.
+    // Must be in the format "v{major}.{minor}-{tag}" for proper comparison.
+    const globalVersions = ["v0", "v2.1-alpha", "v18.2"] as const;
+
+    type GlobalVersion = typeof globalVersions[number];
+
+    const LATEST_GLOBAL_VERSION: GlobalVersion = getLatestVersion(globalVersions);
+
+    const datasetKeys = {
+        VERSION: "data-version",
+        COMPONENT_BUTTON_WIDTH: "data-component-button-width",
+        COMPONENT_BACKGROUND_COLOR: "data-component-background-color",
+    } as const;
+
+    const metaKeys = {
+        GLOBAL_BUTTON_VERSION: "x-global-button-version",
+    } as const;
 
     // These are for reading global component properties from different versions.
     const globalPropReaders: Record<GlobalVersion, (emailDocument: Document) => ButtonGlobalProps> = {
@@ -4439,17 +4966,7 @@ export function createButtonComponentAdapter(): ButtonComponentAdapter {
             }
 
             // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
-            const sheets = Enumerable
-                .from(rules)
-                .select(rule => rule.parentStyleSheet)
-                .distinct()
-                .toArray();
-
-            for (const sheet of sheets) {
-                if (sheet) {
-                    synchronizeSheetToDom(sheet);
-                }
-            }
+            synchronizeRulesToDom(rules);
         },
         "v18.2": (emailDocument: Document, globalProps: ButtonGlobalProps): void => {
             // Write the version to the document body.
@@ -4550,53 +5067,9 @@ export function createButtonComponentAdapter(): ButtonComponentAdapter {
             }
 
             // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
-            const sheets = Enumerable
-                .from(rules)
-                .select(rule => rule.parentStyleSheet)
-                .distinct()
-                .toArray();
-
-            for (const sheet of sheets) {
-                if (sheet) {
-                    synchronizeSheetToDom(sheet);
-                }
-            }
+            synchronizeRulesToDom(rules);
         }
     };
-
-    function createEmptyComponentElement(emailDocument: Document): HTMLElement {
-        // Only put static/constant structure here; all styles and content should be set via writeLocalProps/writeGlobalProps.
-        return createHtmlElement(emailDocument, `
-<div class="component component-button" data-state="component" ${datasetKeys.VERSION}="${LATEST_VERSION}">
-    <table class="button-outerwrap" border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width: 100%;">
-        <tbody>
-            <tr>
-                <td class="button-innerwrap" valign="top">
-                    <table class="button-shell" border="0" cellpadding="0" cellspacing="0">
-                        <tbody>
-                            <tr>
-                                <td class="button-content" align="center" valign="middle">
-                                    <a class="button-link ${RockCssClassContentEditable}" target="_blank" rel="noopener noreferrer" style="display: block; letter-spacing: normal; text-align: center;"></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>`);
-    }
-
-    function getComponentVersion(componentElement: HTMLElement): ComponentVersion {
-        const versionNumber = getComponentVersionNumber(componentElement);
-
-        if (!versionNumber || !componentVersions.includes(versionNumber as ComponentVersion)) {
-            throw new Error(`Unsupported Button component version "${versionNumber}".`);
-        }
-
-        return versionNumber as ComponentVersion;
-    }
 
     function getGlobalVersion(emailDocument: Document): GlobalVersion {
         // v18.2 and later use the meta tag to track global button schema version.
@@ -4621,117 +5094,8 @@ export function createButtonComponentAdapter(): ButtonComponentAdapter {
         return "v0";
     }
 
-    const adapter: ButtonComponentAdapter = {
-        kind: KIND,
-        currentVersion: LATEST_VERSION,
-
-        migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
-            const version = getComponentVersion(componentElement);
-
-            if (compareComponentVersions(version, LATEST_VERSION) >= 0) {
-                // Already latest version
-                return componentElement;
-            }
-
-            // Copy the local props from the old element to the new one.
-            const localProps = localPropReaders[version](componentElement);
-            const newComponentElement = createEmptyComponentElement(emailDocument);
-            adapter.writeLocalProps(newComponentElement, localProps);
-
-            // Replace the old element with the new one.
-            componentElement.replaceWith(newComponentElement);
-
-            return newComponentElement;
-        },
-
-        readLocalProps(componentElement: HTMLElement): ButtonLocalProps {
-            return localPropReaders[LATEST_VERSION](componentElement);
-        },
-
-        writeLocalProps(componentElement: HTMLElement, localProps: ButtonLocalProps): void {
-            // This always assumes the componentElement is already migrated to latest version.
-            // We don't keep track of version-specific writers; only the latest writer.
-
-            const {
-                text,
-                href,
-                fontFamily,
-                fontSizePx,
-                isBold,
-                isUnderlined,
-                isItalicized,
-                letterCase,
-                lineHeight,
-                textColor,
-                horizontalAlignment,
-                backgroundColor,
-                borderRadiusPx,
-                width,
-                marginPx,
-                paddingPx,
-                border
-            } = localProps;
-
-            const buttonInnerwrap = componentElement.querySelector(".button-innerwrap") as HTMLElement | null;
-            const buttonShell = componentElement.querySelector(".button-shell") as HTMLElement | null;
-            const buttonContent = componentElement.querySelector(".button-content") as HTMLElement | null;
-            const buttonLink = componentElement.querySelector(".button-link") as HTMLElement | null;
-
-            // text
-            if (buttonLink) {
-                buttonLink.textContent = text;
-                buttonLink.title = text;
-            }
-
-            setAttributePropertyValue(buttonLink, "href", href);
-            setStylePropertyValue(buttonLink?.style, "font-family", fontFamily);
-            setStyleFontSizePx(buttonLink?.style, fontSizePx);
-            setStyleIsBold(buttonLink?.style, isBold);
-            setStyleIsUnderlined(buttonLink?.style, isUnderlined);
-            setStyleIsItalicized(buttonLink?.style, isItalicized);
-            setStyleLetterCase(buttonLink?.style, letterCase);
-            setStyleLineHeight(buttonLink?.style, lineHeight);
-            setStylePropertyValue(buttonLink?.style, "color", textColor);
-            setStylePaddingPx(buttonLink?.style, paddingPx);
-            setStyleBorder(buttonLink?.style, border);
-
-            // background color
-            setAttributePropertyValue(componentElement, datasetKeys.COMPONENT_BACKGROUND_COLOR, backgroundColor ? "true" : null);
-            setStylePropertyValue(buttonLink?.style, "background-color", backgroundColor);
-            setStylePropertyValue(buttonContent?.style, "background-color", backgroundColor);
-
-            // border radius
-            setStyleBorderRadiusPx(buttonLink?.style, borderRadiusPx);
-            setStyleBorderRadiusPx(buttonContent?.style, borderRadiusPx);
-
-            // width
-            setAttributePropertyValue(componentElement, datasetKeys.COMPONENT_BUTTON_WIDTH, width?.mode); // v18.2 stores the actual mode instead of "true"
-            if (width?.mode === "full") {
-                setAttributePropertyValue(buttonShell, "width", "100%");
-                setStylePropertyValue(buttonShell?.style, "width", "100%");
-            }
-            else if (width?.mode === "fixed") {
-                setAttributePropertyValue(buttonShell, "width", width.fixedWidthPx); // no "px" in the attribute
-                setStylePropertyValue(buttonShell?.style, "width", toPixelStringValueOrNull(width.fixedWidthPx));
-            }
-            else {
-                // default and "fitToText"
-                setAttributePropertyValue(buttonShell, "width", null);
-                setStylePropertyValue(buttonShell?.style, "width", null);
-            }
-
-            // horizontal alignment
-            if (buttonInnerwrap && horizontalAlignment) {
-                buttonInnerwrap.setAttribute("align", horizontalAlignment);
-            }
-            else {
-                // Don't delete the horizontal alignment; let global styles handle it.
-                //innerwrap.removeAttribute("align");
-            }
-
-            // margin (padding on innerwrap)
-            setStylePaddingPx(buttonInnerwrap?.style, marginPx);
-        },
+    const adapter: ButtonGlobalAdapter = {
+        version: LATEST_GLOBAL_VERSION,
 
         readGlobalProps(emailDocument: Document): ButtonGlobalProps {
             // This assumes the emailDocument is already migrated to latest global DOM structure.
@@ -4782,36 +5146,6 @@ export function createButtonComponentAdapter(): ButtonComponentAdapter {
                 paddingPx: null
             });
             writeLatestGlobalProps(emailDocument, globalProps);
-        },
-
-        createComponentElement(emailDocument: Document): HTMLElement {
-            const componentElement = createEmptyComponentElement(emailDocument);
-
-            // Use global props instead of local props when possible.
-            const localPropDefaults: ButtonLocalProps = {
-                text: "Click Me",
-                href: "https://",
-                backgroundColor: null,
-                fontFamily: null,
-                fontSizePx: null,
-                isBold: null,
-                isUnderlined: null,
-                isItalicized: null,
-                letterCase: null,
-                lineHeight: null,
-                textColor: null,
-                horizontalAlignment: "center",
-                borderRadiusPx: null,
-                width: null,
-                border: null,
-                marginPx: null,
-                paddingPx: null
-            };
-
-            adapter.writeLocalProps(componentElement, localPropDefaults);
-
-            // Global props will be applied after the component is added to the email DOM.
-            return componentElement;
         },
 
         getDefaultGlobalProps(): ButtonGlobalProps {
@@ -4881,6 +5215,39 @@ function toPixelStringValueOrNull(pixels: number | null | undefined): string | n
     }
 
     return `${pixels}px`;
+}
+
+/**
+ * Converts a percentage string (e.g., "50%") to a numeric value (e.g., 50).
+ *
+ * @param percentage Percentage string (e.g., "50%").
+ * @returns Numeric percentage value (e.g., 50), or null if invalid.
+ */
+function toPercentageNumericValueOrNull(percentage: string | null | undefined): number | null {
+    percentage = percentage?.trim();
+
+    if (percentage?.endsWith("%")) {
+        const parsed = Number(percentage.slice(0, -1));
+        if (Number.isFinite(parsed)) {
+            return parsed;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Converts a numeric percentage value (e.g., 50) to a percentage string (e.g., "50%").
+ *
+ * @param percentage Numeric percentage value (e.g., 50).
+ * @returns Percentage string (e.g., "50%"), or null if invalid.
+ */
+function toPercentageStringValueOrNull(percentage: number | null | undefined): string | null {
+    if (isNullish(percentage)) {
+        return null;
+    }
+
+    return `${percentage}%`;
 }
 
 /**
@@ -5251,6 +5618,33 @@ function setStylePaddingPx(style: CSSStyleDeclaration | null | undefined, paddin
     );
 }
 
+function getStyleMarginPx(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): ShorthandModel<number | null> | null {
+    return getStyleShorthandValueOrNull(
+        style,
+        {
+            top: "margin-top",
+            right: "margin-right",
+            bottom: "margin-bottom",
+            left: "margin-left"
+        },
+        toPixelNumericValueOrNull
+    );
+}
+
+function setStyleMarginPx(style: CSSStyleDeclaration | null | undefined, marginPx: ShorthandModel<number | null> | null | undefined): void {
+    setStyleShorthandValue(
+        style,
+        marginPx,
+        {
+            top: "margin-top",
+            right: "margin-right",
+            bottom: "margin-bottom",
+            left: "margin-left"
+        },
+        v => `${v}px`
+    );
+}
+
 function getStyleBorderRadiusPx(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): ShorthandModel<number | null> | null {
     return getStyleShorthandValueOrNull(
         style,
@@ -5278,19 +5672,8 @@ function setStyleBorderRadiusPx(style: CSSStyleDeclaration | null | undefined, b
     );
 }
 
-function getStyleBorder(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): BorderModel | null {
-    const borderColor = getStyleShorthandValueOrNull(
-        style,
-        {
-            top: "border-top-color",
-            right: "border-right-color",
-            bottom: "border-bottom-color",
-            left: "border-left-color"
-        },
-        v => v || null
-    );
-
-    const borderStyle = getStyleShorthandValueOrNull(
+function getStyleBorderStyle(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): ShorthandModel<BorderStyle | null> | null {
+    return getStyleShorthandValueOrNull(
         style,
         {
             top: "border-top-style",
@@ -5300,8 +5683,51 @@ function getStyleBorder(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclara
         },
         toBorderStyleOrNull
     );
+}
 
-    const borderWidth = getStyleShorthandValueOrNull(
+function setStyleBorderStyle(style: CSSStyleDeclaration | null | undefined, value: ShorthandModel<BorderStyle | null> | null | undefined): void {
+    setStyleShorthandValue(
+        style,
+        value,
+        {
+            top: "border-top-style",
+            right: "border-right-style",
+            bottom: "border-bottom-style",
+            left: "border-left-style"
+        },
+        v => v
+    );
+}
+
+function getStyleBorderColor(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): ShorthandModel<string | null> | null {
+    return getStyleShorthandValueOrNull(
+        style,
+        {
+            top: "border-top-color",
+            right: "border-right-color",
+            bottom: "border-bottom-color",
+            left: "border-left-color"
+        },
+        v => v || null
+    );
+}
+
+function setStyleBorderColor(style: CSSStyleDeclaration | null | undefined, value: ShorthandModel<string | null> | null | undefined): void {
+    setStyleShorthandValue(
+        style,
+        value,
+        {
+            top: "border-top-color",
+            right: "border-right-color",
+            bottom: "border-bottom-color",
+            left: "border-left-color"
+        },
+        v => v
+    );
+}
+
+function getStyleBorderWidthPx(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): ShorthandModel<number | null> | null {
+    return getStyleShorthandValueOrNull(
         style,
         {
             top: "border-top-width",
@@ -5311,6 +5737,26 @@ function getStyleBorder(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclara
         },
         toPixelNumericValueOrNull
     );
+}
+
+function setStyleBorderWidthPx(style: CSSStyleDeclaration | null | undefined, value: ShorthandModel<number | null> | null | undefined): void {
+    setStyleShorthandValue(
+        style,
+        value,
+        {
+            top: "border-top-width",
+            right: "border-right-width",
+            bottom: "border-bottom-width",
+            left: "border-left-width"
+        },
+        v => toPixelStringValueOrNull(v)!
+    );
+}
+
+function getStyleBorder(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclaration[] | CSSStyleDeclaration | null | undefined): BorderModel | null {
+    const borderColor = getStyleBorderColor(style);
+    const borderStyle = getStyleBorderStyle(style);
+    const borderWidth = getStyleBorderWidthPx(style);
 
     return !borderColor && !borderStyle && !borderWidth
         ? null
@@ -5322,41 +5768,9 @@ function getStyleBorder(style: Enumerable<CSSStyleDeclaration> | CSSStyleDeclara
 }
 
 function setStyleBorder(style: CSSStyleDeclaration | null | undefined, border: BorderModel | null | undefined): void {
-    setStyleShorthandValue(
-        style,
-        border?.style,
-        {
-            top: "border-top-color",
-            right: "border-right-color",
-            bottom: "border-bottom-color",
-            left: "border-left-color"
-        },
-        v => v
-    );
-
-    setStyleShorthandValue(
-        style,
-        border?.style,
-        {
-            top: "border-top-style",
-            right: "border-right-style",
-            bottom: "border-bottom-style",
-            left: "border-left-style"
-        },
-        v => v
-    );
-
-    setStyleShorthandValue(
-        style,
-        border?.widthPx,
-        {
-            top: "border-top-width",
-            right: "border-right-width",
-            bottom: "border-bottom-width",
-            left: "border-left-width"
-        },
-        v => toPixelStringValueOrNull(v)!
-    );
+    setStyleBorderColor(style, border?.color);
+    setStyleBorderStyle(style, border?.style);
+    setStyleBorderWidthPx(style, border?.widthPx);
 }
 
 /**
@@ -5464,5 +5878,21 @@ function synchronizeSheetToDom(sheet: CSSStyleSheet | null | undefined): void {
         if (ownerNode instanceof ownerNode.ownerDocument.defaultView.HTMLStyleElement) {
             ownerNode.textContent = serializeSheet(sheet);
         }
+    }
+}
+
+function synchronizeRulesToDom(rules: Iterable<CSSStyleRule>): void {
+    if (!rules) {
+        return;
+    }
+
+    const sheets = Enumerable
+        .from(rules)
+        .select(rule => rule.parentStyleSheet)
+        .distinct()
+        .toArray();
+
+    for (const sheet of sheets) {
+        synchronizeSheetToDom(sheet);
     }
 }

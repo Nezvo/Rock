@@ -29,8 +29,6 @@ iframe {
         createGlobalBodyBackgroundColorProvider,
         createGlobalBackgroundColorProvider,
         createMediaQueryEffect,
-        createGlobalDividerWidthProvider,
-        createGlobalDividerHorizontalAlignmentProvider
     } from "./providers.partial";
     import {
         checkDropzoneSize,
@@ -74,7 +72,6 @@ iframe {
         ComponentTypeDragLeaveRequest,
         ValueProvider,
         ReplaceComponentRequest,
-        HorizontalAlignment,
         ComponentTypeName
     } from "./types.partial";
     import { GetHtmlRequest } from "./types";
@@ -190,8 +187,6 @@ iframe {
     const globalBodyColorProvider = ref<ValueProvider<string | null | undefined> | undefined>();
     const globalBackgroundColorProvider = ref<ValueProvider<string | null | undefined> | undefined>();
     const globalBodyWidthMediaQueryEffect = ref<Disposable | undefined>();
-    const globalDividerWidthProvider = ref<ValueProvider<number | null | undefined> | undefined>();
-    const globalDividerHorizontalAlignmentProvider = ref<ValueProvider<HorizontalAlignment | null | undefined> | undefined>();
 
     // #endregion
 
@@ -686,7 +681,7 @@ iframe {
 
     async function fixOldWizardElements(document: Document): Promise<void> {
         // Auto-migrate each component type to ensure they are all using the latest versions.
-        document.querySelectorAll(".component:not(.component-button,.component-rsvp)").forEach(componentElement => {
+        document.querySelectorAll(["button", "rsvp", "divider"].map(type => `.component:not(.component-${type})`).join(",")).forEach(componentElement => {
             try {
                 const componentTypeName = getComponentTypeName(componentElement);
                 const componentHelper = getComponentHelper(componentTypeName);
@@ -1225,10 +1220,6 @@ body:not(.${draggingCssClass}) .rock-runtime-wrapper-element.for-component-secti
                 color: #364153;
                 line-height: ${LineHeights.tight.value};`);
             globalStyles.addStyle(`.${GlobalCssClasses.marginParagraph}`, `margin: 0;`);
-            globalStyles.addStyle(GlobalStylesCssSelectors.dividerStyle, `border-style: solid none none;`);
-            globalStyles.addStyle(GlobalStylesCssSelectors.dividerThickness, `border-width: 1px 0px 0px;`);
-            globalStyles.addStyle(GlobalStylesCssSelectors.dividerColor, `border-color: #8b8ba7 transparent transparent;`);
-            globalStyles.addStyle(GlobalStylesCssSelectors.dividerMargin, `padding: 12px 0;`);
 
             // Add non-editable global styles.
             globalStyles.addStyle(`html, body`,
@@ -1357,12 +1348,6 @@ body:not(.${draggingCssClass}) .rock-runtime-wrapper-element.for-component-secti
 
         globalBackgroundColorProvider.value?.dispose();
         globalBackgroundColorProvider.value = createGlobalBackgroundColorProvider(iFrameDocument);
-
-        globalDividerWidthProvider.value?.dispose();
-        globalDividerWidthProvider.value = createGlobalDividerWidthProvider(iFrameDocument);
-
-        globalDividerHorizontalAlignmentProvider.value?.dispose();
-        globalDividerHorizontalAlignmentProvider.value = createGlobalDividerHorizontalAlignmentProvider(iFrameDocument);
 
         return areGlobalDefaultsRequired;
     }
@@ -1578,7 +1563,7 @@ body:not(.${draggingCssClass}) .rock-runtime-wrapper-element.for-component-secti
             const customComponentElement = tempElement.querySelector(".component");
             if (customComponentElement) {
                 const componentTypeName = getComponentTypeName(customComponentElement);
-                if (componentTypeName !== "button" && componentTypeName !== "rsvp") {
+                if (!["button", "rsvp", "divider"].includes(componentTypeName)) {
                     const helper = getComponentHelper(getComponentTypeName(customComponentElement));
                     if (helper && helper.isMigrationRequired(customComponentElement)) {
                         customComponentElement.replaceWith(helper.migrate(customComponentElement));
@@ -1933,7 +1918,7 @@ body:not(.${draggingCssClass}) .rock-runtime-wrapper-element.for-component-secti
             const isComponentChild = draggingElement.value.contains(componentElement);
             if (componentElement) {
                 const componentTypeName = getComponentTypeName(componentElement);
-                if (componentTypeName !== "button" && componentTypeName !== "rsvp") {
+                if (!["button", "rsvp", "divider"].includes(componentTypeName)) {
                     const componentHelper = getComponentHelper(getComponentTypeName(componentElement));
                     if (componentHelper && componentHelper.isMigrationRequired(componentElement)) {
                         const migratedComponentElement = componentHelper.migrate(componentElement);
@@ -1948,7 +1933,14 @@ body:not(.${draggingCssClass}) .rock-runtime-wrapper-element.for-component-secti
                     }
                 }
 
-                emit("componentAdded", { componentTypeName: componentTypeName, componentElement: componentElement });
+                if (!componentElement.isConnected) {
+                    nextTick(() => {
+                        emit("componentAdded", { componentTypeName: componentTypeName, componentElement: componentElement });
+                    });
+                }
+                else {
+                    emit("componentAdded", { componentTypeName: componentTypeName, componentElement: componentElement });
+                }
             }
 
             if (draggingPlaceholderElement.value.parentElement) {
@@ -2168,8 +2160,6 @@ body:not(.${draggingCssClass}) .rock-runtime-wrapper-element.for-component-secti
         globalBodyAlignmentProvider.value?.dispose();
         globalBodyColorProvider.value?.dispose();
         globalBackgroundColorProvider.value?.dispose();
-        globalDividerWidthProvider.value?.dispose();
-        globalDividerHorizontalAlignmentProvider.value?.dispose();
     });
 
     // #endregion
