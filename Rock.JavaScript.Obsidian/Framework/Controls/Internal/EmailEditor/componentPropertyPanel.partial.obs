@@ -46,6 +46,7 @@
 
     <DividerComponentPropertyPanel v-else-if="componentTypeName === 'divider'"
                                    :componentElement="componentElement"
+                                   :dividerGlobalProps="dividerGlobalProps"
                                    :hasScrollableBody="true"
                                    :ltr="ltr"
                                    @clone="$emit('clone')"
@@ -128,7 +129,7 @@
     import TextComponentPropertyPanel from "./propertyPanels/textComponentPropertyPanel.partial.obs";
     import TitleComponentPropertyPanel from "./propertyPanels/titleComponentPropertyPanel.partial.obs";
     import VideoComponentPropertyPanel from "./propertyPanels/videoComponentPropertyPanel.partial.obs";
-    import { ButtonGlobalProps, EditorComponentTypeName } from "./types.partial";
+    import { ButtonGlobalProps, DividerGlobalProps, EditorComponentTypeName } from "./types.partial";
     import { UsageType } from "./types";
     import { getComponentTypeName } from "./utils.partial";
     import { Guid } from "@Obsidian/Types";
@@ -144,6 +145,11 @@
 
         componentElement: {
             type: Object as PropType<HTMLElement>,
+            required: true
+        },
+
+        dividerGlobalProps: {
+            type: Object as PropType<DividerGlobalProps>,
             required: true
         },
 

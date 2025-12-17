@@ -15,8 +15,9 @@
 // </copyright>
 //
 
-import { inject, provide, Ref } from "vue";
+import { Ref } from "vue";
 import { Enumerable } from "@Obsidian/Utility/linq";
+import { Guid } from "@Obsidian/Types";
 
 /**
  * Represents a set of related table elements used for email components.
@@ -385,39 +386,8 @@ export type BorderModel = {
 };
 
 
-
-/**
- * Generic component adapter for a single component type.
- * L represents local (per instance) props.
- * G represents global (per component type) props.
- */
-export type ComponentAdapter<TLocalProps, TGlobalProps> = {
-    /** Component kind identifier, for example "button". */
-    kind: ComponentTypeName;
-
-    /**
-     * Latest DOM version for component instances of this type.
-     * Stored per node as data-version.
-     */
-    currentVersion: string;
-
-    /**
-     * Migrates a single component instance node to the latest DOM version.
-     * Must update data-component-version on the node.
-     */
-    migrateComponent: (emailDocument: Document, componentElement: HTMLElement) => HTMLElement;
-
-    /**
-     * Reads local (per instance) props from a migrated component node.
-     * These props will be bound directly to property panel controls.
-     */
-    readLocalProps: (componentElement: HTMLElement) => TLocalProps;
-
-    /**
-     * Writes local (per instance) props into a migrated component node.
-     * Called when any bound property panel control changes.
-     */
-    writeLocalProps: (componentElement: HTMLElement, localProps: TLocalProps) => void;
+export type GlobalAdapter<TGlobalProps> = {
+    version: string;
 
     /**
      * Reads global props for this component type from the DOM.
@@ -439,11 +409,6 @@ export type ComponentAdapter<TLocalProps, TGlobalProps> = {
     migrateGlobalProps: (emailDocument: Document) => void;
 
     /**
-     * Creates a new component element for this component type but does not add it to the document.
-     */
-    createComponentElement: (emailDocument: Document) => HTMLElement;
-
-    /**
      * Creates a new default global props object for this component type.
      *
      * @param emailDocument
@@ -456,6 +421,42 @@ export type ComponentAdapter<TLocalProps, TGlobalProps> = {
      * @returns
      */
     areGlobalDefaultsNeeded: (emailDocument: Document) => boolean;
+};
+
+/**
+ * Generic component adapter for a single component type.
+ * L represents local (per instance) props.
+ * G represents global (per component type) props.
+ */
+export type ComponentAdapter<TLocalProps> = {
+    /**
+     * Latest DOM version for component instances of this type.
+     * Stored per node as data-version.
+     */
+    version: string;
+
+    /**
+     * Migrates a single component instance node to the latest DOM version.
+     * Must update data-component-version on the node.
+     */
+    migrateComponent: (emailDocument: Document, componentElement: HTMLElement) => HTMLElement;
+
+    /**
+     * Reads local (per instance) props from a migrated component node.
+     * These props will be bound directly to property panel controls.
+     */
+    readLocalProps: (componentElement: HTMLElement) => TLocalProps;
+
+    /**
+     * Writes local (per instance) props into a migrated component node.
+     * Called when any bound property panel control changes.
+     */
+    writeLocalProps: (componentElement: HTMLElement, localProps: TLocalProps) => void;
+
+    /**
+     * Creates a new component element for this component type but does not add it to the document.
+     */
+    createComponentElement: (emailDocument: Document) => HTMLElement;
 };
 
 /**
@@ -627,10 +628,12 @@ export type ButtonGlobalProps = {
 /**
  * Concrete adapter type alias for the Button component.
  */
-export type ButtonComponentAdapter = ComponentAdapter<
-    ButtonLocalProps,
-    ButtonGlobalProps
->;
+export type ButtonComponentAdapter = ComponentAdapter<ButtonLocalProps>;
+
+/**
+ * Concrete global adapter type alias for the Button component.
+ */
+export type ButtonGlobalAdapter = GlobalAdapter<ButtonGlobalProps>;
 
 export type ShorthandPropertyNames = {
     top: CssStyleDeclarationKebabKey;
@@ -638,3 +641,80 @@ export type ShorthandPropertyNames = {
     bottom: CssStyleDeclarationKebabKey;
     left: CssStyleDeclarationKebabKey;
 };
+
+/**
+ * Local RSVP props that map directly to the RSVP component property panel.
+ */
+export type RsvpLocalProps = {
+    blockPaddingPx: ShorthandModel<number | null> | null;
+    blockHorizontalAlignment: HorizontalAlignment | null;
+    fontFamily: string | null;
+    fontSizePx: number | null;
+    isBold: boolean | null;
+    isUnderlined: boolean | null;
+    isItalicized: boolean | null;
+    letterCase: LetterCase | null;
+    lineHeight: number | null;
+    buttonPaddingPx: ShorthandModel<number | null> | null;
+    buttonBorderRadiusPx: ShorthandModel<number | null> | null;
+    acceptText: string;
+    acceptWidth: ButtonWidthModel | null;
+    acceptBackgroundColor: string | null;
+    acceptTextColor: string | null;
+    isDeclineHidden: boolean;
+    declineText: string;
+    declineWidth: ButtonWidthModel | null;
+    declineBackgroundColor: string | null;
+    declineTextColor: string | null;
+    rsvpGroupGuid: Guid | null;
+    rsvpOccurrenceValue: string | null;
+};
+
+/**
+ * Concrete adapter type alias for the RSVP component.
+ */
+export type RsvpComponentAdapter = ComponentAdapter<RsvpLocalProps>;
+
+/**
+ * Local divider props that map directly to the Divider component property panel.
+ */
+export type DividerLocalProps = {
+    style: BorderStyle | null;
+    thicknessPx: number | null;
+    color: string | null;
+    /**
+     * Added in v17.3-alpha to support margin around the divider.
+     */
+    widthPercent: number | null;
+    /**
+     * Added in v17.3-alpha to support horizontal alignment of the divider.
+     */
+    horizontalAlignment: HorizontalAlignment | null;
+    marginPx: ShorthandModel<number | null> | null;
+    /**
+     * @deprecated Supported for legacy reasons. This would place a horizontal line (`<hr>`) instead of a `<div>` resulting in a second line above the colored divider line.
+      */
+    isDividedWithLine: boolean;
+};
+
+/**
+ * Global divider props that map to the "Divider Styling" section of the GlobalPropertyPanel.
+ */
+export type DividerGlobalProps = {
+    style: BorderStyle | null;
+    thicknessPx: number | null;
+    color: string | null;
+    widthPercent: number | null;
+    horizontalAlignment: HorizontalAlignment | null;
+    marginPx: ShorthandModel<number | null> | null;
+};
+
+/**
+ * Concrete adapter type alias for the Divider component.
+ */
+export type DividerComponentAdapter = ComponentAdapter<DividerLocalProps>;
+
+/**
+ * Concrete global adapter type alias for the Divider component.
+ */
+export type DividerGlobalAdapter = GlobalAdapter<DividerGlobalProps>;
