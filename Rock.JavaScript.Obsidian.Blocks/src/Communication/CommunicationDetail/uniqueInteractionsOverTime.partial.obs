@@ -1,6 +1,6 @@
 <!-- Copyright by the Spark Development Network; Licensed under the Rock Community License -->
 <template>
-    <div v-if="newChartData" class="communication-detail-unique-interactions-over-time">
+    <div v-if="chartData" class="communication-detail-unique-interactions-over-time">
         <div class="communication-detail-unique-interactions-over-time-actions">
             <RadioButtonList v-if="showPerformanceChartTimeframeFilter"
                              v-model="performanceChartTimeframe"
@@ -10,8 +10,8 @@
         </div>
         <div class="communication-detail-unique-interactions-over-time-chart">
             <LineChart title="Unique Interactions Over Time"
-                       :labels="newLabels"
-                       :series="newSeries"
+                       :labels="labels"
+                       :series="series"
                        :categoryShowGridLines="true"
                        :legendAlign="LegendAlign.Start"
                        :legendPosition="LegendPosition.Bottom"
@@ -141,7 +141,7 @@
             }));
     });
 
-    const newChartData = computed<{ labels: string[]; series: LineSeries[] } | null>(() => {
+    const chartData = computed<{ labels: string[]; series: LineSeries[] } | null>(() => {
         if (!visibleDataPoints.value.length) {
             return null;
         }
@@ -178,12 +178,12 @@
         };
     });
 
-    const newLabels = computed((): string[] => {
-        return newChartData.value ? newChartData.value.labels : [];
+    const labels = computed((): string[] => {
+        return chartData.value ? chartData.value.labels : [];
     });
 
-    const newSeries = computed((): LineSeries[] => {
-        return newChartData.value ? newChartData.value.series : [];
+    const series = computed((): LineSeries[] => {
+        return chartData.value ? chartData.value.series : [];
     });
 
     // #endregion Computed Values
