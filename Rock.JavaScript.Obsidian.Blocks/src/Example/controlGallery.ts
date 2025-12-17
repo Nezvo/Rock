@@ -257,6 +257,7 @@ import ContextSlicerGallery from "./ControlGallery/contextSlicerGallery.partial.
 import CampusContextPickerGallery from "./ControlGallery/campusContextPickerGallery.partial.obs";
 import BarChartGallery from "./ControlGallery/barChartGallery.partial.obs";
 import PieChartGallery from "./ControlGallery/pieChartGallery.partial.obs";
+import DoughnutChartGallery from "./ControlGallery/doughnutChartGallery.partial.obs";
 import ExperieceModePickerGallery from "./ControlGallery/experienceModePickerGallery.partial.obs";
 import PageTreeGallery from "./ControlGallery/pageTreeGallery.partial.obs";
 import SearchResultsSearchField from "./ControlGallery/searchResultsSearchFieldGallery.partial.obs";
@@ -462,6 +463,7 @@ const controlGalleryComponents: Record<string, Component> = [
     CampusContextPickerGallery,
     BarChartGallery,
     PieChartGallery,
+    DoughnutChartGallery,
     ExperieceModePickerGallery,
     PageTreeGallery,
     SearchResultsSearchField,
