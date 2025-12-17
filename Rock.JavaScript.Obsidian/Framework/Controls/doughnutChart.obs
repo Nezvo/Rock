@@ -8,7 +8,7 @@
     import { computed, PropType } from "vue";
     import Chart from "./chart.obs";
     import { LabelDateFormat, LegendAlign, LegendPosition, LineStyle, DoughnutSeries, TooltipCallback } from "@Obsidian/Core/Controls/chart";
-    import { Chart as ChartJS, ChartData, ChartOptions, TooltipItem, TooltipLabelStyle, ChartDataset, LegendItem } from "@Obsidian/Libs/chart";
+    import { ChartData, ChartOptions, TooltipItem, TooltipLabelStyle, ChartDataset, LegendItem } from "@Obsidian/Libs/chart";
     import { Enumerable } from "@Obsidian/Utility/linq";
     import { isNullish } from "@Obsidian/Utility/util";
     import { getCssVariableValue } from "@Obsidian/Utility/cssUtils";
@@ -256,7 +256,7 @@
         };
     });
 
-    const chartOptions = computed<ChartOptions<"doughnut">>(() => {
+    const chartOptions = computed<ChartOptions<"doughnut">>((): ChartOptions<"doughnut"> => {
         return {
             // Allow the chart to change size with the parent container.
             responsive: true,
@@ -274,7 +274,7 @@
                         font: {
                             family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
                             size: parseInt(getCssVar("--font-size-small")) || undefined,
-                            weight: getCssVar("--font-weight-semibold")
+                            weight: getCssVar("--font-weight-semibold") as "bold" | "normal" | "bolder" | "lighter"
                         },
 
                         generateLabels: (chart) => {
@@ -325,7 +325,7 @@
                     font: {
                         family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
                         size: parseInt(getCssVar("--font-size-small")) || undefined,
-                        weight: getCssVar("--font-weight-semibold")
+                        weight: getCssVar("--font-weight-semibold") as "bold" | "normal" | "bolder" | "lighter"
                     },
 
                     text: props.title ?? undefined
@@ -339,7 +339,7 @@
                     bodyFont: {
                         family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
                         size: parseInt(getCssVar("--font-size-xsmall")) || undefined,
-                        weight: getCssVar("--font-weight-regular")
+                        weight: getCssVar("--font-weight-regular") as "bold" | "normal" | "bolder" | "lighter"
                     },
 
                     borderColor: getCssVar("--color-interface-soft"),
@@ -436,7 +436,7 @@
                     titleFont: {
                         family: getCssVar("--font-family-segoe") || getCssVar("--font-family-sans"),
                         size: parseInt(getCssVar("--font-size-small")) || undefined,
-                        weight: getCssVar("--font-weight-semibold")
+                        weight: getCssVar("--font-weight-semibold") as "bold" | "normal" | "bolder" | "lighter"
                     },
                 }
             },
