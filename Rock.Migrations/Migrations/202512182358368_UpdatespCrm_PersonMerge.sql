@@ -20,7 +20,7 @@
 </doc>
 */
 	
-ALTER PROCEDURE [dbo].[spCrm_PersonMerge]
+CREATE PROCEDURE [dbo].[spCrm_PersonMerge]
 	  @OldId int
 	, @NewId int
 
