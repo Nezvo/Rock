@@ -1,4 +1,10 @@
 @charset "UTF-8";
+/* CSS Overrides Top Start */
+@import url('/Styles/styles-v2/icons/fontawesome-icon.css?v=4232385967');
+@import url('/Styles/styles-v2/icons/fontawesome-solid.css?v=4137481333');
+@import url('/Styles/styles-v2/icons/tabler-icon.css?v=225734114');
+/* CSS Overrides Top End */
+
 @import "../../../Styles/summernote/summernote.min.css";
 /* ==================== NORMALIZE ==================== */
 * {
@@ -34985,6 +34991,63 @@ body.navbar-side-open {
   }
 }
 
+a.rock-bookmark {
+  color: var(--color-interface-strong);
+}
+
+.rock-bookmark {
+  --size: 32px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 0 0 var(--spacing-small);
+  font-size: calc(var(--size) * 0.5);
+  background-color: var(--color-interface-softer);
+  border: 1px solid var(--color-interface-soft);
+  border-radius: 999px;
+  transition: 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.rock-bookmark:hover {
+  color: var(--color-interface-stronger);
+}
+.rock-bookmark:focus {
+  box-shadow: var(--input-focus-box-shadow) !important;
+}
+.rock-bookmark:focus i {
+  color: var(--color-primary) !important;
+}
+@media (min-width: 768px) {
+  .rock-bookmark {
+    --size: 40px;
+    padding: 20px;
+  }
+}
+
+.rock-top-header .rock-bookmark.active.has-reminders > .indicator-bottom {
+  position: absolute;
+  top: 0px;
+  right: 2px;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-interface-softest);
+  width: 8px;
+  height: 8px;
+  border-radius: var(--rounded-xsmall);
+}
+@media (min-width: 768px) {
+  .rock-top-header .rock-bookmark.active.has-reminders > .indicator-bottom {
+    top: 2px;
+    right: 2px;
+    border: none;
+  }
+}
+
+.rock-top-header .rock-bookmark:hover {
+  border: 1px solid var(--color-interface-medium);
+}
+
 .navbar-static-side {
   --nav-childpages-bg: var(--navbarside-background-color);
   position: fixed;
@@ -35033,6 +35096,14 @@ body.navbar-side-open {
 .navbar-static-side .navbar-side .nav-item-top.open .nav-childpages {
   display: inline-block;
   box-shadow: var(--popup-box-shadow);
+}
+.navbar-static-side .navbar-side .nav-item-top.open .item-title,
+.navbar-static-side .navbar-side .nav-item-top.open .nav-childpages li.title {
+  color: var(--color-interface-stronger);
+}
+.navbar-static-side .navbar-side .nav-item-top.open .item-title i,
+.navbar-static-side .navbar-side .nav-item-top.open .nav-childpages li.title i {
+  color: var(--color-interface-strong);
 }
 @media (min-width: 480px) {
   .navbar-static-side .navbar-side .nav-item-top.open .item-title {
@@ -35673,3 +35744,42 @@ body.navbar-side-open {
 }
 
 /*# sourceMappingURL=theme.css.map */
+
+/* CSS Overrides Bottom Start */
+:root {
+    --base-primary: #FF791D;
+    --logo-image: url('/Assets/Images/rock-logo-circle-white.svg');
+    --base-link: #006DCC;
+    --base-secondary: #83758f;
+    --base-critical: #ee7725;
+    --base-danger: #D70015;
+    --base-info: #005DD7;
+    --base-success: #01A11E;
+    --base-warning: #E58600;
+    --base-interface-strongest: #0a0a0a;
+    --base-interface-stronger: #0d1117;
+    --base-interface-strong: #3d444d;
+    --base-interface-medium: #8B8BA7;
+    --base-interface-soft: #D9D9E3;
+    --base-interface-softer: #f8f8fc;
+    --base-interface-softest: #fdfdfd;
+    --font-size-xsmall: 12px;
+    --font-size-small: 14px;
+    --font-size-regular: 16px;
+    --font-size-h1: 44px;
+    --font-size-h2: 36px;
+    --font-size-h3: 28px;
+    --font-size-h4: 22px;
+    --font-size-h5: 18px;
+    --font-size-h6: 16px;
+    --font-family-title: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';
+    --font-family-body: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';
+    --spacing-tiny: 4px;
+    --spacing-xsmall: 8px;
+    --spacing-small: 12px;
+    --spacing-medium: 16px;
+    --spacing-large: 24px;
+    --spacing-xlarge: 48px;
+    --spacing-huge: 80px;
+}
+/* CSS Overrides Bottom End */
