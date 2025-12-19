@@ -177,17 +177,34 @@
     // #endregion Event Handlers
 
     async function onOrderChanged(item: Record<string, unknown>, beforeItem: Record<string, unknown> | null): Promise<boolean> {
-        try {
-            const result = await invokeBlockAction<string>("ReorderConnectionRequestAttribute", {
-                key: item["guid"],
-                beforeKey: beforeItem?.["guid"] ?? null
-            });
-            return result.isSuccess;
-        }
-        catch (error) {
-            console.error("Error reordering connection request attributes:", error);
+        const itemGuid = item["guid"] as string;
+        const beforeItemGuid = beforeItem?.["guid"] as string | null;
+
+        const currentItems = [...(props.modelValue ?? [])];
+        const idx = currentItems.findIndex(i => i.guid === itemGuid);
+
+        if (idx < 0) {
             return false;
         }
+
+        const itemToMove = currentItems.splice(idx, 1)[0];
+
+        if (beforeItemGuid) {
+            const beforeIndex = currentItems.findIndex(i => i.guid === beforeItemGuid);
+            if (beforeIndex < 0) {
+                currentItems.push(itemToMove);
+            }
+            else {
+                currentItems.splice(beforeIndex, 0, itemToMove);
+            }
+        }
+        else {
+            currentItems.push(itemToMove);
+        }
+
+        emit("update:modelValue", currentItems);
+
+        return true;
     }
 
     // #region Watchers

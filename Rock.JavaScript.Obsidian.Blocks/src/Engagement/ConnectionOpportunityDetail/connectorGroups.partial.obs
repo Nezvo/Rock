@@ -101,8 +101,8 @@
     function createNewConnectorGroup(): ConnectorGroupBag {
         return {
             guid: newGuid(),
-            connectorGroup: { text: "", value: "" },
-            campus: { text: "", value: "" }
+            connectorGroup: null,
+            campus: null
         };
     }
 
@@ -119,8 +119,8 @@
     const gridData = computed(() => {
         const rows = (props.modelValue ?? []).map(cg => ({
             guid: cg.guid,
-            group: cg.connectorGroup?.text ?? "",
-            campus: cg.campus?.text ?? ""
+            group: cg.connectorGroup?.text || "",
+            campus: cg.campus?.text || "All Campuses"
         }));
         return { rows };
     });
