@@ -35,9 +35,8 @@ import { EmailEditorGetFutureAttendanceOccurrencesOptionsBag } from "@Obsidian/V
 import { EmailEditorCreateAttendanceOccurrenceOptionsBag } from "@Obsidian/ViewModels/Rest/Controls/emailEditorCreateAttendanceOccurrenceOptionsBag";
 import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
 import { Guid } from "@Obsidian/Types";
-import { findComponentInnerWrappers, getImageComponentHelper, getSectionComponentHelper, getTextComponentHelper, getTitleComponentHelper } from "./utils.partial";
+import { createImageComponentAdapter, findComponentInnerWrappers, getSectionComponentHelper, getTextComponentHelper, getTitleComponentHelper } from "./utils.partial";
 import { inject, provide, Ref } from "vue";
-import { isNullish } from "@Obsidian/Utility/util";
 
 type ElementBinaryFileInfo = {
     binaryFile: ListItemBag | null | undefined;
@@ -276,9 +275,9 @@ export class EmailEditorApi {
         } as const;
 
         const sectionComponentHelper = getSectionComponentHelper();
-        const imageComponentHelper = getImageComponentHelper();
         const titleComponentHelper = getTitleComponentHelper();
         const textComponentHelper = getTextComponentHelper();
+        const imageComponentAdapter = createImageComponentAdapter();
 
         const starterHeroSectionComponent = sectionComponentHelper.createComponentElement("section");
         const elements = sectionComponentHelper.getElements(starterHeroSectionComponent);
@@ -295,7 +294,7 @@ export class EmailEditorApi {
                     const dropzone = wrappers.marginWrapper.borderWrapper.paddingWrapper.td.querySelector(".dropzone") as HTMLElement;
 
                     if (dropzone) {
-                        const imageComponent = imageComponentHelper.createComponentElement();
+                        const imageComponent = imageComponentAdapter.createComponentElement(document);
                         dropzone.appendChild(imageComponent);
 
                         const titleComponent = titleComponentHelper.createComponentElement();
@@ -347,7 +346,7 @@ export class EmailEditorApi {
                     const dropzone = wrappers.marginWrapper.borderWrapper.paddingWrapper.td.querySelector(".dropzone") as HTMLElement;
 
                     if (dropzone) {
-                        const imageComponent = imageComponentHelper.createComponentElement();
+                        const imageComponent = imageComponentAdapter.createComponentElement(document);
                         dropzone.appendChild(imageComponent);
 
                         const titleComponent = titleComponentHelper.createComponentElement();
@@ -380,7 +379,7 @@ export class EmailEditorApi {
                     const dropzone = wrappers.marginWrapper.borderWrapper.paddingWrapper.td.querySelector(".dropzone") as HTMLElement;
 
                     if (dropzone) {
-                        const imageComponent = imageComponentHelper.createComponentElement();
+                        const imageComponent = imageComponentAdapter.createComponentElement(document);
                         dropzone.appendChild(imageComponent);
 
                         const titleComponent = titleComponentHelper.createComponentElement();
@@ -433,7 +432,7 @@ export class EmailEditorApi {
                     const dropzone = wrappers.marginWrapper.borderWrapper.paddingWrapper.td.querySelector(".dropzone") as HTMLElement;
 
                     if (dropzone) {
-                        const imageComponent = imageComponentHelper.createComponentElement();
+                        const imageComponent = imageComponentAdapter.createComponentElement(document);
                         dropzone.appendChild(imageComponent);
 
                         const titleComponent = titleComponentHelper.createComponentElement();
@@ -466,7 +465,7 @@ export class EmailEditorApi {
                     const dropzone = wrappers.marginWrapper.borderWrapper.paddingWrapper.td.querySelector(".dropzone") as HTMLElement;
 
                     if (dropzone) {
-                        const imageComponent = imageComponentHelper.createComponentElement();
+                        const imageComponent = imageComponentAdapter.createComponentElement(document);
                         dropzone.appendChild(imageComponent);
 
                         const titleComponent = titleComponentHelper.createComponentElement();
@@ -499,7 +498,7 @@ export class EmailEditorApi {
                     const dropzone = wrappers.marginWrapper.borderWrapper.paddingWrapper.td.querySelector(".dropzone") as HTMLElement;
 
                     if (dropzone) {
-                        const imageComponent = imageComponentHelper.createComponentElement();
+                        const imageComponent = imageComponentAdapter.createComponentElement(document);
                         dropzone.appendChild(imageComponent);
 
                         const titleComponent = titleComponentHelper.createComponentElement();

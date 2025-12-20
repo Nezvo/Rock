@@ -18,6 +18,8 @@
 import { Ref } from "vue";
 import { Enumerable } from "@Obsidian/Utility/linq";
 import { Guid } from "@Obsidian/Types";
+import { ListItemBag } from "@Obsidian/ViewModels/Utility/listItemBag";
+import { FileAsset } from "@Obsidian/ViewModels/Controls/fileAsset";
 
 /**
  * Represents a set of related table elements used for email components.
@@ -423,6 +425,8 @@ export type GlobalAdapter<TGlobalProps> = {
     areGlobalDefaultsNeeded: (emailDocument: Document) => boolean;
 };
 
+export type GlobalAdapterSnapshot<TGlobalProps> = Omit<GlobalAdapter<TGlobalProps>, "migrateGlobalProps" | "getDefaultGlobalProps" | "areGlobalDefaultsNeeded">;
+
 /**
  * Generic component adapter for a single component type.
  * L represents local (per instance) props.
@@ -718,3 +722,104 @@ export type DividerComponentAdapter = ComponentAdapter<DividerLocalProps>;
  * Concrete global adapter type alias for the Divider component.
  */
 export type DividerGlobalAdapter = GlobalAdapter<DividerGlobalProps>;
+
+export type ResizeMode = "crop" | "pad" | "stretch";
+
+type ImageSizeResponsive = {
+    readonly type: "responsive";
+};
+
+type ImageSizeOriginal = {
+    readonly type: "original";
+};
+
+type ImageSizeFixed = {
+    readonly type: "fixed";
+
+    /**
+     * These values are for backward compatibility with existing terminology,
+     * but map to these new values in the image component property panel:
+     *
+     * - "crop" == "Cover"
+     * - "pad" == "Contain"
+     * - "stretch" == "Stretch"
+     */
+    resizeMode: ResizeMode;
+    fixedWidthPx: number | null;
+    fixedHeightPx: number | null;
+};
+
+// Use discriminated union for ImageSize so each type can have its own properties.
+export type ImageSizeModel = ImageSizeResponsive | ImageSizeOriginal | ImageSizeFixed;
+
+type ImageSourceFile = {
+    readonly type: "file";
+
+    isHighResolution: boolean;
+    file: ListItemBag | null;
+};
+
+type ImageSourceAsset = {
+    readonly type: "asset";
+
+    asset: FileAsset | null;
+};
+
+export type ImageSourceModel = ImageSourceFile | ImageSourceAsset;
+
+export type ImageLocalProps = {
+    /**
+     * The source of the image along with related properties.
+     */
+    imageSource: ImageSourceModel;
+
+    /**
+     * The alt text for the image if it cannot be displayed.
+     */
+    altText: string;
+
+    /**
+     * The href to navigate to when the image is clicked.
+     */
+    href: string | null;
+
+    /**
+     * The image size mode and related properties.
+     */
+    imageSize: ImageSizeModel;
+
+    /**
+     * Horizontal alignment of the image.
+     */
+    horizontalAlignment: HorizontalAlignment | null;
+
+    /**
+     * Corner radius in pixels for the image.
+     *
+     * Not supported in some versions of Outlook.
+     */
+    borderRadiusPx: ShorthandModel<number | null> | null;
+
+    /**
+     * Outer margin applied around the image.
+     */
+    marginPx: ShorthandModel<number | null> | null;
+
+    /**
+     * Border styling applied to the image.
+     */
+    border: BorderModel | null;
+};
+
+export type ImageComponentAdapter = ComponentAdapter<ImageLocalProps>;
+
+export type BodyGlobalProps = {
+    widthPx: number | null;
+    backgroundColor: string | null;
+    bodyAlignment: HorizontalAlignment | null;
+    border: BorderModel | null;
+    marginPx: ShorthandModel<number | null> | null;
+    paddingPx: ShorthandModel<number | null> | null;
+};
+
+export type BodyGlobalAdapter = GlobalAdapter<BodyGlobalProps>;
