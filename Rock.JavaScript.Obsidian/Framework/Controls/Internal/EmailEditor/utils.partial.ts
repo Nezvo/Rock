@@ -51,9 +51,18 @@ import {
     RsvpLocalProps,
     RsvpComponentAdapter,
     ButtonGlobalAdapter,
+    ImageComponentAdapter,
+    ImageLocalProps,
+    ImageSizeModel,
+    ResizeMode,
+    ImageSourceModel,
+    BodyGlobalAdapter,
+    BodyGlobalProps,
+    TextAlignment,
+    GlobalAdapterSnapshot,
 } from "./types.partial";
 import { isElement, isHTMLElement, isHTMLTableElement, replaceTagName } from "@Obsidian/Utility/dom";
-import { newGuid } from "@Obsidian/Utility/guid";
+import { newGuid, toGuidOrNull } from "@Obsidian/Utility/guid";
 import { Enumerable } from "@Obsidian/Utility/linq";
 import { splitCase, toTitleCase } from "@Obsidian/Utility/stringUtils";
 import { isNullish } from "@Obsidian/Utility/util";
@@ -64,9 +73,6 @@ import { toNumberOrNull } from "@Obsidian/Utility/numberUtils";
 export const AccordionGroupInjectionKey: InjectionKey<AccordionManager> = Symbol("accordion-group");
 
 export const EmptyDropzoneSvgPixelWidth = 103;
-export const DefaultBodyWidth = 600;
-export const DefaultBodyAlignment = "center";
-export const DefaultBodyColor = "#ffffff";
 export const DefaultEmailBackgroundColor = "#e7e7e7";
 
 export const RockStylesCssClass = "rock-styles" as const;
@@ -181,29 +187,6 @@ export const GlobalCssClasses = {
 
 export const GlobalStylesCssSelectors = {
     backgroundColor: `.${EmailWrapperCssClass}`,
-
-    bodyWidth: getBorderWrapperTableSelector("row"),
-    bodyColor: getBorderWrapperCellSelector("row"),
-    bodyPadding: getPaddingWrapperCellSelector("row"),
-    bodyAlignment: getMarginWrapperCellSelector("row"),
-    bodyBorderStyling: getBorderWrapperCellSelector("row"),
-    bodyMargin: getMarginWrapperCellSelector("row"),
-
-    buttonBackgroundColor: `.component-button .button-link`,
-    buttonTextStyling: `.component-button .button-link`,
-    buttonCornerRadius: getBorderWrapperCellSelector("button"),
-    // Padding needs to be applied to the anchor element instead of the padding-wrapper cell.
-    buttonPadding: `.component-button .button-link`,
-    buttonMargin: getMarginWrapperCellSelector("button"),
-    buttonBorderStyling: getBorderWrapperCellSelector("button"),
-    buttonWidthValuesShell: `.component-button .button-shell, .component-rsvp .rsvp-button-shell`,
-    buttonWidthValuesButton: `.component-button .button-link, .component-rsvp .rsvp-accept-link, .component-rsvp .rsvp-decline-link`,
-
-    dividerMargin: getMarginWrapperCellSelector("divider"),
-    dividerWidth: getBorderWrapperTableSelector("divider"),
-    dividerStyle: getPaddingWrapperCellSelector("divider"),
-    dividerThickness: getPaddingWrapperCellSelector("divider"),
-    dividerColor: getPaddingWrapperCellSelector("divider"),
 } as const;
 
 // #endregion Constants
@@ -838,8 +821,8 @@ export function createComponentElement(document: Document, componentTypeName: Ed
         }
 
         case "image": {
-            const { createComponentElement } = getImageComponentHelper();
-            return createComponentElement();
+            const adapter = createImageComponentAdapter();
+            return adapter.createComponentElement(document);
         }
 
         case "code": {
@@ -1558,63 +1541,83 @@ export function isComponentVersionNumber(str: string): boolean {
 }
 
 /**
- * Compares two component version strings using a **semantic-like** versioning system.
+ * Compares two component version strings using a semantic like versioning system.
  *
- * Version format: `v<major>[.<minor>][-<phase>.<phaseVersion>]`
- * - `v2` (Major-only version, treated as `v2.0`)
- * - `v2.0` (Stable version)
- * - `v2.1` (Minor update)
- * - `v2.0-alpha.1` (Pre-release: alpha phase, version 1)
- * - `v2.0-beta.2` (Pre-release: beta phase, version 2)
+ * Version format: `v<major>[.<minor>][.<patch>][-<phase>[.<phaseVersion>]]`
+ * - `v2` (Major only, treated as `v2.0.0`)
+ * - `v2.0` (Treated as `v2.0.0`)
+ * - `v2.1.3` (Patch included)
+ * - `v2.0-foo` (Pre release: phase "foo", no phase version)
+ * - `v2.0-foo.1` (Pre release: phase "foo", version 1)
  *
- * **Comparison Rules:**
- * 1. **Major version (`vX` vs `vY`)**: Higher major versions are greater.
- * 2. **Minor version (`vX.Y` vs `vX.Z`)**: If major versions are equal, higher minor versions are greater.
- * 3. **Stable vs. Pre-release (`vX.Y` vs `vX.Y-beta.Z`)**: Stable versions are always greater than pre-releases.
- * 4. **Phase Sorting (`alpha < beta < rc`)**: Pre-release phases are sorted lexicographically.
- * 5. **Phase Version (`alpha.1 < alpha.2`)**: If the phase is the same, numerical phase version is compared.
- *
- * **Examples:**
- * ```typescript
- * compareVersions("v2", "v2.1"); // -1 (v2.0 < v2.1)
- * compareVersions("v2.0-alpha.1", "v2.0"); // -1 (alpha < stable)
- * compareVersions("v2.0-beta.2", "v2.0-beta.10"); // -1 (beta.2 < beta.10)
- * compareVersions("v2.0", "v3"); // -1 (v2 < v3)
- * compareVersions("v10", "v2.1"); // 1 (v10 > v2.1)
- * compareVersions("v2.0-beta.2", "v2.0-alpha.1"); // 1 (beta > alpha)
- * compareVersions("v2.0-beta.2", "v2.0-beta.2"); // 0 (equal)
- * ```
- *
- * @param {string} v1 - First version string (e.g., "v2.0-beta.1", "v2")
- * @param {string} v2 - Second version string (e.g., "v2.0", "v2.1", "v3")
- * @returns {number} Returns:
- * - `-1` if `v1 < v2`
- * - `1` if `v1 > v2`
- * - `0` if they are equal
+ * Comparison rules:
+ * 1) Major, then minor, then patch (higher means newer)
+ * 2) If major minor patch match, a version with no phase is newer than a version with a phase (phase indicates pre-release and stable beats pre-release)
+ * 3) If both have a phase, phase is compared alphabetically (case insensitive)
+ * 4) If phases match, phaseVersion compares numerically. Missing phaseVersion is treated as 0
  */
 export function compareComponentVersions(v1: string, v2: string): number {
-    function parseVersion(version: string): { major: number; minor: number; phase: string; phaseVersion: number } {
-        const match = version.match(/^v(\d+)(?:\.(\d+))?(?:-([a-zA-Z]+)(?:\.(\d+))?)?$/);
+    type Parsed = {
+        major: number
+        minor: number
+        patch: number
+        phase: string
+        phaseVersion: number
+    };
+
+    function parseVersion(version: string): Parsed {
+        // v<major>[.<minor>][.<patch>][-<phase>[.<phaseVersion>]]
+        const match = version.match(
+            /^v(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:-([a-zA-Z]+)(?:\.(\d+))?)?$/
+        );
 
         return {
-            major: match ? parseInt(match[1]) : 0,
-            minor: match?.[2] ? parseInt(match[2]) : 0, // Defaults to 0 if missing
-            phase: match?.[3] ?? "", // Phase name (e.g., alpha, beta)
-            phaseVersion: match?.[4] ? parseInt(match[4]) : 0 // Defaults to 0 if missing
+            major: match ? parseInt(match[1], 10) : 0,
+            minor: match && match[2] ? parseInt(match[2], 10) : 0,
+            patch: match && match[3] ? parseInt(match[3], 10) : 0,
+            phase: match && match[4] ? match[4] : "",
+            phaseVersion: match && match[5] ? parseInt(match[5], 10) : 0,
         };
     }
 
-    const v1Parts = parseVersion(v1);
-    const v2Parts = parseVersion(v2);
+    const a = parseVersion(v1);
+    const b = parseVersion(v2);
 
-    return (
-        v1Parts.major - v2Parts.major ||  // Compare major version
-        v1Parts.minor - v2Parts.minor ||  // Compare minor version
-        (v1Parts.phase === v2Parts.phase
-            ? v1Parts.phaseVersion - v2Parts.phaseVersion // Only compare phase versions when same phase
-            : (!v1Parts.phase ? -1 : !v2Parts.phase ? 1 : v1Parts.phase.localeCompare(v2Parts.phase)))
-    );
+    if (a.major !== b.major) {
+        return a.major < b.major ? -1 : 1;
+    }
+    if (a.minor !== b.minor) {
+        return a.minor < b.minor ? -1 : 1;
+    }
+    if (a.patch !== b.patch) {
+        return a.patch < b.patch ? -1 : 1;
+    }
+
+    const aStable = a.phase === "";
+    const bStable = b.phase === "";
+    if (aStable && !bStable) {
+        return 1;
+    }
+    if (!aStable && bStable) {
+        return -1;
+    }
+    if (aStable && bStable) {
+        return 0;
+    }
+
+    // Both have a phase: alphabetical sort, case insensitive for stability
+    const phaseComparison = a.phase.toLowerCase().localeCompare(b.phase.toLowerCase());
+    if (phaseComparison !== 0) {
+        return phaseComparison < 0 ? -1 : 1;
+    }
+
+    if (a.phaseVersion !== b.phaseVersion) {
+        return a.phaseVersion < b.phaseVersion ? -1 : 1;
+    }
+
+    return 0;
 }
+
 
 // #endregion Functions
 
@@ -2460,21 +2463,35 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
     const globalVersions = ["v0", "v17.3-alpha", "v18.2"] as const;
     type DividerGlobalVersion = (typeof globalVersions)[number];
 
-    const metaKeys = {
-        GLOBAL_DIVIDER_VERSION: "x-rock-global-divider-version"
+    const attributeValues = {
+        META_NAME_GLOBAL_DIVIDER_VERSION: "x-rock-global-divider-version"
     } as const;
 
-    const dividerDatasetKeys = {
-        COMPONENT_HORIZONTAL_ALIGNMENT: "data-component-horizontal-alignment",
-        COMPONENT_WIDTH: "data-component-width"
+    const attributeNames = {
+        DATA_COMPONENT_HORIZONTAL_ALIGNMENT: "data-component-horizontal-alignment",
+        DATA_COMPONENT_WIDTH: "data-component-width"
     } as const;
+
+    const defaultGlobalProps: DividerGlobalProps = {
+        style: "solid",
+        thicknessPx: 1,
+        color: "#8b8ba7",
+        widthPercent: 100,
+        horizontalAlignment: "center",
+        marginPx: {
+            top: 12,
+            bottom: 12,
+            left: 0,
+            right: 0
+        }
+    };
 
     function getGlobalVersion(emailDocument: Document): DividerGlobalVersion {
         // v18.2 and later use the meta tag to track global button schema version.
-        const globalPropsVersion: DividerGlobalVersion | undefined = (emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_DIVIDER_VERSION}"]`)?.getAttribute("content") || undefined) as (DividerGlobalVersion | undefined);
+        const globalVersion = getMetaTag(emailDocument, attributeValues.META_NAME_GLOBAL_DIVIDER_VERSION)?.getAttribute("content");
 
-        if (globalPropsVersion && globalVersions.includes(globalPropsVersion)) {
-            return globalPropsVersion;
+        if (globalVersion && globalVersions.includes(globalVersion as DividerGlobalVersion)) {
+            return globalVersion as DividerGlobalVersion;
         }
 
         // Try to infer from structure.
@@ -2491,28 +2508,14 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
         return "v0";
     }
 
-    // Define the adapters for each version and we'll only return the latest.
-    // These are used for migrations.
-    const adapters: Record<DividerGlobalVersion, DividerGlobalAdapter> = {
+    // Don't modify a specific version once released.
+    // Instead, add new versions using semver.
+    // The major and minor versions should align with the current Rock version.
+    // If necessary, you can add patch versions for fixes within the same release.
+    // Avoid defining pre-release versions (like "v17.3-alpha") unless absolutely necessary.
+    const adapters: Record<DividerGlobalVersion, GlobalAdapterSnapshot<DividerGlobalProps>> = {
         "v0": {
             version: "v0",
-
-            areGlobalDefaultsNeeded(): boolean {
-                // No global defaults for v0.
-                return false;
-            },
-
-            getDefaultGlobalProps(): DividerGlobalProps {
-                // No global defaults for v0.
-                return {
-                    style: null,
-                    thicknessPx: null,
-                    color: null,
-                    widthPercent: null,
-                    horizontalAlignment: null,
-                    marginPx: null,
-                };
-            },
 
             readGlobalProps(_emailDocument: Document): DividerGlobalProps {
                 // No global props for v0.
@@ -2528,46 +2531,11 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
 
             writeGlobalProps(_emailDocument: Document, _globalProps: DividerGlobalProps): void {
                 // No global props for v0.
-            },
-
-            migrateGlobalProps(_emailDocument: Document): DividerGlobalProps {
-                // No global props for v0.
-                return {
-                    style: null,
-                    thicknessPx: null,
-                    color: null,
-                    widthPercent: null,
-                    horizontalAlignment: null,
-                    marginPx: null
-                };
             }
         },
 
         "v17.3-alpha": {
             version: "v17.3-alpha",
-
-            areGlobalDefaultsNeeded(emailDocument: Document): boolean {
-                // Only true if the default global styles are missing.
-                const isGlobalDividerStyleMissing = !findRockStyleRules(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td").any();
-                const isGlobalDividerPaddingStyleMissing = !findRockStyleRules(emailDocument, ".margin-wrapper-for-divider>tbody>tr>td").any();
-                return isGlobalDividerStyleMissing && isGlobalDividerPaddingStyleMissing;
-            },
-
-            getDefaultGlobalProps(): DividerGlobalProps {
-                return {
-                    style: "solid",
-                    thicknessPx: 1,
-                    color: "#8b8ba7",
-                    widthPercent: 100,
-                    horizontalAlignment: "center",
-                    marginPx: {
-                        top: 12,
-                        bottom: 12,
-                        left: 0,
-                        right: 0
-                    }
-                };
-            },
 
             readGlobalProps(emailDocument: Document): DividerGlobalProps {
                 const paddingWrapperTdStyles = findRockStyleRules(emailDocument, ".padding-wrapper-for-divider>tbody>tr>td")
@@ -2650,82 +2618,11 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
 
                 // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
                 synchronizeRulesToDom(rules);
-            },
-
-            migrateGlobalProps(emailDocument: Document): DividerGlobalProps {
-                const globalVersion = getGlobalVersion(emailDocument);
-                const thisAdapter = adapters["v17.3-alpha"];
-                const adapter = adapters[globalVersion];
-
-                if (thisAdapter === adapter || compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
-                    // Already on this or a later version; no migration needed.
-                    return adapter.readGlobalProps(emailDocument);
-                }
-
-                // Clear the global props using the old adapter (to clean up any old styles),
-                // and restore them using the new adapter.
-                const globalProps = adapter.readGlobalProps(emailDocument);
-                adapter.writeGlobalProps(emailDocument, {
-                    color: null,
-                    horizontalAlignment: null,
-                    marginPx: null,
-                    style: null,
-                    thicknessPx: null,
-                    widthPercent: null
-                });
-                thisAdapter.writeGlobalProps(emailDocument, globalProps);
-                return thisAdapter.readGlobalProps(emailDocument);
             }
         },
+
         "v18.2": {
             version: "v18.2",
-
-            areGlobalDefaultsNeeded(emailDocument: Document): boolean {
-                const metaContent = (emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_DIVIDER_VERSION}"]`) as HTMLMetaElement | null)?.content;
-
-                // Global defaults are needed if there haven't been any added yet as identified by the meta tag introduced in v18.2.
-                return !metaContent;
-            },
-
-            getDefaultGlobalProps(): DividerGlobalProps {
-                return {
-                    style: "solid",
-                    thicknessPx: 1,
-                    color: "#8b8ba7",
-                    widthPercent: 100,
-                    horizontalAlignment: "center",
-                    marginPx: {
-                        top: 12,
-                        bottom: 12,
-                        left: 0,
-                        right: 0
-                    }
-                };
-            },
-
-            migrateGlobalProps(emailDocument: Document): DividerGlobalProps {
-                const adapter = adapters[getGlobalVersion(emailDocument)];
-                const thisAdapter = adapters["v18.2"];
-                const globalProps = adapter.readGlobalProps(emailDocument);
-
-                if (compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
-                    // Already on this or a newer version; no migration needed.
-                    return globalProps;
-                }
-
-                // Clear the global props using the old adapter (to clean up any old styles),
-                // and restore them using the new adapter.
-                adapter.writeGlobalProps(emailDocument, {
-                    color: null,
-                    horizontalAlignment: null,
-                    marginPx: null,
-                    style: null,
-                    thicknessPx: null,
-                    widthPercent: null
-                });
-                thisAdapter.writeGlobalProps(emailDocument, globalProps);
-                return thisAdapter.readGlobalProps(emailDocument);
-            },
 
             readGlobalProps(emailDocument: Document): DividerGlobalProps {
                 const marginWrapperTdStyles = findRockStyleRules(emailDocument, ".margin-wrapper-for-divider > tbody > tr > td")
@@ -2763,17 +2660,7 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
             },
 
             writeGlobalProps(emailDocument: Document, globalProps: DividerGlobalProps): void {
-                // Write the version to the document body.
-                const globalVersionMeta = emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_DIVIDER_VERSION}"]`) as HTMLMetaElement | null;
-                if (globalVersionMeta) {
-                    globalVersionMeta.setAttribute("content", "v18.2");
-                }
-                else {
-                    const meta = emailDocument.createElement("meta");
-                    meta.setAttribute("name", metaKeys.GLOBAL_DIVIDER_VERSION);
-                    meta.setAttribute("content", "v18.2");
-                    emailDocument.head.appendChild(meta);
-                }
+                addOrUpdateMetaTag(emailDocument, attributeValues.META_NAME_GLOBAL_DIVIDER_VERSION, "v18.2");
 
                 const marginWrapperTdSelector = ".margin-wrapper-for-divider > tbody > tr > td";
                 const marginWrapperTdRule = findRockStyleRules(emailDocument, marginWrapperTdSelector)?.lastOrDefault()
@@ -2830,11 +2717,11 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
 
                 // horizontalAlignment
                         // Only set attribute values on components that don't have the data attribute.
-                emailDocument.querySelectorAll(`.component-divider:not([${dividerDatasetKeys.COMPONENT_HORIZONTAL_ALIGNMENT}]) ${marginWrapperTdSelector}`)
+                emailDocument.querySelectorAll(`.component-divider:not([${attributeNames.DATA_COMPONENT_HORIZONTAL_ALIGNMENT}]) ${marginWrapperTdSelector}`)
                     .forEach(marginWrapperTd => {
                         setAttributePropertyValue(marginWrapperTd, "align", globalProps.horizontalAlignment);
                     });
-                emailDocument.querySelectorAll(`.component-divider:not([${dividerDatasetKeys.COMPONENT_HORIZONTAL_ALIGNMENT}]) ${borderWrapperTableSelector}`)
+                emailDocument.querySelectorAll(`.component-divider:not([${attributeNames.DATA_COMPONENT_HORIZONTAL_ALIGNMENT}]) ${borderWrapperTableSelector}`)
                     .forEach(borderWrapperTable => {
                         setAttributePropertyValue(borderWrapperTable, "align", globalProps.horizontalAlignment);
                     });
@@ -2875,7 +2762,7 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
 
                 // widthPercent
                 setStylePropertyValue(borderWrapperTableRule?.style, "width", toPercentageStringValueOrNull(globalProps.widthPercent));
-                emailDocument.querySelectorAll(`.component-divider:not([${dividerDatasetKeys.COMPONENT_WIDTH}]) ${borderWrapperTableSelector}`)
+                emailDocument.querySelectorAll(`.component-divider:not([${attributeNames.DATA_COMPONENT_WIDTH}]) ${borderWrapperTableSelector}`)
                     .forEach(borderWrapperTable => {
                         setAttributePropertyValue(borderWrapperTable, "width", toPercentageStringValueOrNull(globalProps.widthPercent));
                     });
@@ -2886,7 +2773,53 @@ export function createDividerGlobalAdapter(): DividerGlobalAdapter {
         }
     };
 
-    return adapters[getLatestVersion(globalVersions)];
+    const latestAdapter = adapters[getLatestVersion(globalVersions)];
+
+    return {
+        ...latestAdapter,
+
+        areGlobalDefaultsNeeded(emailDocument: Document): boolean {
+            return compareComponentVersions(getGlobalVersion(emailDocument), "v0") === 0;
+        },
+
+        getDefaultGlobalProps(): DividerGlobalProps {
+            return defaultGlobalProps;
+        },
+
+        migrateGlobalProps(emailDocument: Document): DividerGlobalProps {
+            const adapter = adapters[getGlobalVersion(emailDocument)];
+            const thisAdapter = latestAdapter;
+            const globalProps = adapter.readGlobalProps(emailDocument);
+
+            if (compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                // Already on this or a newer version; no migration needed.
+                return globalProps;
+            }
+
+            // Clear the global props using the old adapter (to clean up any old styles),
+            // and restore them using the new adapter.
+            adapter.writeGlobalProps(emailDocument, {
+                color: null,
+                horizontalAlignment: null,
+                marginPx: null,
+                style: null,
+                thicknessPx: null,
+                widthPercent: null
+            });
+            thisAdapter.writeGlobalProps(emailDocument, globalProps);
+            return thisAdapter.readGlobalProps(emailDocument);
+        },
+    };
+}
+
+function getComponentVersion<T extends string>(componentElement: HTMLElement, componentVersions: readonly T[]): T {
+    const version = componentElement.getAttribute("data-version");
+
+    if (version && componentVersions.includes(version as T)) {
+        return version as T;
+    }
+
+    return getEarliestVersion(componentVersions);
 }
 
 export function createDividerComponentAdapter(): DividerComponentAdapter {
@@ -2898,16 +2831,6 @@ export function createDividerComponentAdapter(): DividerComponentAdapter {
         COMPONENT_HORIZONTAL_ALIGNMENT: "data-component-horizontal-alignment",
         COMPONENT_WIDTH: "data-component-width"
     } as const;
-
-    function getComponentVersion(componentElement: HTMLElement): DividerComponentVersion {
-        const version = componentElement.getAttribute("data-version");
-
-        if (version && componentVersions.includes(version as DividerComponentVersion)) {
-            return version as DividerComponentVersion;
-        }
-
-        return "v0";
-    }
 
     // Define the adapters for each version and we'll only return the latest.
     // These are used for both component migration and global props migration.
@@ -3088,7 +3011,7 @@ export function createDividerComponentAdapter(): DividerComponentAdapter {
             },
 
             migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
-                const version = getComponentVersion(componentElement);
+                const version = getComponentVersion(componentElement, componentVersions);
                 const thisAdapter = adapters["v17.3-alpha"];
                 const adapter = adapters[version];
 
@@ -3269,7 +3192,7 @@ export function createDividerComponentAdapter(): DividerComponentAdapter {
             },
 
             migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
-                const version = getComponentVersion(componentElement);
+                const version = getComponentVersion(componentElement, componentVersions);
                 const thisAdapter = adapters["v18.2"];
                 const adapter = adapters[version];
 
@@ -3296,6 +3219,10 @@ export function createDividerComponentAdapter(): DividerComponentAdapter {
 
 function getLatestVersion<T extends string>(versions: readonly T[] | T[]): T {
     return Enumerable.from(versions).aggregate((v1, v2) => compareComponentVersions(v1, v2) > 0 ? v1 : v2, "v0" as T);
+}
+
+function getEarliestVersion<T extends string>(versions: readonly T[] | T[]): T {
+    return Enumerable.from(versions).aggregate((v1, v2) => compareComponentVersions(v1, v2) < 0 ? v1 : v2, "v9999" as T);
 }
 
 export function createRsvpComponentAdapter(): RsvpComponentAdapter {
@@ -4096,7 +4023,6 @@ export function getSectionComponentHelper(): ComponentMigrationHelper & {
                     return newRoot;
                 },
 
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 function v2AlphaToV17_3Alpha(componentElement: Element): Element {
                     const versionNumber = getComponentVersionNumber(componentElement);
                     if (!versionNumber) {
@@ -4125,241 +4051,1197 @@ export function getSectionComponentHelper(): ComponentMigrationHelper & {
     };
 }
 
-export function getImageComponentHelper(): ComponentMigrationHelper & {
-    getElements(componentElement: Element): ComponentStructure | null,
-    createComponentElement(): HTMLElement
-} {
-    const latestVersion = "v18-alpha" as const;
+function getMetaTag(emailDocument: Document, name: string): HTMLMetaElement | null {
+    return emailDocument.head.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+}
 
-    return {
-        createComponentElement(): HTMLElement {
-            const componentElements = createComponent(
-                "image",
-                latestVersion,
-                // Use box-sizing: border-box to ensure border is included in image width calculations.
-                `<img alt="" src="/Assets/Images/image-placeholder.jpg" data-imgcsswidth="full" style="width: 100%; box-sizing: border-box;">`
-            );
-            // Image component needs a line-height of 0 to remove extra space under image.
-            componentElements.marginWrapper.borderWrapper.paddingWrapper.td.style.lineHeight = "0";
-            return componentElements.marginWrapper.table;
+function addOrUpdateMetaTag(emailDocument: Document, name: string, content: string): void {
+    let metaTag = getMetaTag(emailDocument, name);
+
+    if (!metaTag) {
+        metaTag = emailDocument.createElement("meta");
+        metaTag.setAttribute("name", name);
+        emailDocument.head.appendChild(metaTag);
+    }
+
+    metaTag.setAttribute("content", content);
+}
+
+export function createBodyGlobalAdapter(): BodyGlobalAdapter {
+    const globalVersions = ["v0", "v17.3-alpha", "v18.2"] as const;
+    type BodyGlobalVersion = (typeof globalVersions)[number];
+    const latestVersion = getLatestVersion<BodyGlobalVersion>(globalVersions);
+
+    const attributeValues = {
+        META_NAME_GLOBAL_BODY_VERSION: "x-rock-global-body-version"
+    } as const;
+
+    const defaultGlobalProps: BodyGlobalProps = {
+        widthPx: 600,
+        backgroundColor: "#ffffff",
+        bodyAlignment: "center",
+        border: null,
+        marginPx: null,
+        paddingPx: createShorthandModel(24)
+    };
+
+    function getGlobalVersion(emailDocument: Document): BodyGlobalVersion {
+        // v18.2 and later use the meta tag to track global button schema version.
+        const globalVersion = getMetaTag(emailDocument, attributeValues.META_NAME_GLOBAL_BODY_VERSION)?.getAttribute("content");
+
+        if (globalVersion && globalVersions.includes(globalVersion as BodyGlobalVersion)) {
+            // v18.2 and up use the meta tag for version tracking.
+            return globalVersion as BodyGlobalVersion;
+        }
+
+        const hasAnyGlobalStylesFromV17_3_alpha =
+            findRockStyleRules(emailDocument, ".border-wrapper-for-row").any(r => !!r.style.maxWidth);
+
+        if (hasAnyGlobalStylesFromV17_3_alpha) {
+            return "v17.3-alpha";
+        }
+
+        // No version info, assume v0 (legacy).
+        return "v0";
+    }
+
+    // Don't modify a specific version once released.
+    // Instead, add new versions using semver.
+    // The major and minor versions should align with the current Rock version.
+    // If necessary, you can add patch versions for fixes within the same release.
+    // Avoid defining pre-release versions (like "v17.3-alpha") unless absolutely necessary.
+    const adapters: Record<BodyGlobalVersion, GlobalAdapterSnapshot<BodyGlobalProps>> = {
+        /*
+            - Mirrors the WebForms version where there were no global properties.
+         */
+        "v0": {
+            version: "v0",
+
+            readGlobalProps(_emailDocument: Document): BodyGlobalProps {
+                // v0 has no global props.
+                return {
+                    widthPx: null,
+                    backgroundColor: null,
+                    bodyAlignment: null,
+                    border: null,
+                    marginPx: null,
+                    paddingPx: null
+                };
+            },
+
+            writeGlobalProps(_emailDocument: Document, _globalProps: BodyGlobalProps): void {
+                // v0 has no global props.
+            }
         },
 
-        getElements(componentElement: Element): ComponentStructure | null {
-            if (!componentElement.classList.contains("component-image")) {
-                throw new Error(`Element is not an image component element: ${componentElement.outerHTML}`);
-            }
+        /*
+            - Obsidian version where global properties were introduced.
+         */
+        "v17.3-alpha": {
+            version: "v17.3-alpha",
 
-            return findComponentInnerWrappers(componentElement);
-        },
+            readGlobalProps(emailDocument: Document): BodyGlobalProps {
+                const borderWrapperForRowStyles = findRockStyleRules(emailDocument, ".border-wrapper-for-row")
+                    .select(rule => rule.style)
+                    .toArray();
+                const backgroundColorStyles = findRockStyleRules(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-row>tbody>tr>td`)
+                    .select(rule => rule.style)
+                    .toArray();
+                const borderCellStyles = findRockStyleRules(emailDocument, `.border-wrapper-for-row > tbody > tr > td`)
+                    .select(rule => rule.style)
+                    .toArray();
+                const marginWrapperTdForRowStyles = findRockStyleRules(emailDocument, `.margin-wrapper-for-row > tbody > tr > td`)
+                    .select(rule => rule.style)
+                    .toArray();
+                const paddingWrapperTdForRowStyles = findRockStyleRules(emailDocument, `.padding-wrapper-for-row > tbody > tr > td`)
+                    .select(rule => rule.style)
+                    .toArray();
 
-        isMigrationRequired(componentElement: Element): boolean {
-            if (!componentElement.classList.contains("component-image")) {
-                throw new Error(`Element is not a image component element: ${componentElement.outerHTML}`);
-            }
+                return {
+                    widthPx: toPixelNumericValueOrNull(getStylePropertyValueOrNull(borderWrapperForRowStyles, "max-width")),
+                    backgroundColor: getStylePropertyValueOrNull(backgroundColorStyles, "background-color"),
+                    bodyAlignment: toHorizontalAlignmentOrNull(emailDocument.querySelector(`.margin-wrapper-for-row > tbody > tr > td`)?.getAttribute("align")),
+                    border: getStyleBorder(borderCellStyles),
+                    marginPx: getStylePaddingPx(marginWrapperTdForRowStyles),
+                    paddingPx: getStylePaddingPx(paddingWrapperTdForRowStyles)
+                };
+            },
 
-            const versionNumber = getComponentVersionNumber(componentElement);
+            writeGlobalProps(emailDocument: Document, globalProps: BodyGlobalProps): void {
+                const borderWrapperForRowRule = findRockStyleRules(emailDocument, `.border-wrapper-for-row`)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, `.border-wrapper-for-row`);
+                const borderWrapperForRowTdRule = findRockStyleRules(emailDocument, `.border-wrapper-for-row > tbody > tr > td`)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, `.border-wrapper-for-row > tbody > tr > td`);
+                const paddingWrapperForRowTdWithoutBackgroundColorRule = findRockStyleRules(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-row>tbody>tr>td`)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-row>tbody>tr>td`);
+                const marginWrapperForRowTdRule = findRockStyleRules(emailDocument, `.margin-wrapper-for-row > tbody > tr > td`)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, `.margin-wrapper-for-row > tbody > tr > td`);
+                const paddingWrapperForRowTdRule = findRockStyleRules(emailDocument, `.padding-wrapper-for-row > tbody > tr > td`)?.lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, `.padding-wrapper-for-row > tbody > tr > td`);
 
-            if (!versionNumber) {
-                return true;
-            }
+                const updatedRules: CSSRule[] = [
+                    borderWrapperForRowRule,
+                    borderWrapperForRowTdRule,
+                    paddingWrapperForRowTdWithoutBackgroundColorRule,
+                    marginWrapperForRowTdRule,
+                    paddingWrapperForRowTdRule
+                ];
 
-            const comparison = compareComponentVersions(versionNumber, latestVersion);
+                setStyleBorder(borderWrapperForRowTdRule.style, globalProps.border);
+                setStylePaddingPx(marginWrapperForRowTdRule.style, globalProps.marginPx);
+                setStylePaddingPx(paddingWrapperForRowTdRule.style, globalProps.paddingPx);
 
-            if (comparison < 0) {
-                return true;
-            }
+                // horizontalAlignment
+                emailDocument.querySelectorAll(marginWrapperForRowTdRule.selectorText).forEach(element => {
+                    setAttributePropertyValue(element, "align", globalProps.bodyAlignment ?? defaultGlobalProps.bodyAlignment);
+                });
 
-            return false;
-        },
+                // bodyWidthPx
+                const bodyWidthPxString = toPixelStringValueOrNull(globalProps.widthPx);
+                setStylePropertyValue(borderWrapperForRowRule.style, "max-width", bodyWidthPxString);
+                setStylePropertyValue(borderWrapperForRowRule.style, "width", !isNullish(globalProps.widthPx) ? "100%" : null);
+                emailDocument.querySelectorAll(`.border-wrapper-for-row:not([data-component-body-width="true"])`) // For some reason this is on the border-wrapper instead of the top-level component.
+                    .forEach(element => {
+                        setAttributePropertyValue(element, "width", globalProps.widthPx?.toString());
+                    });
+                setStylePropertyValue(borderWrapperForRowTdRule.style, "max-width", bodyWidthPxString);
 
-        migrate(oldComponentElement: Element): Element {
-            if (!oldComponentElement.classList.contains("component-image")) {
-                throw new Error("Element is not a valid image component.");
-            }
+                // Whenever the body width is changed,
+                // also update the responsive @media rules.
+                const fallbackBodyWidthPxString = toPixelStringValueOrNull(defaultGlobalProps.widthPx) || "600px";
+                findRockMediaStyleSheets(emailDocument).forEach(sheet => {
+                    sheet.ownerNode?.remove();
+                });
+                const sheet = createRockMediaStyleSheet(emailDocument);
+                const i = sheet.insertRule(`@media screen and (max-width: ${bodyWidthPxString || fallbackBodyWidthPxString}) {
+    .email-wrapper {
+        min-height: 100vh;
+    }
 
-            const componentVersion = getComponentVersionNumber(oldComponentElement);
+    .small-12 {
+        display: inline-block !important;
+        width: 100% !important;
+    }
 
-            // Check if the component is already at the latest version.
-            if (componentVersion && compareComponentVersions(componentVersion, latestVersion) === 0) {
-                return oldComponentElement;
-            }
+    .small-11 {
+        display: inline-block !important;
+        width: 91.66667% !important;
+    }
 
-            // These are in order from oldest to newest; new migrations should be added at the end.
-            const migrations = [
-                function v0ToV2Alpha(oldComponent: Element): Element {
-                    const migrationVersionNumber = "v2-alpha";
-                    const versionNumber = getComponentVersionNumber(oldComponent);
+    .small-10 {
+        display: inline-block !important;
+        width: 83.33333% !important;
+    }
 
-                    if (versionNumber && compareComponentVersions(versionNumber, migrationVersionNumber) >= 0) {
-                        return oldComponent; // Already migrated
-                    }
+    .small-9 {
+        display: inline-block !important;
+        width: 75% !important;
+    }
 
-                    const image = oldComponent.querySelector("img");
-                    if (!image) {
-                        throw new Error("No <img> found in the image component.");
-                    }
+    .small-8 {
+        display: inline-block !important;
+        width: 66.66667% !important;
+    }
 
-                    const anchor = oldComponent.querySelector("a");
-                    const imgSrc = image.getAttribute("src") ?? "";
-                    const alt = image.getAttribute("alt") ?? "";
+    .small-7 {
+        display: inline-block !important;
+        width: 58.33333% !important;
+    }
 
-                    const imageGuid = oldComponent.getAttribute("data-image-guid") ?? "";
-                    const imageFilename = oldComponent.getAttribute("data-image-filename") ?? "";
-                    const imageWidth = oldComponent.getAttribute("data-image-width") ?? "";
-                    const imageHeight = oldComponent.getAttribute("data-image-height") ?? "";
-                    const imageResizeMode = oldComponent.getAttribute("data-image-resizemode") ?? "";
+    .small-6 {
+        display: inline-block !important;
+        width: 50% !important;
+    }
 
-                    const hasMargin = (oldComponent as HTMLElement).style.margin;
-                    const margin = hasMargin || "";
+    .small-5 {
+        display: inline-block !important;
+        width: 41.66667% !important;
+    }
 
-                    const align = (oldComponent as HTMLElement).style.textAlign || "";
+    .small-4 {
+        display: inline-block !important;
+        width: 33.33333% !important;
+    }
 
-                    const tdAlignAttr = align ? ` align="${align}"` : "";
+    .small-3 {
+        display: inline-block !important;
+        width: 25% !important;
+    }
 
-                    const widthAttr = imageWidth ? ` width="${imageWidth}"` : "";
-                    const heightAttr = imageHeight ? ` height="${imageHeight}"` : "";
-                    const heightStyle = imageHeight ? ` height: ${imageHeight};` : "";
+    .small-2 {
+        display: inline-block !important;
+        width: 16.66667% !important;
+    }
 
-                    const tdPadding = margin ? ` style="padding: ${margin};"` : "";
+    .small-1 {
+        display: inline-block !important;
+        width: 8.33333% !important;
+    }
 
-                    const wrapper = document.createElement("table");
-                    wrapper.setAttribute("border", "0");
-                    wrapper.setAttribute("cellpadding", "0");
-                    wrapper.setAttribute("cellspacing", "0");
-                    wrapper.setAttribute("width", "100%");
-                    wrapper.setAttribute("role", "presentation");
-                    wrapper.className = "margin-wrapper margin-wrapper-for-image component component-image";
-                    wrapper.setAttribute("data-state", "component");
-                    setComponentVersionNumber(wrapper, migrationVersionNumber);
+    .spacer {
+        display: none !important;
+        width: 0 !important;
+    }
+}`, sheet.cssRules.length);
 
-                    if (imageGuid) {
-                        wrapper.setAttribute("data-image-guid", imageGuid);
-                    }
-                    if (imageFilename) {
-                        wrapper.setAttribute("data-image-filename", imageFilename);
-                    }
-                    if (imageWidth) {
-                        wrapper.setAttribute("data-image-width", imageWidth);
-                    }
-                    if (imageHeight) {
-                        wrapper.setAttribute("data-image-height", imageHeight);
-                    }
-                    if (imageResizeMode) {
-                        wrapper.setAttribute("data-image-resizemode", imageResizeMode);
-                    }
-
-                    wrapper.innerHTML = `
-                        <tbody><tr><td${tdPadding}>
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation"
-                                   class="border-wrapper border-wrapper-for-image" style="border-collapse: separate !important;">
-                                <tbody><tr><td style="overflow: hidden;">
-                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation"
-                                           class="padding-wrapper padding-wrapper-for-image">
-                                        <tbody><tr><td${tdAlignAttr} style="line-height: 0;">
-                                            ${anchor
-                            ? `<a href="${anchor.getAttribute("href") ?? ""}"><img alt="${alt}" src="${imgSrc}" style="box-sizing: border-box;${heightStyle}"${widthAttr}${heightAttr}></a>`
-                            : `<img alt="${alt}" src="${imgSrc}" style="box-sizing: border-box;${heightStyle}"${widthAttr}${heightAttr}>`}
-                                        </td></tr></tbody>
-                                    </table>
-                                </td></tr></tbody>
-                            </table>
-                        </td></tr></tbody>
-                    `;
-
-                    return wrapper;
-                },
-
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                function v2AlphaToV17_3Alpha(componentElement: Element): Element {
-                    const migrationVersionNumber = "v17.3-alpha";
-                    const versionNumber = getComponentVersionNumber(componentElement);
-
-                    if (!versionNumber) {
-                        throw new Error("Component version number is missing.");
-                    }
-
-                    if (compareComponentVersions(versionNumber, migrationVersionNumber) >= 0) {
-                        return componentElement; // Already migrated
-                    }
-
-                    // Bump version.
-                    setComponentVersionNumber(componentElement, migrationVersionNumber);
-
-                    return componentElement;
-                },
-
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                function v17_3AlphaToV18Alpha(componentElement: Element): Element {
-                    const migrationVersionNumber = "v18-alpha";
-
-                    const versionNumber = getComponentVersionNumber(componentElement);
-
-                    if (!versionNumber) {
-                        // This shouldn't occur unless the v0 migration was skipped or modified incorrectly.
-                        throw new Error("Component version number is missing.");
-                    }
-
-                    if (compareComponentVersions(versionNumber, migrationVersionNumber) >= 0) {
-                        return componentElement; // Already migrated
-                    }
-
-                    // Check if this is an "asset" image based on `data-image-assetstorageproviderid`
-                    const assetStorageId = componentElement.getAttribute("data-image-assetstorageproviderid");
-
-                    if (!assetStorageId) {
-                        // If it's not an asset-based image, just bump the version number.
-                        setComponentVersionNumber(componentElement, migrationVersionNumber);
-                        return componentElement;
-                    }
-
-                    let scalePercentage = parseInt(componentElement.getAttribute("data-image-scale") ?? "100");
-                    if (!scalePercentage || Number.isNaN(scalePercentage)) {
-                        scalePercentage = 100;
-                    }
-
-                    const img = componentElement.querySelector("img");
-                    let inlineImageWidth = parseInt(img?.style.width ?? "0");
-
-                    if (!img?.style.width.endsWith("px") || Number.isNaN(inlineImageWidth)) {
-                        inlineImageWidth = 0;
-                    }
-
-                    // Remove the scale since it's irrelevant for responsive rendering
-                    componentElement.removeAttribute("data-image-scale");
-
-                    if (scalePercentage < 100 && inlineImageWidth > 0) {
-                        // The image was scaled down so set the width to the scaled size
-                        componentElement.setAttribute("data-image-resizemode", "crop");
-                        componentElement.setAttribute("data-image-width", `${inlineImageWidth}`);
-
-                        if (img) {
-                            img.style.objectFit = "cover";
-                            // img should already have a width set based on the previous scale feature.
-                        }
-                    }
-                    else {
-                        // The image was left at 100% scale so set to the original image size
-                        componentElement.removeAttribute("data-image-size");
-
-                        if (img) {
-                            img.style.removeProperty("width");
-                        }
-                    }
-
-                    setComponentVersionNumber(componentElement, migrationVersionNumber);
-
-                    return componentElement;
+                // If the media rule was added successfully,
+                // include it in the updated rules array so the DOM can be updated accordingly
+                // in the following step.
+                const mediaRule = sheet.cssRules.item(i);
+                if (mediaRule) {
+                    updatedRules.push(mediaRule);
                 }
-            ];
 
-            // Run migrations.
-            return migrations.reduce((component, migrate) => migrate(component), oldComponentElement);
+                // backgroundColor
+                setStylePropertyValue(paddingWrapperForRowTdWithoutBackgroundColorRule.style, "background-color", globalProps.backgroundColor);
+                let backgroundColor = globalProps.backgroundColor;
+
+                // bgcolor doesn't allow hex values with alpha values.
+                // If transparent, use the "transparent" named color instead.
+                if (backgroundColor?.startsWith("#")
+                    && (
+                        (backgroundColor.length === 5 && backgroundColor.endsWith("0"))     // #RGBA
+                        || (backgroundColor.length === 9 && backgroundColor.endsWith("00")) // #RRGGBBAA
+                    )
+                ) {
+                    backgroundColor = "transparent";
+                }
+                emailDocument.querySelectorAll(`.component:not([data-component-background-color="true"]) .padding-wrapper-for-row`).forEach(element => {
+                    setAttributePropertyValue(element, "bgcolor", backgroundColor);
+                });
+
+                // All the above work only updates the in-memory document;
+                // now synchronize the sheet(s) to the DOM.
+                synchronizeRulesToDom(updatedRules);
+            }
         },
 
-        get latestVersion(): string {
-            return latestVersion;
+        /*
+            - Added meta tag to track global body version.
+         */
+        "v18.2": {
+            version: "v18.2",
+
+            readGlobalProps(emailDocument: Document): BodyGlobalProps {
+                return adapters["v17.3-alpha"].readGlobalProps(emailDocument);
+            },
+
+            writeGlobalProps(emailDocument: Document, globalProps: BodyGlobalProps): void {
+                addOrUpdateMetaTag(emailDocument, attributeValues.META_NAME_GLOBAL_BODY_VERSION, "v18.2");
+
+                adapters["v17.3-alpha"].writeGlobalProps(emailDocument, globalProps);
+            }
         }
     };
+
+    const latestAdapter = adapters[latestVersion];
+
+    return {
+        ...latestAdapter,
+
+        areGlobalDefaultsNeeded(emailDocument: Document): boolean {
+            return compareComponentVersions(getGlobalVersion(emailDocument), "v0") === 0;
+        },
+
+        getDefaultGlobalProps(): BodyGlobalProps {
+            return defaultGlobalProps;
+        },
+
+        migrateGlobalProps(emailDocument: Document): void {
+            const adapter = adapters[getGlobalVersion(emailDocument)];
+
+            if (adapter === latestAdapter || compareComponentVersions(adapter.version, latestAdapter.version) >= 0) {
+                // Already on this or later version.
+                return;
+            }
+
+            // Clear old props first
+            const globalProps = adapter.readGlobalProps(emailDocument);
+            adapter.writeGlobalProps(emailDocument, {
+                widthPx: null,
+                backgroundColor: null,
+                bodyAlignment: null,
+                border: null,
+                marginPx: null,
+                paddingPx: null
+            });
+
+            latestAdapter.writeGlobalProps(emailDocument, globalProps);
+        }
+    };
+}
+
+export function createImageComponentAdapter(): ImageComponentAdapter {
+    const componentVersions = ["v0", "v18-alpha", "v18.2"] as const;
+    type ImageComponentVersion = (typeof componentVersions)[number];
+    const latestVersion = getLatestVersion<ImageComponentVersion>(componentVersions);
+    const placeholderImageSrc = "/Assets/Images/image-placeholder.jpg";
+
+    const bodyGlobalAdapter = createBodyGlobalAdapter();
+
+    const attributeNames = {
+        // Asset keys (don't change the letter case of these values)
+        dataImageWidth: "data-image-width",
+        dataImageId: "data-image-id",
+        dataImageHeight: "data-image-height",
+        dataImageGuid: "data-image-guid",
+        dataImageFileName: "data-image-filename",
+        dataImgCssWidth: "data-imgcsswidth",
+        dataImageResizeMode: "data-image-resizemode",
+        dataImageHighRes: "data-image-high-res",
+        dataImageSize: "data-image-size",
+
+        // Asset keys (don't change the letter case of these values)
+        dataImageAssetStorageProviderId: "data-image-assetstorageproviderid",
+        dataImageKey: "data-image-key",
+        dataImageIconpath: "data-image-iconpath",
+        dataImageName: "data-image-name",
+        dataImageUrl: "data-image-url"
+    } as const;
+
+    const adapters: Record<ImageComponentVersion, ImageComponentAdapter> = {
+        /*
+            Changes:
+            - Initial version that mirrors the functionality of the WebForms version.
+         */
+        "v0": {
+            version: "v0",
+
+            createComponentElement(): HTMLElement {
+                throw new Error("Cannot create image component with version 'v0'.");
+            },
+
+            migrateComponent(_emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+                // This is the base version; no migration needed.
+                return componentElement;
+            },
+
+            readLocalProps(componentElement: HTMLElement): ImageLocalProps {
+                const image = componentElement.querySelector("img");
+                const anchor = componentElement.querySelector("a");
+
+                const imageWidth = toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageWidth));
+                const imageHeight = toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageHeight));
+                const imageResizeMode = componentElement.getAttribute(attributeNames.dataImageResizeMode) ?? "";
+
+                const imageSize: ImageSizeModel =
+                    image?.getAttribute(attributeNames.dataImgCssWidth) === "full"
+                        ? { type: "responsive" }
+                        : isNullish(imageWidth) && isNullish(imageHeight) ? { type: "original" }
+                            : {
+                                type: "fixed",
+                                fixedWidthPx: imageWidth,
+                                fixedHeightPx: imageHeight,
+                                resizeMode: toResizeModeOrNull(imageResizeMode) ?? "crop"
+                            };
+
+                // Determine if image is an asset or file
+                const assetStorageProviderId = toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageAssetStorageProviderId));
+                const assetKey = componentElement.getAttribute(attributeNames.dataImageKey);
+                const assetIconpath = componentElement.getAttribute(attributeNames.dataImageIconpath);
+                const assetName = componentElement.getAttribute(attributeNames.dataImageName);
+                const assetUri = componentElement.getAttribute(attributeNames.dataImageUrl);
+                const isAsset = !isNullish(assetStorageProviderId)
+                    && !isNullish(assetKey)
+                    && !isNullish(assetIconpath)
+                    && !isNullish(assetName)
+                    && !isNullish(assetUri);
+                const fileGuid = toGuidOrNull(componentElement.getAttribute(attributeNames.dataImageGuid));
+                const fileName = componentElement.getAttribute(attributeNames.dataImageFileName);
+
+                const imageSource: ImageSourceModel =
+                    isAsset
+                        ? {
+                            type: "asset",
+                            asset: {
+                                assetStorageProviderId: assetStorageProviderId,
+                                key: assetKey,
+                                iconPath: assetIconpath,
+                                name: assetName,
+                                uri: assetUri,
+                                description: "",
+                                fileSize: 0,
+                                formattedFileSize: "",
+                                lastModifiedDateTime: "",
+                                type: 0
+                            }
+                        }
+                        : {
+                            type: "file",
+                            file: fileGuid
+                                ? {
+                                    value: fileGuid,
+                                    text: fileName
+                                }
+                                : null,
+                            isHighResolution: false // not supported in v0
+                        };
+
+                return {
+                    altText: image?.getAttribute("alt") ?? "",
+                    border: null, // not supported in v0
+                    borderRadiusPx: null, // not supported in v0
+                    horizontalAlignment: toHorizontalAlignmentOrNull(toTextAlignmentOrNull(getStylePropertyValueOrNull(componentElement.style, "text-align"))),
+                    href: anchor?.getAttribute("href") || null,
+                    imageSize,
+                    imageSource,
+                    marginPx: getStylePaddingPx(componentElement.style) // margin stored as padding
+                };
+            },
+
+            writeLocalProps(_componentElement: HTMLElement, _localProps: ImageLocalProps): void {
+                throw new Error("Cannot write local props to image component with version 'v0'.");
+            }
+        },
+
+        // TODO Implement intermediate 17.3-alpha adapter that sets the scale attribute; update v18-alpha to handle the scale appropriately, if needed.
+
+        /*
+            Changes:
+            - New image component structure for the Obsidian email editor.
+         */
+        "v18-alpha": {
+            version: "v18-alpha",
+
+            createComponentElement(emailDocument: Document): HTMLElement {
+                // Important!
+                // To ensure border-radius is applied to the border,
+                //   the .border-wrapper-for-image <table> must have `border-collapse: separate`
+                //   with `overflow: hidden` on its <td>.
+                // To remove extra space under the image,
+                //   the .padding-wrapper-for-image <table> needs `line-height: 0`
+                const componentElement = createHtmlElement(emailDocument, `
+<table class="component component-image margin-wrapper margin-wrapper-for-image"
+       data-state="component"
+       data-version="v18-alpha"
+       border="0"
+       cellpadding="0"
+       cellspacing="0"
+       width="100%"
+       role="presentation">
+    <tbody>
+        <tr>
+            <td>
+                <table class="border-wrapper border-wrapper-for-image"
+                       border="0"
+                       cellpadding="0"
+                       cellspacing="0"
+                       role="presentation"
+                       width="100%"
+                       style="border-collapse: separate !important;">
+                    <tbody>
+                        <tr>
+                            <td style="overflow: hidden;">
+                                <table class="padding-wrapper padding-wrapper-for-image"
+                                       border="0"
+                                       cellpadding="0"
+                                       cellspacing="0"
+                                       role="presentation"
+                                       width="100%">
+                                    <tbody>
+                                        <tr>
+                                            <td style="line-height: 0;">
+                                                <img alt="" src="/Assets/Images/image-placeholder.jpg" data-imgcsswidth="full" style="width: 100%; box-sizing: border-box;">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+`);
+
+                // Apply default local props before returning the element.
+                // If there are any global properties to set, prefer to set shared properties there rather than here,
+                // otherwise each component instance will have to be updated manually in the UI when global defaults change.
+                const adapter = adapters["v18.2"];
+                const defaultLocalProps: ImageLocalProps = {
+                    imageSource: {
+                        type: "file",
+                        file: null,
+                        isHighResolution: false
+                    },
+                    altText: "",
+                    href: null,
+                    imageSize: { type: "responsive" },
+                    horizontalAlignment: null,
+                    borderRadiusPx: null,
+                    border: null,
+                    marginPx: null
+                };
+                adapter.writeLocalProps(componentElement, defaultLocalProps);
+
+                return componentElement;
+            },
+
+            migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+                const adapter = adapters[getComponentVersion<ImageComponentVersion>(componentElement, componentVersions)];
+                const thisAdapter = adapters["v18-alpha"];
+
+                if (adapter === thisAdapter || compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                    // Already on this or later version.
+                    return componentElement;
+                }
+
+                const localProps = adapter.readLocalProps(componentElement);
+                const newComponentElement = thisAdapter.createComponentElement(emailDocument);
+                thisAdapter.writeLocalProps(newComponentElement, localProps);
+                componentElement.replaceWith(newComponentElement);
+
+                return newComponentElement;
+            },
+
+            readLocalProps(componentElement: HTMLElement): ImageLocalProps {
+                const imageElement = componentElement.querySelector("img") as HTMLImageElement | null;
+                const anchorElement = componentElement.querySelector("a") as HTMLAnchorElement | null;
+                const marginWrapperTd = componentElement.querySelector(".margin-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+
+                const imageSizeType = componentElement.getAttribute(attributeNames.dataImageResizeMode)
+                    ? "fixed"
+                    : getStylePropertyValueOrNull(imageElement?.style, "width") === "100%"
+                        ? "responsive"
+                        : (imageElement?.src && !imageElement.src.includes("width=") && !imageElement.src.includes("height="))
+                            ? "original"
+                            : "responsive"; // fallback to responsive if we can't determine size
+
+                const imageSize: ImageSizeModel =
+                    imageSizeType === "original" ? { type: "original" }
+                        : imageSizeType === "fixed"
+                            ? {
+                                type: "fixed",
+                                fixedWidthPx: toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageWidth)),
+                                fixedHeightPx: toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageHeight)),
+                                resizeMode: toResizeModeOrNull(componentElement.getAttribute(attributeNames.dataImageResizeMode)) ?? "crop"
+                            }
+                            : { type: "responsive" };
+
+                // Determine if image is an asset or file
+                const assetStorageProviderId = toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageAssetStorageProviderId));
+                const assetKey = componentElement.getAttribute(attributeNames.dataImageKey);
+                const assetIconpath = componentElement.getAttribute(attributeNames.dataImageIconpath);
+                const assetName = componentElement.getAttribute(attributeNames.dataImageName);
+                const assetUri = componentElement.getAttribute(attributeNames.dataImageUrl);
+                const isAsset = !isNullish(assetStorageProviderId)
+                    && !isNullish(assetKey)
+                    && !isNullish(assetIconpath)
+                    && !isNullish(assetName)
+                    && !isNullish(assetUri);
+                const fileGuid = toGuidOrNull(componentElement.getAttribute(attributeNames.dataImageGuid));
+                const fileName = componentElement.getAttribute(attributeNames.dataImageFileName);
+
+                const imageSource: ImageSourceModel =
+                    isAsset
+                        ? {
+                            type: "asset",
+                            asset: {
+                                assetStorageProviderId: assetStorageProviderId,
+                                key: assetKey,
+                                iconPath: assetIconpath,
+                                name: assetName,
+                                uri: assetUri,
+                                description: "",
+                                fileSize: 0,
+                                formattedFileSize: "",
+                                lastModifiedDateTime: "",
+                                type: 0
+                            }
+                        }
+                        : {
+                            type: "file",
+                            file: fileGuid
+                                ? {
+                                    value: fileGuid,
+                                    text: fileName
+                                }
+                                : null,
+                            isHighResolution: componentElement.getAttribute(attributeNames.dataImageHighRes) === "true"
+                        };
+
+                return {
+                    imageSource,
+                    altText: imageElement?.getAttribute("alt") ?? "",
+                    href: anchorElement?.getAttribute("href") || null,
+                    imageSize,
+                    horizontalAlignment: toHorizontalAlignmentOrNull(getStylePropertyValueOrNull(componentElement.style, "text-align")),
+                    borderRadiusPx: getStyleBorderRadiusPx(imageElement?.style),
+                    border: getStyleBorder(imageElement?.style),
+                    marginPx: getStylePaddingPx(marginWrapperTd?.style)
+                };
+            },
+
+            writeLocalProps(componentElement: HTMLElement, localProps: ImageLocalProps): void {
+                const emailDocument = componentElement.ownerDocument;
+                const imageElement = componentElement.querySelector("img") as HTMLImageElement | null;
+                let anchorElement = componentElement.querySelector("a") as HTMLAnchorElement | null;
+                const marginWrapperTd = componentElement.querySelector(".margin-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+                const borderWrapperTd = componentElement.querySelector(".border-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+                const paddingWrapperTd = componentElement.querySelector(".padding-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+
+                // imageSource
+                if (localProps.imageSource.type === "asset") {
+                    // Set asset attributes.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageAssetStorageProviderId, localProps.imageSource.asset?.assetStorageProviderId);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageKey, localProps.imageSource.asset?.key);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageIconpath, localProps.imageSource.asset?.iconPath);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageName, localProps.imageSource.asset?.name);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageUrl, localProps.imageSource.asset?.uri);
+
+                    // Clear file attributes.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageGuid, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageFileName, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageHighRes, null);
+
+                    // Set shared attributes.
+                    // Ensure imgCssWidth marker when a source exists.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImgCssWidth, localProps.imageSource.asset ? "image" : null);
+
+                    // Show the asset image or the placeholder.
+                    if (localProps.imageSource.asset?.uri) {
+                        setAttributePropertyValue(imageElement, "src", localProps.imageSource.asset.uri);
+                    }
+                    else {
+                        setAttributePropertyValue(imageElement, "src", placeholderImageSrc);
+                        setStylePropertyValue(imageElement?.style, "width", "100%");
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setAttributePropertyValue(imageElement, "width", null);
+                    }
+                }
+                else if (localProps.imageSource.type === "file") {
+                    // Clear asset attributes.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageAssetStorageProviderId, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageKey, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageIconpath, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageName, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageUrl, null);
+
+                    // Set file attributes.
+                    const fileGuid = toGuidOrNull(localProps.imageSource.file?.value);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageGuid, fileGuid);
+                    const fileName = fileGuid ? localProps.imageSource.file?.text : null;
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageFileName, fileName);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageHighRes, localProps.imageSource.isHighResolution ? "true" : null);
+
+                    // Set shared attributes.
+                    // Ensure imgCssWidth marker when a source exists.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImgCssWidth, fileGuid ? "image" : null);
+
+                    // Show the file image or the placeholder.
+                    if (fileGuid) {
+                        // Build the file image URL with parameters.
+                        const params = new URLSearchParams();
+                        params.set("isBinaryFile", "T");
+                        params.set("guid", fileGuid);
+                        params.set("fileName", fileName ?? "");
+
+                        const resolutionFactor = localProps.imageSource.isHighResolution ? 2 : 1;
+
+                        if (localProps.imageSize.type === "fixed") {
+                            if (localProps.imageSize.fixedWidthPx) {
+                                params.set("width", `${localProps.imageSize.fixedWidthPx * resolutionFactor}`);
+                            }
+
+                            if (localProps.imageSize.fixedHeightPx) {
+                                params.set("height", `${localProps.imageSize.fixedHeightPx * resolutionFactor}`);
+                            }
+
+                            params.set("mode", localProps.imageSize.resizeMode);
+                            params.set("scale", "both");
+                        }
+                        else if (localProps.imageSize.type === "responsive") {
+                            const rowSpecificBodyWidth = toNumberOrNull(componentElement.closest("[data-component-body-width='true']")?.getAttribute("width"));
+                            const bodyWidth = rowSpecificBodyWidth ?? bodyGlobalAdapter.readGlobalProps(emailDocument).widthPx ?? 0;
+
+                            if (bodyWidth) {
+                                params.set("width", `${bodyWidth * resolutionFactor}`);
+                            }
+                        }
+
+                        setAttributePropertyValue(imageElement, "src", `/GetImage.ashx?${params.toString()}`);
+                    }
+                    else {
+                        setAttributePropertyValue(imageElement, "src", placeholderImageSrc);
+                        setStylePropertyValue(imageElement?.style, "width", "100%");
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setAttributePropertyValue(imageElement, "width", null);
+                    }
+                }
+
+                // altText
+                setAttributePropertyValue(imageElement, "alt", localProps.altText);
+
+                // href - adds/removes anchor element as needed
+                if (localProps.href) {
+                    if (!anchorElement) {
+                        anchorElement = emailDocument.createElement("a");
+
+                        if (imageElement) {
+                            imageElement.replaceWith(anchorElement);
+                            anchorElement.appendChild(imageElement);
+                        }
+                    }
+
+                    anchorElement.setAttribute("href", localProps.href);
+                }
+                else if (anchorElement) {
+                    if (imageElement) {
+                        anchorElement.replaceWith(imageElement);
+                    }
+                    else {
+                        anchorElement.remove();
+                    }
+
+                    anchorElement = null;
+                }
+
+                // imageSize
+                switch (localProps.imageSize.type) {
+                    case "responsive":
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageSize, "responsive");
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageResizeMode, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageWidth, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageHeight, null);
+
+                        setStylePropertyValue(imageElement?.style, "width", "100%");
+                        setAttributePropertyValue(imageElement, "width", null);
+                        setStylePropertyValue(imageElement?.style, "height", null);
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setStylePropertyValue(imageElement?.style, "object-fit", null);
+                        break;
+                    case "original":
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageSize, "original");
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageResizeMode, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageWidth, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageHeight, null);
+
+                        setStylePropertyValue(imageElement?.style, "width", null);
+                        setAttributePropertyValue(imageElement, "width", null);
+                        setStylePropertyValue(imageElement?.style, "height", null);
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setStylePropertyValue(imageElement?.style, "object-fit", null);
+                        break;
+                    case "fixed":
+                        // Handle metadata first
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageSize, "fixed");
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageResizeMode, localProps.imageSize.resizeMode);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageWidth, localProps.imageSize.fixedWidthPx?.toString());
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageHeight, localProps.imageSize.fixedHeightPx?.toString());
+
+                        setStylePropertyValue(imageElement?.style, "width", toPixelStringValueOrNull(localProps.imageSize.fixedWidthPx));
+                        setAttributePropertyValue(imageElement, "width", localProps.imageSize.fixedWidthPx?.toString());
+                        setStylePropertyValue(imageElement?.style, "height", toPixelStringValueOrNull(localProps.imageSize.fixedHeightPx));
+                        setAttributePropertyValue(imageElement, "height", localProps.imageSize.fixedHeightPx?.toString());
+
+                        if (localProps.imageSource.type === "asset") {
+                            const resizeMode = localProps.imageSize.resizeMode;
+                            const objectFit =
+                                resizeMode === "pad" ? "contain"
+                                    : resizeMode === "stretch" ? "fill"
+                                        : "cover";
+                            setStylePropertyValue(imageElement?.style, "object-fit", objectFit);
+                        }
+                        else {
+                            setStylePropertyValue(imageElement?.style, "object-fit", null);
+                        }
+
+                        break;
+                }
+
+                // horizontalAlignment
+                setStylePropertyValue(componentElement.style, "text-align", toTextAlignmentOrNull(localProps.horizontalAlignment));
+                setAttributePropertyValue(paddingWrapperTd, "align", localProps.horizontalAlignment);
+
+                // borderRadiusPx
+                setStyleBorderRadiusPx(imageElement?.style, localProps.borderRadiusPx);
+                setStyleBorderRadiusPx(borderWrapperTd?.style, localProps.borderRadiusPx);
+
+                // border
+                setStyleBorder(imageElement?.style, localProps.border);
+
+                // marginPx
+                setStylePaddingPx(marginWrapperTd?.style, localProps.marginPx); // Set padding on the margin wrapper td
+            }
+        },
+
+        /*
+            Changes:
+            - Fixed an issue where responsive images would expand the width of columns beyond the body width.
+        */
+        "v18.2": {
+            version: "v18.2",
+
+            createComponentElement(emailDocument: Document): HTMLElement {
+                // Important!
+                // To ensure border-radius is applied to the border,
+                //   the .border-wrapper-for-image <table> must have `border-collapse: separate`
+                //   with `overflow: hidden` on its <td>.
+                // To remove extra space under the image,
+                //   the .padding-wrapper-for-image <table> needs `line-height: 0`
+                const componentElement = createHtmlElement(emailDocument, `
+<table class="component component-image margin-wrapper margin-wrapper-for-image"
+       data-state="component"
+       data-version="v18.2"
+       border="0"
+       cellpadding="0"
+       cellspacing="0"
+       role="presentation"
+       width="100%">
+    <tbody>
+        <tr>
+            <td width="100%">
+                <table class="border-wrapper border-wrapper-for-image"
+                       border="0"
+                       cellpadding="0"
+                       cellspacing="0"
+                       role="presentation"
+                       width="100%"
+                       style="border-collapse: separate !important;">
+                    <tbody>
+                        <tr>
+                            <td width="100%"
+                                style="overflow: hidden;">
+                                <table class="padding-wrapper padding-wrapper-for-image"
+                                       border="0"
+                                       cellpadding="0"
+                                       cellspacing="0"
+                                       role="presentation"
+                                       width="100%">
+                                    <tbody>
+                                        <tr>
+                                            <td width="100%"
+                                                style="line-height: 0;">
+                                                <img style="box-sizing: border-box;" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+`);
+
+                // Apply default local props before returning the element.
+                // If there are any global properties to set, prefer to set shared properties there rather than here,
+                // otherwise each component instance will have to be updated manually in the UI when global defaults change.
+                const adapter = adapters["v18.2"];
+                const defaultLocalProps: ImageLocalProps = {
+                    imageSource: {
+                        type: "file",
+                        file: null,
+                        isHighResolution: false
+                    },
+                    altText: "",
+                    href: null,
+                    imageSize: { type: "responsive" },
+                    horizontalAlignment: null,
+                    borderRadiusPx: null,
+                    border: null,
+                    marginPx: null
+                };
+                adapter.writeLocalProps(componentElement, defaultLocalProps);
+
+                return componentElement;
+            },
+
+            migrateComponent(emailDocument: Document, componentElement: HTMLElement): HTMLElement {
+                const adapter = adapters[getComponentVersion<ImageComponentVersion>(componentElement, componentVersions)];
+                const thisAdapter = adapters["v18.2"];
+
+                if (adapter === thisAdapter || compareComponentVersions(adapter.version, thisAdapter.version) >= 0) {
+                    // Already on this or later version.
+                    return componentElement;
+                }
+
+                const localProps = adapter.readLocalProps(componentElement);
+                const newComponentElement = thisAdapter.createComponentElement(emailDocument);
+                thisAdapter.writeLocalProps(newComponentElement, localProps);
+                componentElement.replaceWith(newComponentElement);
+
+                return newComponentElement;
+            },
+
+            readLocalProps(componentElement: HTMLElement): ImageLocalProps {
+                const imageElement = componentElement.querySelector("img") as HTMLImageElement | null;
+                const anchorElement = componentElement.querySelector("a") as HTMLAnchorElement | null;
+                const marginWrapperTd = componentElement.querySelector(".margin-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+
+                const imageSizeType = componentElement.getAttribute(attributeNames.dataImageResizeMode)
+                    ? "fixed"
+                    : getStylePropertyValueOrNull(imageElement?.style, "width") === "100%"
+                        ? "responsive"
+                        : (imageElement?.src && !imageElement.src.includes("width=") && !imageElement.src.includes("height="))
+                            ? "original"
+                            : "responsive"; // fallback to responsive if we can't determine size
+
+                const imageSize: ImageSizeModel =
+                    imageSizeType === "original" ? { type: "original" }
+                        : imageSizeType === "fixed"
+                            ? {
+                                type: "fixed",
+                                fixedWidthPx: toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageWidth)),
+                                fixedHeightPx: toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageHeight)),
+                                resizeMode: toResizeModeOrNull(componentElement.getAttribute(attributeNames.dataImageResizeMode)) ?? "crop"
+                            }
+                            : { type: "responsive" };
+
+                // Determine if image is an asset or file
+                const assetStorageProviderId = toNumberOrNull(componentElement.getAttribute(attributeNames.dataImageAssetStorageProviderId));
+                const assetKey = componentElement.getAttribute(attributeNames.dataImageKey);
+                const assetIconpath = componentElement.getAttribute(attributeNames.dataImageIconpath);
+                const assetName = componentElement.getAttribute(attributeNames.dataImageName);
+                const assetUri = componentElement.getAttribute(attributeNames.dataImageUrl);
+                const isAsset = !isNullish(assetStorageProviderId)
+                    && !isNullish(assetKey)
+                    && !isNullish(assetIconpath)
+                    && !isNullish(assetName)
+                    && !isNullish(assetUri);
+                const fileGuid = toGuidOrNull(componentElement.getAttribute(attributeNames.dataImageGuid));
+                const fileName = componentElement.getAttribute(attributeNames.dataImageFileName);
+
+                const imageSource: ImageSourceModel =
+                    isAsset
+                        ? {
+                            type: "asset",
+                            asset: {
+                                assetStorageProviderId: assetStorageProviderId,
+                                key: assetKey,
+                                iconPath: assetIconpath,
+                                name: assetName,
+                                uri: assetUri,
+                                description: "",
+                                fileSize: 0,
+                                formattedFileSize: "",
+                                lastModifiedDateTime: "",
+                                type: 0
+                            }
+                        }
+                        : {
+                            type: "file",
+                            file: fileGuid
+                                ? {
+                                    value: fileGuid,
+                                    text: fileName
+                                }
+                                : null,
+                            isHighResolution: componentElement.getAttribute(attributeNames.dataImageHighRes) === "true"
+                        };
+
+                return {
+                    imageSource,
+                    altText: imageElement?.getAttribute("alt") ?? "",
+                    href: anchorElement?.getAttribute("href") || null,
+                    imageSize,
+                    horizontalAlignment: toHorizontalAlignmentOrNull(getStylePropertyValueOrNull(componentElement.style, "text-align")),
+                    borderRadiusPx: getStyleBorderRadiusPx(imageElement?.style),
+                    border: getStyleBorder(imageElement?.style),
+                    marginPx: getStylePaddingPx(marginWrapperTd?.style)
+                };
+            },
+
+            writeLocalProps(componentElement: HTMLElement, localProps: ImageLocalProps): void {
+                const emailDocument = componentElement.ownerDocument;
+                const imageElement = componentElement.querySelector("img") as HTMLImageElement | null;
+                let anchorElement = componentElement.querySelector("a") as HTMLAnchorElement | null;
+                const marginWrapperTd = componentElement.querySelector(".margin-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+                const borderWrapperTd = componentElement.querySelector(".border-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+                const paddingWrapperTd = componentElement.querySelector(".padding-wrapper-for-image > tbody > tr > td") as HTMLTableCellElement | null;
+
+                // imageSource
+                if (localProps.imageSource.type === "asset") {
+                    // Set asset attributes.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageAssetStorageProviderId, localProps.imageSource.asset?.assetStorageProviderId);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageKey, localProps.imageSource.asset?.key);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageIconpath, localProps.imageSource.asset?.iconPath);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageName, localProps.imageSource.asset?.name);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageUrl, localProps.imageSource.asset?.uri);
+
+                    // Clear file attributes.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageGuid, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageFileName, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageHighRes, null);
+
+                    // Set shared attributes.
+                    // Ensure imgCssWidth marker when a source exists.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImgCssWidth, localProps.imageSource.asset ? "image" : null);
+
+                    // Show the asset image or the placeholder.
+                    if (localProps.imageSource.asset?.uri) {
+                        setAttributePropertyValue(imageElement, "src", localProps.imageSource.asset.uri);
+                    }
+                    else {
+                        setAttributePropertyValue(imageElement, "src", placeholderImageSrc);
+                        setStylePropertyValue(imageElement?.style, "width", "100%");
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setAttributePropertyValue(imageElement, "width", null);
+                    }
+                }
+                else if (localProps.imageSource.type === "file") {
+                    // Clear asset attributes.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageAssetStorageProviderId, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageKey, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageIconpath, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageName, null);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageUrl, null);
+
+                    // Set file attributes.
+                    const fileGuid = toGuidOrNull(localProps.imageSource.file?.value);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageGuid, fileGuid);
+                    const fileName = fileGuid ? localProps.imageSource.file?.text : null;
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageFileName, fileName);
+                    setAttributePropertyValue(componentElement, attributeNames.dataImageHighRes, localProps.imageSource.isHighResolution ? "true" : null);
+
+                    // Set shared attributes.
+                    // Ensure imgCssWidth marker when a source exists.
+                    setAttributePropertyValue(componentElement, attributeNames.dataImgCssWidth, fileGuid ? "image" : null);
+
+                    // Show the file image or the placeholder.
+                    if (fileGuid) {
+                        // Build the file image URL with parameters.
+                        const params = new URLSearchParams();
+                        params.set("isBinaryFile", "T");
+                        params.set("guid", fileGuid);
+                        params.set("fileName", fileName ?? "");
+
+                        const resolutionFactor = localProps.imageSource.isHighResolution ? 2 : 1;
+
+                        if (localProps.imageSize.type === "fixed") {
+                            if (localProps.imageSize.fixedWidthPx) {
+                                params.set("width", `${localProps.imageSize.fixedWidthPx * resolutionFactor}`);
+                            }
+
+                            if (localProps.imageSize.fixedHeightPx) {
+                                params.set("height", `${localProps.imageSize.fixedHeightPx * resolutionFactor}`);
+                            }
+
+                            params.set("mode", localProps.imageSize.resizeMode);
+                            params.set("scale", "both");
+                        }
+                        else if (localProps.imageSize.type === "responsive") {
+                            const rowSpecificBodyWidth = toNumberOrNull(componentElement.closest("[data-component-body-width='true']")?.getAttribute("width"));
+                            const bodyWidth = rowSpecificBodyWidth ?? bodyGlobalAdapter.readGlobalProps(emailDocument).widthPx ?? 0;
+
+                            if (bodyWidth) {
+                                params.set("width", `${bodyWidth * resolutionFactor}`);
+                            }
+                        }
+
+                        setAttributePropertyValue(imageElement, "src", `/GetImage.ashx?${params.toString()}`);
+                    }
+                    else {
+                        setAttributePropertyValue(imageElement, "src", placeholderImageSrc);
+                        setStylePropertyValue(imageElement?.style, "width", "100%");
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setAttributePropertyValue(imageElement, "width", null);
+                    }
+                }
+
+                // altText
+                setAttributePropertyValue(imageElement, "alt", localProps.altText);
+
+                // href - adds/removes anchor element as needed
+                if (localProps.href) {
+                    if (!anchorElement) {
+                        anchorElement = emailDocument.createElement("a");
+
+                        if (imageElement) {
+                            imageElement.replaceWith(anchorElement);
+                            anchorElement.appendChild(imageElement);
+                        }
+                    }
+
+                    anchorElement.setAttribute("href", localProps.href);
+                }
+                else if (anchorElement) {
+                    if (imageElement) {
+                        anchorElement.replaceWith(imageElement);
+                    }
+                    else {
+                        anchorElement.remove();
+                    }
+
+                    anchorElement = null;
+                }
+
+                // imageSize
+                switch (localProps.imageSize.type) {
+                    case "responsive":
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageSize, "responsive");
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageResizeMode, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageWidth, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageHeight, null);
+
+                        setStylePropertyValue(imageElement?.style, "width", "100%");
+                        setAttributePropertyValue(imageElement, "width", "100%");
+                        setStylePropertyValue(imageElement?.style, "height", null);
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setStylePropertyValue(imageElement?.style, "object-fit", null);
+                        break;
+                    case "original":
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageSize, "original");
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageResizeMode, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageWidth, null);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageHeight, null);
+
+                        setStylePropertyValue(imageElement?.style, "width", null);
+                        setAttributePropertyValue(imageElement, "width", null);
+                        setStylePropertyValue(imageElement?.style, "height", null);
+                        setAttributePropertyValue(imageElement, "height", null);
+                        setStylePropertyValue(imageElement?.style, "object-fit", null);
+                        break;
+                    case "fixed":
+                        // Handle metadata first
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageSize, "fixed");
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageResizeMode, localProps.imageSize.resizeMode);
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageWidth, localProps.imageSize.fixedWidthPx?.toString());
+                        setAttributePropertyValue(componentElement, attributeNames.dataImageHeight, localProps.imageSize.fixedHeightPx?.toString());
+
+                        setStylePropertyValue(imageElement?.style, "width", toPixelStringValueOrNull(localProps.imageSize.fixedWidthPx));
+                        setAttributePropertyValue(imageElement, "width", localProps.imageSize.fixedWidthPx?.toString());
+                        setStylePropertyValue(imageElement?.style, "height", toPixelStringValueOrNull(localProps.imageSize.fixedHeightPx));
+                        setAttributePropertyValue(imageElement, "height", localProps.imageSize.fixedHeightPx?.toString());
+
+                        if (localProps.imageSource.type === "asset") {
+                            const resizeMode = localProps.imageSize.resizeMode;
+                            const objectFit =
+                                resizeMode === "pad" ? "contain"
+                                    : resizeMode === "stretch" ? "fill"
+                                        : "cover";
+                            setStylePropertyValue(imageElement?.style, "object-fit", objectFit);
+                        }
+                        else {
+                            setStylePropertyValue(imageElement?.style, "object-fit", null);
+                        }
+
+                        break;
+                }
+
+                // horizontalAlignment
+                setStylePropertyValue(componentElement.style, "text-align", toTextAlignmentOrNull(localProps.horizontalAlignment));
+                setAttributePropertyValue(paddingWrapperTd, "align", localProps.horizontalAlignment);
+
+                // borderRadiusPx
+                setStyleBorderRadiusPx(imageElement?.style, localProps.borderRadiusPx);
+                setStyleBorderRadiusPx(borderWrapperTd?.style, localProps.borderRadiusPx);
+
+                // border
+                setStyleBorder(imageElement?.style, localProps.border);
+
+                // marginPx
+                setStylePaddingPx(marginWrapperTd?.style, localProps.marginPx); // Set padding on the margin wrapper td
+            }
+        }
+    };
+
+    return adapters[latestVersion];
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -4369,8 +5251,6 @@ export function getComponentHelper(componentTypeName: ComponentTypeName) {
             return getTitleComponentHelper();
         case "text":
             return getTextComponentHelper();
-        case "image":
-            return getImageComponentHelper();
         case "video":
             return getVideoComponentHelper();
         case "row":
@@ -4382,6 +5262,8 @@ export function getComponentHelper(componentTypeName: ComponentTypeName) {
         case "button":
         case "rsvp":
         case "divider":
+        case "image":
+            // These components have their own adapters created elsewhere.
             return null;
         default:
             console.error(`Unknown component type: ${componentTypeName}`);
@@ -4774,309 +5656,49 @@ export function createButtonGlobalAdapter(): ButtonGlobalAdapter {
     // so that components can handle different versions correctly.
     // Must be in the format "v{major}.{minor}-{tag}" for proper comparison.
     const globalVersions = ["v0", "v2.1-alpha", "v18.2"] as const;
-
     type GlobalVersion = typeof globalVersions[number];
+    const latestVersion: GlobalVersion = getLatestVersion(globalVersions);
 
-    const LATEST_GLOBAL_VERSION: GlobalVersion = getLatestVersion(globalVersions);
-
-    const datasetKeys = {
-        VERSION: "data-version",
-        COMPONENT_BUTTON_WIDTH: "data-component-button-width",
-        COMPONENT_BACKGROUND_COLOR: "data-component-background-color",
+    const attributeNames = {
+        DATA_VERSION: "data-version",
+        DATA_COMPONENT_BUTTON_WIDTH: "data-component-button-width",
+        DATA_COMPONENT_BACKGROUND_COLOR: "data-component-background-color",
     } as const;
 
-    const metaKeys = {
-        GLOBAL_BUTTON_VERSION: "x-global-button-version",
+    const attributeValues = {
+        META_NAME_GLOBAL_BUTTON_VERSION: "x-rock-global-button-version",
     } as const;
 
-    // These are for reading global component properties from different versions.
-    const globalPropReaders: Record<GlobalVersion, (emailDocument: Document) => ButtonGlobalProps> = {
-        "v0": (_emailDocument: Document): ButtonGlobalProps => {
-            // No global props in v0 (legacy)
-            return {
-                backgroundColor: null,
-                fontFamily: null,
-                fontSizePx: null,
-                isBold: null,
-                isUnderlined: null,
-                isItalicized: null,
-                letterCase: null,
-                lineHeight: null,
-                textColor: null,
-                border: null,
-                borderRadiusPx: null,
-                width: null,
-                marginPx: null,
-                paddingPx: null
-            };
+    const defaultGlobalProps: ButtonGlobalProps = {
+        backgroundColor: "#2196f3",
+        fontFamily: FontFamilies.Arial,
+        fontSizePx: null,
+        isBold: true,
+        isUnderlined: false,
+        isItalicized: null,
+        letterCase: null,
+        lineHeight: toNumberOrNull(LineHeights.tight.value),
+        textColor: "#FFFFFF",
+        border: {
+            style: createShorthandModel<BorderStyle>("solid"),
+            widthPx: createShorthandModel<number>(1),
+            color: createShorthandModel<string>("#2196f3")
         },
-        "v2.1-alpha": (emailDocument: Document): ButtonGlobalProps => {
-            const buttonLinkStyles = findRockStyleRules(emailDocument, ".component-button .button-link")
-                .select(rule => rule.style)
-                .toArray();
-            const marginWrapperTdStyles = findRockStyleRules(emailDocument, ".margin-wrapper-for-button>tbody>tr>td")
-                .select(rule => rule.style)
-                .toArray();
-            const paddingWrapperTdStyles = findRockStyleRules(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-button>tbody>tr>td`)
-                .select(rule => rule.style)
-                .toArray();
-            const borderWrapperTdStyles = findRockStyleRules(emailDocument, ".border-wrapper-for-button>tbody>tr>td")
-                .select(rule => rule.style)
-                .toArray();
-            const buttonShellWidthStyles = findRockStyleRules(emailDocument, `.component-button:not([data-component-button-width="true"]) .button-shell`)
-                .select(rule => rule.style)
-                .toArray();
-
-            const buttonShellWidth = getStylePropertyValueOrNull(buttonShellWidthStyles, "width");
-            const buttonShellWidthPx = toPixelNumericValueOrNull(buttonShellWidth);
-            const isFullWidth = buttonShellWidth === "100%";
-            const isFixedWidth = !isNullish(buttonShellWidthPx);
-
-            return {
-                backgroundColor: getStylePropertyValueOrNull(paddingWrapperTdStyles, "background-color"),
-                fontFamily: getStylePropertyValueOrNull(buttonLinkStyles, "font-family"),
-                fontSizePx: getStyleFontSizePx(buttonLinkStyles),
-                isBold: getStyleIsBold(buttonLinkStyles),
-                isUnderlined: getStyleIsUnderlined(buttonLinkStyles),
-                isItalicized: getStyleIsItalicized(buttonLinkStyles),
-                letterCase: getStyleLetterCase(buttonLinkStyles),
-                lineHeight: getStyleLineHeight(buttonLinkStyles),
-                textColor: getStylePropertyValueOrNull(buttonLinkStyles, "color"),
-                border: getStyleBorder(buttonLinkStyles),
-                borderRadiusPx: getStyleBorderRadiusPx(borderWrapperTdStyles),
-                width: isFullWidth
-                    ? { mode: "full", fixedWidthPx: null }
-                    : isFixedWidth
-                        ? { mode: "fixed", fixedWidthPx: buttonShellWidthPx }
-                        : { mode: "fitToText", fixedWidthPx: null },
-                marginPx: getStylePaddingPx(marginWrapperTdStyles),
-                paddingPx: getStylePaddingPx(buttonLinkStyles)
-            };
+        borderRadiusPx: createShorthandModel<number>(4),
+        width: {
+            mode: "fitToText",
+            fixedWidthPx: null
         },
-        "v18.2": (emailDocument: Document): ButtonGlobalProps => {
-            const buttonLinkStyles = findRockStyleRules(emailDocument, ".component-button .button-link")
-                .select(rule => rule.style)
-                .toArray(); // Materialize to array the elements are only queried once.
-            const buttonWidthButtonShellRuleSelector = `.component-button:not([data-component-button-width]) .button-shell`;
-            const buttonWidthButtonShellStyles = findRockStyleRules(emailDocument, buttonWidthButtonShellRuleSelector)
-                .select(rule => rule.style)
-                .toArray();
-            const buttonInnerwrapStyles = findRockStyleRules(emailDocument, ".component-button .button-innerwrap")
-                .select(rule => rule.style)
-                .toArray();
-
-            let widthMode: ButtonWidthMode | null = emailDocument.body.getAttribute(datasetKeys.COMPONENT_BUTTON_WIDTH) as (ButtonWidthMode | null) || null;
-            if (<string>widthMode === "true") {
-                // Fix issues where the attribute was set to "true" instead of a valid mode.
-                widthMode = "fitToText";
-            }
-            const fixedWidthPx = toPixelNumericValueOrNull(getStylePropertyValueOrNull(buttonWidthButtonShellStyles, "width"));
-
-            return {
-                fontFamily: getStylePropertyValueOrNull(buttonLinkStyles, "font-family"),
-                fontSizePx: getStyleFontSizePx(buttonLinkStyles),
-                isBold: getStyleIsBold(buttonLinkStyles),
-                isUnderlined: getStyleIsUnderlined(buttonLinkStyles),
-                isItalicized: getStyleIsItalicized(buttonLinkStyles),
-                letterCase: getStyleLetterCase(buttonLinkStyles),
-                lineHeight: getStyleLineHeight(buttonLinkStyles),
-                textColor: getStylePropertyValueOrNull(buttonLinkStyles, "color"),
-                backgroundColor: getStylePropertyValueOrNull(buttonLinkStyles, "background-color"),
-                borderRadiusPx: getStyleBorderRadiusPx(buttonLinkStyles),
-                width: widthMode === "fixed"
-                    ? {
-                        mode: "fixed",
-                        fixedWidthPx
-                    }
-                    : widthMode
-                        ? {
-                            mode: widthMode,
-                            fixedWidthPx: null
-                        }
-                        : null,
-                marginPx: getStylePaddingPx(buttonInnerwrapStyles), // margin is padding on the innerwrap
-                paddingPx: getStylePaddingPx(buttonLinkStyles),
-                border: getStyleBorder(buttonLinkStyles)
-            };
-        }
-    };
-
-    // These are for writing global component properties to different versions.
-    const globalPropWriters: Record<GlobalVersion, (emailDocument: Document, globalProps: ButtonGlobalProps) => void> = {
-        "v0": (_emailDocument: Document, _globalProps: ButtonGlobalProps): void => { /* No global props in v0 (legacy) */ },
-        "v2.1-alpha": (emailDocument: Document, globalProps: ButtonGlobalProps): void => {
-            const buttonLinkRule = findRockStyleRules(emailDocument, ".component-button .button-link").lastOrDefault()
-                ?? createRockStyleRule(emailDocument, ".component-button .button-link");
-            const backgroundColorRule = findRockStyleRules(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-button>tbody>tr>td`).lastOrDefault()
-                ?? createRockStyleRule(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-button>tbody>tr>td`);
-            const borderWrapperTdRule = findRockStyleRules(emailDocument, ".border-wrapper-for-button>tbody>tr>td").lastOrDefault()
-                ?? createRockStyleRule(emailDocument, ".border-wrapper-for-button>tbody>tr>td");
-            const marginWrapperTdRule = findRockStyleRules(emailDocument, ".margin-wrapper-for-button>tbody>tr>td").lastOrDefault()
-                ?? createRockStyleRule(emailDocument, ".margin-wrapper-for-button>tbody>tr>td");
-            const buttonWidthButtonShellRuleSelector = `.component-button:not([data-component-button-width="true"]) .button-shell`;
-            const buttonWidthButtonShellRule = findRockStyleRules(emailDocument, buttonWidthButtonShellRuleSelector).lastOrDefault()
-                ?? createRockStyleRule(emailDocument, buttonWidthButtonShellRuleSelector);
-            const rules = [
-                buttonLinkRule,
-                backgroundColorRule,
-                borderWrapperTdRule,
-                marginWrapperTdRule,
-                buttonWidthButtonShellRule
-            ];
-
-            setStylePropertyValue(buttonLinkRule.style, "font-family", globalProps.fontFamily);
-            setStyleFontSizePx(buttonLinkRule.style, globalProps.fontSizePx);
-            setStyleIsBold(buttonLinkRule.style, globalProps.isBold);
-            setStyleIsUnderlined(buttonLinkRule.style, globalProps.isUnderlined);
-            setStyleIsItalicized(buttonLinkRule.style, globalProps.isItalicized);
-            setStyleLetterCase(buttonLinkRule.style, globalProps.letterCase);
-            setStyleLineHeight(buttonLinkRule.style, globalProps.lineHeight);
-            setStylePropertyValue(buttonLinkRule.style, "color", globalProps.textColor);
-            setStyleBorder(borderWrapperTdRule.style, globalProps.border);
-            setStyleBorderRadiusPx(borderWrapperTdRule.style, globalProps.borderRadiusPx);
-            setStylePaddingPx(marginWrapperTdRule.style, globalProps.marginPx); // margin is padding on the margin wrapper td
-            setStylePaddingPx(buttonLinkRule.style, globalProps.paddingPx);
-
-            // background color
-            setStylePropertyValue(buttonLinkRule.style, "background-color", globalProps.backgroundColor);
-            setStylePropertyValue(backgroundColorRule.style, "background-color", globalProps.backgroundColor);
-
-            // width
-            if (globalProps.width?.mode === "full") {
-                Enumerable
-                    .from(emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector))
-                    .forEach(el => setAttributePropertyValue(el, "width", "100%"));
-
-                setStylePropertyValue(buttonWidthButtonShellRule.style, "width", "100%");
-            }
-            else if (globalProps.width?.mode === "fixed") {
-                Enumerable
-                    .from(emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector))
-                    .forEach(el => setAttributePropertyValue(el, "width", globalProps.width?.fixedWidthPx)); // No "px" in the attribute.
-
-                setStylePropertyValue(buttonWidthButtonShellRule.style, "width", toPixelStringValueOrNull(globalProps.width.fixedWidthPx));
-            }
-            else {
-                // default and "fitToText"
-                Enumerable
-                    .from(emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector))
-                    .forEach(el => setAttributePropertyValue(el, "width", null));
-
-                setStylePropertyValue(buttonWidthButtonShellRule.style, "width", null);
-            }
-
-            // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
-            synchronizeRulesToDom(rules);
-        },
-        "v18.2": (emailDocument: Document, globalProps: ButtonGlobalProps): void => {
-            // Write the version to the document body.
-            const globalVersionMeta = emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_BUTTON_VERSION}"]`) as HTMLMetaElement | null;
-            if (globalVersionMeta) {
-                globalVersionMeta.setAttribute("content", LATEST_GLOBAL_VERSION);
-            }
-            else {
-                const meta = emailDocument.createElement("meta");
-                meta.setAttribute("name", metaKeys.GLOBAL_BUTTON_VERSION);
-                meta.setAttribute("content", LATEST_GLOBAL_VERSION);
-                emailDocument.head.appendChild(meta);
-            }
-
-            const buttonLinkRule = findRockStyleRules(emailDocument, ".component-button .button-link").lastOrDefault()
-                ?? createRockStyleRule(emailDocument, ".component-button .button-link");
-            const buttonContentRule = findRockStyleRules(emailDocument, ".component-button .button-content").lastOrDefault()
-                ?? createRockStyleRule(emailDocument, ".component-button .button-content");
-            const buttonWidthButtonShellRuleSelector = `.component-button:not([data-component-button-width]) .button-shell`;
-            const buttonWidthButtonShellRule = findRockStyleRules(emailDocument, buttonWidthButtonShellRuleSelector).lastOrDefault()
-                ?? createRockStyleRule(emailDocument, buttonWidthButtonShellRuleSelector);
-            const buttonInnerwrapRule = findRockStyleRules(emailDocument, ".component-button .button-innerwrap").lastOrDefault()
-                ?? createRockStyleRule(emailDocument, ".component-button .button-innerwrap");
-            const rules = [
-                buttonLinkRule,
-                buttonContentRule,
-                buttonWidthButtonShellRule,
-                buttonInnerwrapRule
-            ];
-
-            const {
-                fontFamily,
-                fontSizePx,
-                isBold,
-                isUnderlined,
-                isItalicized,
-                letterCase,
-                lineHeight,
-                textColor,
-                backgroundColor,
-                borderRadiusPx,
-                width,
-                marginPx,
-                paddingPx,
-                border
-            } = globalProps;
-
-            // Delete old global rules from v2.1-alpha that are now inline in the buttonLinkRule.
-            setStylePropertyValue(buttonLinkRule.style, "text-align", null);
-            setStylePropertyValue(buttonLinkRule.style, "letter-spacing", null);
-
-            setStylePropertyValue(buttonLinkRule.style, "font-family", fontFamily);
-            setStyleFontSizePx(buttonLinkRule.style, fontSizePx);
-            setStyleIsBold(buttonLinkRule.style, isBold);
-            setStyleIsUnderlined(buttonLinkRule.style, isUnderlined);
-            setStyleIsItalicized(buttonLinkRule.style, isItalicized);
-            setStyleLetterCase(buttonLinkRule.style, letterCase);
-            setStyleLineHeight(buttonLinkRule.style, lineHeight);
-            setStylePropertyValue(buttonLinkRule.style, "color", textColor);
-            setStylePaddingPx(buttonLinkRule.style, paddingPx);
-            setStylePaddingPx(buttonInnerwrapRule.style, marginPx); // margin (padding on innerwrap)
-            setStyleBorder(buttonLinkRule.style, border);
-
-            // background color
-            // Clean up any old DATA_COMPONENT_BACKGROUND_COLOR attributes first.
-            emailDocument.querySelectorAll(`.component-button[${datasetKeys.COMPONENT_BACKGROUND_COLOR}]`)
-                .forEach(el => {
-                    setAttributePropertyValue(el, datasetKeys.COMPONENT_BACKGROUND_COLOR, null);
-                });
-            setStylePropertyValue(buttonLinkRule.style, "background-color", backgroundColor);
-            setStylePropertyValue(buttonContentRule.style, "background-color", backgroundColor);
-
-            // border radius
-            setStyleBorderRadiusPx(buttonLinkRule.style, borderRadiusPx);
-            setStyleBorderRadiusPx(buttonContentRule.style, borderRadiusPx);
-
-            // width
-            // Set data attribute to indicate whether global button width is used.
-            setAttributePropertyValue(emailDocument.body, datasetKeys.COMPONENT_BUTTON_WIDTH, width?.mode);
-            if (width?.mode === "full") {
-                emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector).forEach(buttonShell => {
-                    setAttributePropertyValue(buttonShell, "width", "100%");
-                });
-                setStylePropertyValue(buttonWidthButtonShellRule.style, "width", "100%");
-            }
-            else if (width?.mode === "fixed") {
-                emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector).forEach(buttonShell => {
-                    setAttributePropertyValue(buttonShell, "width", width.fixedWidthPx); // No "px" in the attribute.
-                });
-                setStylePropertyValue(buttonWidthButtonShellRule.style, "width", toPixelStringValueOrNull(width.fixedWidthPx));
-            }
-            else {
-                // default and "fitToText"
-                emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector).forEach(buttonShell => {
-                    setAttributePropertyValue(buttonShell, "width", null);
-                });
-                setStylePropertyValue(buttonWidthButtonShellRule.style, "width", null);
-            }
-
-            // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
-            synchronizeRulesToDom(rules);
-        }
+        marginPx: null,
+        paddingPx: createShorthandModel<number>(15)
     };
 
     function getGlobalVersion(emailDocument: Document): GlobalVersion {
         // v18.2 and later use the meta tag to track global button schema version.
-        const globalPropsVersion: GlobalVersion | undefined = (emailDocument.head.querySelector(`meta[name="${metaKeys.GLOBAL_BUTTON_VERSION}"]`)?.getAttribute("content") || undefined) as (GlobalVersion | undefined);
+        const globalVersion = getMetaTag(emailDocument, attributeValues.META_NAME_GLOBAL_BUTTON_VERSION)?.getAttribute("content");
 
-        if (globalPropsVersion) {
-            return globalPropsVersion;
+        if (globalVersion && globalVersions.includes(globalVersion as GlobalVersion)) {
+            return globalVersion as GlobalVersion;
         }
 
         // Try to infer from structure.
@@ -5094,23 +5716,311 @@ export function createButtonGlobalAdapter(): ButtonGlobalAdapter {
         return "v0";
     }
 
-    const adapter: ButtonGlobalAdapter = {
-        version: LATEST_GLOBAL_VERSION,
+    // Don't modify a specific version once released.
+    // Instead, add new versions using semver.
+    // The major and minor versions should align with the current Rock version.
+    // If necessary, you can add patch versions for fixes within the same release.
+    // Avoid defining pre-release versions (like "v17.3-alpha") unless absolutely necessary.
+    const adapters: Record<GlobalVersion, GlobalAdapterSnapshot<ButtonGlobalProps>> = {
+        "v0": {
+            version: "v0",
 
-        readGlobalProps(emailDocument: Document): ButtonGlobalProps {
-            // This assumes the emailDocument is already migrated to latest global DOM structure.
-            return globalPropReaders[LATEST_GLOBAL_VERSION](emailDocument);
+            readGlobalProps(_emailDocument: Document): ButtonGlobalProps {
+                // No global props in v0 (legacy)
+                return {
+                    backgroundColor: null,
+                    fontFamily: null,
+                    fontSizePx: null,
+                    isBold: null,
+                    isUnderlined: null,
+                    isItalicized: null,
+                    letterCase: null,
+                    lineHeight: null,
+                    textColor: null,
+                    border: null,
+                    borderRadiusPx: null,
+                    width: null,
+                    marginPx: null,
+                    paddingPx: null
+                };
+            },
+
+            writeGlobalProps(_emailDocument: Document, _globalProps: ButtonGlobalProps): void {
+                // No global props in v0 (legacy)
+            }
         },
 
-        writeGlobalProps(emailDocument: Document, props: ButtonGlobalProps): void {
-            // This assumes the emailDocument is already migrated to latest global DOM structure.
-            globalPropWriters[LATEST_GLOBAL_VERSION](emailDocument, props);
+        "v2.1-alpha": {
+            version: "v2.1-alpha",
+
+            readGlobalProps(emailDocument: Document): ButtonGlobalProps {
+                const buttonLinkStyles = findRockStyleRules(emailDocument, ".component-button .button-link")
+                    .select(rule => rule.style)
+                    .toArray();
+                const marginWrapperTdStyles = findRockStyleRules(emailDocument, ".margin-wrapper-for-button>tbody>tr>td")
+                    .select(rule => rule.style)
+                    .toArray();
+                const paddingWrapperTdStyles = findRockStyleRules(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-button>tbody>tr>td`)
+                    .select(rule => rule.style)
+                    .toArray();
+                const borderWrapperTdStyles = findRockStyleRules(emailDocument, ".border-wrapper-for-button>tbody>tr>td")
+                    .select(rule => rule.style)
+                    .toArray();
+                const buttonShellWidthStyles = findRockStyleRules(emailDocument, `.component-button:not([data-component-button-width="true"]) .button-shell`)
+                    .select(rule => rule.style)
+                    .toArray();
+
+                const buttonShellWidth = getStylePropertyValueOrNull(buttonShellWidthStyles, "width");
+                const buttonShellWidthPx = toPixelNumericValueOrNull(buttonShellWidth);
+                const isFullWidth = buttonShellWidth === "100%";
+                const isFixedWidth = !isNullish(buttonShellWidthPx);
+
+                return {
+                    backgroundColor: getStylePropertyValueOrNull(paddingWrapperTdStyles, "background-color"),
+                    fontFamily: getStylePropertyValueOrNull(buttonLinkStyles, "font-family"),
+                    fontSizePx: getStyleFontSizePx(buttonLinkStyles),
+                    isBold: getStyleIsBold(buttonLinkStyles),
+                    isUnderlined: getStyleIsUnderlined(buttonLinkStyles),
+                    isItalicized: getStyleIsItalicized(buttonLinkStyles),
+                    letterCase: getStyleLetterCase(buttonLinkStyles),
+                    lineHeight: getStyleLineHeight(buttonLinkStyles),
+                    textColor: getStylePropertyValueOrNull(buttonLinkStyles, "color"),
+                    border: getStyleBorder(buttonLinkStyles),
+                    borderRadiusPx: getStyleBorderRadiusPx(borderWrapperTdStyles),
+                    width: isFullWidth
+                        ? { mode: "full", fixedWidthPx: null }
+                        : isFixedWidth
+                            ? { mode: "fixed", fixedWidthPx: buttonShellWidthPx }
+                            : { mode: "fitToText", fixedWidthPx: null },
+                    marginPx: getStylePaddingPx(marginWrapperTdStyles),
+                    paddingPx: getStylePaddingPx(buttonLinkStyles)
+                };
+            },
+
+            writeGlobalProps(emailDocument: Document, globalProps: ButtonGlobalProps): void {
+                const buttonLinkRule = findRockStyleRules(emailDocument, ".component-button .button-link").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".component-button .button-link");
+                const backgroundColorRule = findRockStyleRules(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-button>tbody>tr>td`).lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, `.component:not([data-component-background-color="true"]) .padding-wrapper-for-button>tbody>tr>td`);
+                const borderWrapperTdRule = findRockStyleRules(emailDocument, ".border-wrapper-for-button>tbody>tr>td").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".border-wrapper-for-button>tbody>tr>td");
+                const marginWrapperTdRule = findRockStyleRules(emailDocument, ".margin-wrapper-for-button>tbody>tr>td").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".margin-wrapper-for-button>tbody>tr>td");
+                const buttonWidthButtonShellRuleSelector = `.component-button:not([data-component-button-width="true"]) .button-shell`;
+                const buttonWidthButtonShellRule = findRockStyleRules(emailDocument, buttonWidthButtonShellRuleSelector).lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, buttonWidthButtonShellRuleSelector);
+                const rules = [
+                    buttonLinkRule,
+                    backgroundColorRule,
+                    borderWrapperTdRule,
+                    marginWrapperTdRule,
+                    buttonWidthButtonShellRule
+                ];
+
+                setStylePropertyValue(buttonLinkRule.style, "font-family", globalProps.fontFamily);
+                setStyleFontSizePx(buttonLinkRule.style, globalProps.fontSizePx);
+                setStyleIsBold(buttonLinkRule.style, globalProps.isBold);
+                setStyleIsUnderlined(buttonLinkRule.style, globalProps.isUnderlined);
+                setStyleIsItalicized(buttonLinkRule.style, globalProps.isItalicized);
+                setStyleLetterCase(buttonLinkRule.style, globalProps.letterCase);
+                setStyleLineHeight(buttonLinkRule.style, globalProps.lineHeight);
+                setStylePropertyValue(buttonLinkRule.style, "color", globalProps.textColor);
+                setStyleBorder(borderWrapperTdRule.style, globalProps.border);
+                setStyleBorderRadiusPx(borderWrapperTdRule.style, globalProps.borderRadiusPx);
+                setStylePaddingPx(marginWrapperTdRule.style, globalProps.marginPx); // margin is padding on the margin wrapper td
+                setStylePaddingPx(buttonLinkRule.style, globalProps.paddingPx);
+
+                // background color
+                setStylePropertyValue(buttonLinkRule.style, "background-color", globalProps.backgroundColor);
+                setStylePropertyValue(backgroundColorRule.style, "background-color", globalProps.backgroundColor);
+
+                // width
+                if (globalProps.width?.mode === "full") {
+                    Enumerable
+                        .from(emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector))
+                        .forEach(el => setAttributePropertyValue(el, "width", "100%"));
+
+                    setStylePropertyValue(buttonWidthButtonShellRule.style, "width", "100%");
+                }
+                else if (globalProps.width?.mode === "fixed") {
+                    Enumerable
+                        .from(emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector))
+                        .forEach(el => setAttributePropertyValue(el, "width", globalProps.width?.fixedWidthPx)); // No "px" in the attribute.
+
+                    setStylePropertyValue(buttonWidthButtonShellRule.style, "width", toPixelStringValueOrNull(globalProps.width.fixedWidthPx));
+                }
+                else {
+                    // default and "fitToText"
+                    Enumerable
+                        .from(emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector))
+                        .forEach(el => setAttributePropertyValue(el, "width", null));
+
+                    setStylePropertyValue(buttonWidthButtonShellRule.style, "width", null);
+                }
+
+                // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
+                synchronizeRulesToDom(rules);
+            }
+        },
+
+        "v18.2": {
+            version: "v18.2",
+
+            readGlobalProps(emailDocument: Document): ButtonGlobalProps {
+                const buttonLinkStyles = findRockStyleRules(emailDocument, ".component-button .button-link")
+                    .select(rule => rule.style)
+                    .toArray(); // Materialize to array the elements are only queried once.
+                const buttonWidthButtonShellRuleSelector = `.component-button:not([data-component-button-width]) .button-shell`;
+                const buttonWidthButtonShellStyles = findRockStyleRules(emailDocument, buttonWidthButtonShellRuleSelector)
+                    .select(rule => rule.style)
+                    .toArray();
+                const buttonInnerwrapStyles = findRockStyleRules(emailDocument, ".component-button .button-innerwrap")
+                    .select(rule => rule.style)
+                    .toArray();
+
+                let widthMode: ButtonWidthMode | null = emailDocument.body.getAttribute(attributeNames.DATA_COMPONENT_BUTTON_WIDTH) as (ButtonWidthMode | null) || null;
+                if (<string>widthMode === "true") {
+                    // Fix issues where the attribute was set to "true" instead of a valid mode.
+                    widthMode = "fitToText";
+                }
+                const fixedWidthPx = toPixelNumericValueOrNull(getStylePropertyValueOrNull(buttonWidthButtonShellStyles, "width"));
+
+                return {
+                    fontFamily: getStylePropertyValueOrNull(buttonLinkStyles, "font-family"),
+                    fontSizePx: getStyleFontSizePx(buttonLinkStyles),
+                    isBold: getStyleIsBold(buttonLinkStyles),
+                    isUnderlined: getStyleIsUnderlined(buttonLinkStyles),
+                    isItalicized: getStyleIsItalicized(buttonLinkStyles),
+                    letterCase: getStyleLetterCase(buttonLinkStyles),
+                    lineHeight: getStyleLineHeight(buttonLinkStyles),
+                    textColor: getStylePropertyValueOrNull(buttonLinkStyles, "color"),
+                    backgroundColor: getStylePropertyValueOrNull(buttonLinkStyles, "background-color"),
+                    borderRadiusPx: getStyleBorderRadiusPx(buttonLinkStyles),
+                    width: widthMode === "fixed"
+                        ? {
+                            mode: "fixed",
+                            fixedWidthPx
+                        }
+                        : widthMode
+                            ? {
+                                mode: widthMode,
+                                fixedWidthPx: null
+                            }
+                            : null,
+                    marginPx: getStylePaddingPx(buttonInnerwrapStyles), // margin is padding on the innerwrap
+                    paddingPx: getStylePaddingPx(buttonLinkStyles),
+                    border: getStyleBorder(buttonLinkStyles)
+                };
+            },
+
+            writeGlobalProps(emailDocument: Document, globalProps: ButtonGlobalProps): void {
+                // Write the version to the document body.
+                addOrUpdateMetaTag(emailDocument, attributeValues.META_NAME_GLOBAL_BUTTON_VERSION, "v18.2");
+
+                const buttonLinkRule = findRockStyleRules(emailDocument, ".component-button .button-link").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".component-button .button-link");
+                const buttonContentRule = findRockStyleRules(emailDocument, ".component-button .button-content").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".component-button .button-content");
+                const buttonWidthButtonShellRuleSelector = `.component-button:not([data-component-button-width]) .button-shell`;
+                const buttonWidthButtonShellRule = findRockStyleRules(emailDocument, buttonWidthButtonShellRuleSelector).lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, buttonWidthButtonShellRuleSelector);
+                const buttonInnerwrapRule = findRockStyleRules(emailDocument, ".component-button .button-innerwrap").lastOrDefault()
+                    ?? createRockStyleRule(emailDocument, ".component-button .button-innerwrap");
+                const rules = [
+                    buttonLinkRule,
+                    buttonContentRule,
+                    buttonWidthButtonShellRule,
+                    buttonInnerwrapRule
+                ];
+
+                const {
+                    fontFamily,
+                    fontSizePx,
+                    isBold,
+                    isUnderlined,
+                    isItalicized,
+                    letterCase,
+                    lineHeight,
+                    textColor,
+                    backgroundColor,
+                    borderRadiusPx,
+                    width,
+                    marginPx,
+                    paddingPx,
+                    border
+                } = globalProps;
+
+                // Delete old global rules from v2.1-alpha that are now inline in the buttonLinkRule.
+                setStylePropertyValue(buttonLinkRule.style, "text-align", null);
+                setStylePropertyValue(buttonLinkRule.style, "letter-spacing", null);
+
+                setStylePropertyValue(buttonLinkRule.style, "font-family", fontFamily);
+                setStyleFontSizePx(buttonLinkRule.style, fontSizePx);
+                setStyleIsBold(buttonLinkRule.style, isBold);
+                setStyleIsUnderlined(buttonLinkRule.style, isUnderlined);
+                setStyleIsItalicized(buttonLinkRule.style, isItalicized);
+                setStyleLetterCase(buttonLinkRule.style, letterCase);
+                setStyleLineHeight(buttonLinkRule.style, lineHeight);
+                setStylePropertyValue(buttonLinkRule.style, "color", textColor);
+                setStylePaddingPx(buttonLinkRule.style, paddingPx);
+                setStylePaddingPx(buttonInnerwrapRule.style, marginPx); // margin (padding on innerwrap)
+                setStyleBorder(buttonLinkRule.style, border);
+
+                // background color
+                // Clean up any old DATA_COMPONENT_BACKGROUND_COLOR attributes first.
+                emailDocument.querySelectorAll(`.component-button[${attributeNames.DATA_COMPONENT_BACKGROUND_COLOR}]`)
+                    .forEach(el => {
+                        setAttributePropertyValue(el, attributeNames.DATA_COMPONENT_BACKGROUND_COLOR, null);
+                    });
+                setStylePropertyValue(buttonLinkRule.style, "background-color", backgroundColor);
+                setStylePropertyValue(buttonContentRule.style, "background-color", backgroundColor);
+
+                // border radius
+                setStyleBorderRadiusPx(buttonLinkRule.style, borderRadiusPx);
+                setStyleBorderRadiusPx(buttonContentRule.style, borderRadiusPx);
+
+                // width
+                // Set data attribute to indicate whether global button width is used.
+                setAttributePropertyValue(emailDocument.body, attributeNames.DATA_COMPONENT_BUTTON_WIDTH, width?.mode);
+                if (width?.mode === "full") {
+                    emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector).forEach(buttonShell => {
+                        setAttributePropertyValue(buttonShell, "width", "100%");
+                    });
+                    setStylePropertyValue(buttonWidthButtonShellRule.style, "width", "100%");
+                }
+                else if (width?.mode === "fixed") {
+                    emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector).forEach(buttonShell => {
+                        setAttributePropertyValue(buttonShell, "width", width.fixedWidthPx); // No "px" in the attribute.
+                    });
+                    setStylePropertyValue(buttonWidthButtonShellRule.style, "width", toPixelStringValueOrNull(width.fixedWidthPx));
+                }
+                else {
+                    // default and "fitToText"
+                    emailDocument.querySelectorAll(buttonWidthButtonShellRuleSelector).forEach(buttonShell => {
+                        setAttributePropertyValue(buttonShell, "width", null);
+                    });
+                    setStylePropertyValue(buttonWidthButtonShellRule.style, "width", null);
+                }
+
+                // All the above work only updates the in-memory document; now synchronize the sheet to the DOM.
+                synchronizeRulesToDom(rules);
+            }
+        }
+    };
+
+    const latestAdapter = adapters[latestVersion];
+
+    return {
+        ...latestAdapter,
+
+        areGlobalDefaultsNeeded(emailDocument: Document): boolean {
+            return compareComponentVersions(getGlobalVersion(emailDocument), "v0") === 0;
         },
 
         migrateGlobalProps(emailDocument: Document): void {
-            const globalPropsVersion = getGlobalVersion(emailDocument);
+            const adapter = adapters[getGlobalVersion(emailDocument)];
 
-            if (compareComponentVersions(globalPropsVersion, LATEST_GLOBAL_VERSION) >= 0) {
+            if (adapter === latestAdapter || compareComponentVersions(adapter.version, latestAdapter.version) >= 0) {
                 // Already latest version; no migration needed.
                 return;
             }
@@ -5119,17 +6029,9 @@ export function createButtonGlobalAdapter(): ButtonGlobalAdapter {
             // 1. Read global props using the old version reader.
             // 2. Write null props using the old version writer to clear old styles.
             // 3. Write the previously read props using the latest version writer.
-            const readOldGlobalProps = globalPropReaders[globalPropsVersion];
-            const writeOldGlobalProps = globalPropWriters[globalPropsVersion];
-            const writeLatestGlobalProps = globalPropWriters[LATEST_GLOBAL_VERSION];
 
-            if (!readOldGlobalProps || !writeOldGlobalProps || !writeLatestGlobalProps) {
-                console.warn(`Button global props migration: unknown version "${globalPropsVersion}".`);
-                return;
-            }
-
-            const globalProps = readOldGlobalProps(emailDocument);
-            writeOldGlobalProps(emailDocument, {
+            const globalProps = adapter.readGlobalProps(emailDocument);
+            adapter.writeGlobalProps(emailDocument, {
                 backgroundColor: null,
                 fontFamily: null,
                 fontSizePx: null,
@@ -5145,41 +6047,13 @@ export function createButtonGlobalAdapter(): ButtonGlobalAdapter {
                 marginPx: null,
                 paddingPx: null
             });
-            writeLatestGlobalProps(emailDocument, globalProps);
+            latestAdapter.writeGlobalProps(emailDocument, globalProps);
         },
 
         getDefaultGlobalProps(): ButtonGlobalProps {
-            return {
-                backgroundColor: "#2196f3",
-                fontFamily: FontFamilies.Arial,
-                fontSizePx: null,
-                isBold: true,
-                isUnderlined: false,
-                isItalicized: null,
-                letterCase: null,
-                lineHeight: toNumberOrNull(LineHeights.tight.value),
-                textColor: "#FFFFFF",
-                border: {
-                    style: createShorthandModel<BorderStyle>("solid"),
-                    widthPx: createShorthandModel<number>(1),
-                    color: createShorthandModel<string>("#2196f3")
-                },
-                borderRadiusPx: createShorthandModel<number>(4),
-                width: {
-                    mode: "fitToText",
-                    fixedWidthPx: null
-                },
-                marginPx: null,
-                paddingPx: createShorthandModel<number>(15)
-            };
-        },
-
-        areGlobalDefaultsNeeded(emailDocument: Document): boolean {
-            return getGlobalVersion(emailDocument) === "v0";
+            return defaultGlobalProps;
         }
     };
-
-    return adapter;
 }
 
 /**
@@ -5250,6 +6124,24 @@ function toPercentageStringValueOrNull(percentage: number | null | undefined): s
     return `${percentage}%`;
 }
 
+function toResizeModeOrNull(resizeMode: string | null | undefined): ResizeMode | null {
+    if (!resizeMode) {
+        return null;
+    }
+
+    resizeMode = resizeMode.trim().toLowerCase();
+    switch (resizeMode) {
+        case "crop":
+            return "crop";
+        case "pad":
+            return "pad";
+        case "stretch":
+            return "stretch";
+        default:
+            return null;
+    }
+}
+
 /**
  * Converts a CSS border style (e.g., "solid", "dashed", etc.) string to a BorderStyle or null if invalid.
  *
@@ -5281,6 +6173,21 @@ function toHorizontalAlignmentOrNull(align: string | null | undefined): Horizont
     return alignValue === "left" || alignValue === "center" || alignValue === "right"
         ? (alignValue as HorizontalAlignment)
         : null;
+}
+
+function toTextAlignmentOrNull(horizontalAlignment: HorizontalAlignment | string | null | undefined): TextAlignment | null {
+    switch (horizontalAlignment?.trim().toLowerCase()) {
+        case "left":
+            return "left";
+        case "center":
+            return "center";
+        case "right":
+            return "right";
+        case "justify":
+            return "justify";
+        default:
+            return null;
+    }
 }
 
 function isEnumerable<T>(obj: unknown): obj is Enumerable<T> {
@@ -5811,6 +6718,43 @@ function findRockStyleRules(doc: Document, rulesetSelector: string): Enumerable<
 }
 
 /**
+ * Finds rock style CSS rules matching the specified ruleset selector within the document.
+ *
+ * This looks for `<style class="rock-styles">` elements within the `<body>` of the document
+ *
+ * @param emailDocument The document in which to find the rock style rules.
+ * @returns An enumerable of matching CSSStyleRule objects.
+ */
+function findRockMediaStyleSheets(emailDocument: Document): Enumerable<CSSStyleSheet> {
+    const docWindow = emailDocument.defaultView;
+
+    if (!docWindow) {
+        return Enumerable.empty<CSSStyleSheet>();
+    }
+
+    return Enumerable
+        .from(emailDocument.head.querySelectorAll(`style.rock-media-styles`))
+        .ofType((el): el is HTMLStyleElement => el instanceof docWindow.HTMLStyleElement)
+        .select(el => el.sheet)
+        .ofType((sheet): sheet is CSSStyleSheet => sheet instanceof docWindow.CSSStyleSheet);
+}
+
+function createRockMediaStyleSheet(emailDocument: Document): CSSStyleSheet {
+    const emailDocWindow = emailDocument.defaultView;
+    if (!emailDocWindow) {
+        throw new Error("Document has no defaultView.");
+    }
+
+    // Create the <style class="rock-media-styles"> element within <body>.
+    const styleEl = emailDocument.createElement("style");
+    styleEl.className = "rock-media-styles";
+    emailDocument.head.append(styleEl);
+
+    // This should not be `null` now that the style element is in the DOM.
+    return styleEl.sheet as CSSStyleSheet;
+}
+
+/**
  * Creates a new rock style CSS rule for the specified ruleset selector within the document.
  *
  * This creates (or reuses) a `<style class="rock-styles">` element within the `<body>` of the document
@@ -5881,7 +6825,7 @@ function synchronizeSheetToDom(sheet: CSSStyleSheet | null | undefined): void {
     }
 }
 
-function synchronizeRulesToDom(rules: Iterable<CSSStyleRule>): void {
+function synchronizeRulesToDom(rules: Iterable<CSSRule>): void {
     if (!rules) {
         return;
     }
