@@ -104,11 +104,33 @@
           color: var(--color-interface-stronger);
         }
       }
+
+      .btn-panel-action:last-child,
+      .panel-secondary-actions:last-child .btn-panel-action,
+      .quick-filter:last-child,
+      .quick-filter:last-child .btn-panel-action {
+        border-top-right-radius: var(--rounded-xsmall);
+      }
+
+      .quick-filter:last-child.quick-filter-active {
+        border-top-right-radius: 0;
+
+        .btn-panel-action.active {
+          border-top-right-radius: 0;
+        }
+
+        .quick-filter-open,
+        .quick-filter-open * {
+          border-top-right-radius: var(--rounded-xsmall);
+        }
+      }
+
       // If the panel's quick filter has an immediate sibling to the right that's NOT a .btn-panel-action, add a right margin.
-      .quick-filter:has(+ *):not(:has(+ .btn-panel-action)),
+      /*.quick-filter:has(+ *):not(:has(+ .btn-panel-action)),
       .quick-filter:has(+ *):not(:has(+ .panel-secondary-actions)) {
         margin-right: var(--spacing-medium);
-      }
+      }*/
+
       // Hide the action buttons on small screens
       @media screen and (max-width: @screen-sm-max) {
         .panel-action-zoom,

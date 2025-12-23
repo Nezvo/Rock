@@ -27,6 +27,14 @@
 
 // ======================= END PANEL TITLE ======================
 
+// ======================= PANEL HEADER ACTION BUTTONS =======================
+
+// Make sure the last action button in the panel header has rounded corners on the top-right.
+
+
+
+// ====================== END PANEL ACTION BUTTONS ======================
+
 // ===================== OBSIDIAN PANELS (PANEL FLEX) =====================
 
 // Styles created for new Obsidian panels. Not used by webforms-based panels.
@@ -140,9 +148,27 @@
           background-color: var(--color-interface-soft);
           color:            var(--color-interface-stronger);
         }
-
       }
 
+      .btn-panel-action:last-child,
+      .panel-secondary-actions:last-child .btn-panel-action,
+      .quick-filter:last-child,
+      .quick-filter:last-child .btn-panel-action {
+        border-top-right-radius: var(--rounded-small);
+      }
+
+      .quick-filter:last-child.quick-filter-active {
+        border-top-right-radius: 0;
+
+        .btn-panel-action.active {
+          border-top-right-radius: 0;
+        }
+
+        .quick-filter-open,
+        .quick-filter-open * {
+          border-top-right-radius: var(--rounded-small);
+        }
+      }
       // If the panel's quick filter has an immediate sibling to the right that's NOT a .btn-panel-action, add a right margin.
       /*.quick-filter:has(+ *):not(:has(+ .btn-panel-action)),
       .quick-filter:has(+ *):not(:has(+ .panel-secondary-actions)) {
