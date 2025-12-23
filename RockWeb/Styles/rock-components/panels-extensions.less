@@ -173,6 +173,27 @@
   }
 }
 
+.panel.panel-flex.panel-fullscreen {
+  .panel-header .panel-header-actions {
+    .btn-panel-action:last-child,
+    .panel-secondary-actions:last-child .btn-panel-action,
+    .quick-filter:last-child,
+    .quick-filter:last-child .btn-panel-action {
+      border-top-right-radius: 0;
+    }
+
+    .quick-filter:last-child.quick-filter-active {
+      border-top-right-radius: 0;
+
+      .btn-panel-action.active,
+      .quick-filter-open,
+      .quick-filter-open * {
+        border-top-right-radius: 0;
+      }
+    }
+  }
+}
+
 
 .panel.panel-flex .panel-flex-fill-body {
   position: absolute;
